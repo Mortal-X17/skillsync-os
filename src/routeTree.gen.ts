@@ -18,6 +18,8 @@ import { Route as LearnRouteImport } from './routes/learn'
 import { Route as HabitsRouteImport } from './routes/habits'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as HabitsIndexRouteImport } from './routes/habits.index'
 import { Route as LearnRoadmapIdRouteImport } from './routes/learn.$roadmapId'
 import { Route as HabitsHabitIdRouteImport } from './routes/habits.$habitId'
 import { Route as LearnRoadmapIdTopicIdRouteImport } from './routes/learn.$roadmapId_.$topicId'
@@ -67,6 +69,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnIndexRoute = LearnIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LearnRoute,
+} as any)
+const HabitsIndexRoute = HabitsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HabitsRoute,
+} as any)
 const LearnRoadmapIdRoute = LearnRoadmapIdRouteImport.update({
   id: '/$roadmapId',
   path: '/$roadmapId',
@@ -95,13 +107,13 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
+  '/habits/': typeof HabitsIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/learn/$roadmapId/$topicId': typeof LearnRoadmapIdTopicIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
-  '/habits': typeof HabitsRouteWithChildren
-  '/learn': typeof LearnRouteWithChildren
   '/notes': typeof NotesRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRoute
@@ -109,6 +121,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
+  '/habits': typeof HabitsIndexRoute
+  '/learn': typeof LearnIndexRoute
   '/learn/$roadmapId/$topicId': typeof LearnRoadmapIdTopicIdRoute
 }
 export interface FileRoutesById {
@@ -124,6 +138,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
+  '/habits/': typeof HabitsIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/learn/$roadmapId_/$topicId': typeof LearnRoadmapIdTopicIdRoute
 }
 export interface FileRouteTypes {
@@ -140,13 +156,13 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/habits/$habitId'
     | '/learn/$roadmapId'
+    | '/habits/'
+    | '/learn/'
     | '/learn/$roadmapId/$topicId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/analytics'
-    | '/habits'
-    | '/learn'
     | '/notes'
     | '/planner'
     | '/profile'
@@ -154,6 +170,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/habits/$habitId'
     | '/learn/$roadmapId'
+    | '/habits'
+    | '/learn'
     | '/learn/$roadmapId/$topicId'
   id:
     | '__root__'
@@ -168,6 +186,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/habits/$habitId'
     | '/learn/$roadmapId'
+    | '/habits/'
+    | '/learn/'
     | '/learn/$roadmapId_/$topicId'
   fileRoutesById: FileRoutesById
 }
@@ -248,6 +268,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learn/': {
+      id: '/learn/'
+      path: '/'
+      fullPath: '/learn/'
+      preLoaderRoute: typeof LearnIndexRouteImport
+      parentRoute: typeof LearnRoute
+    }
+    '/habits/': {
+      id: '/habits/'
+      path: '/'
+      fullPath: '/habits/'
+      preLoaderRoute: typeof HabitsIndexRouteImport
+      parentRoute: typeof HabitsRoute
+    }
     '/learn/$roadmapId': {
       id: '/learn/$roadmapId'
       path: '/$roadmapId'
@@ -274,10 +308,12 @@ declare module '@tanstack/react-router' {
 
 interface HabitsRouteChildren {
   HabitsHabitIdRoute: typeof HabitsHabitIdRoute
+  HabitsIndexRoute: typeof HabitsIndexRoute
 }
 
 const HabitsRouteChildren: HabitsRouteChildren = {
   HabitsHabitIdRoute: HabitsHabitIdRoute,
+  HabitsIndexRoute: HabitsIndexRoute,
 }
 
 const HabitsRouteWithChildren =
@@ -285,11 +321,13 @@ const HabitsRouteWithChildren =
 
 interface LearnRouteChildren {
   LearnRoadmapIdRoute: typeof LearnRoadmapIdRoute
+  LearnIndexRoute: typeof LearnIndexRoute
   LearnRoadmapIdTopicIdRoute: typeof LearnRoadmapIdTopicIdRoute
 }
 
 const LearnRouteChildren: LearnRouteChildren = {
   LearnRoadmapIdRoute: LearnRoadmapIdRoute,
+  LearnIndexRoute: LearnIndexRoute,
   LearnRoadmapIdTopicIdRoute: LearnRoadmapIdTopicIdRoute,
 }
 

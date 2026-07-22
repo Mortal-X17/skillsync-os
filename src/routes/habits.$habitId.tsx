@@ -24,6 +24,10 @@ export const Route = createFileRoute("/habits/$habitId")({
     meta: [
       { title: "Habit — SkillSync" },
       { name: "description", content: "Habit details, streaks and history." },
+      { property: "og:title", content: "Habit — SkillSync" },
+      { property: "og:description", content: "Habit details, streaks and history." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HabitDetail,
@@ -35,8 +39,10 @@ function HabitDetail() {
   const hydrated = useHydrated();
 
   const habit = useAppStore((s) => s.habits.find((h) => h.id === habitId));
-  const logs = useAppStore((s) =>
-    s.habitLogs.filter((l) => l.habitId === habitId),
+  const habitLogs = useAppStore((s) => s.habitLogs);
+  const logs = useMemo(
+    () => habitLogs.filter((l) => l.habitId === habitId),
+    [habitLogs, habitId],
   );
   const renameHabit = useAppStore((s) => s.renameHabit);
   const deleteHabit = useAppStore((s) => s.deleteHabit);

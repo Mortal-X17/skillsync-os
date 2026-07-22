@@ -30,6 +30,8 @@ export const Route = createFileRoute("/learn/$roadmapId")({
       { name: "description", content: `Roadmap ${params.roadmapId} on SkillSync.` },
       { property: "og:title", content: "Roadmap — SkillSync" },
       { property: "og:description", content: "Edit phases, topics, subtopics and checklists." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: RoadmapDetail,
@@ -232,15 +234,36 @@ function RoadmapDetail() {
                       return (
                         <div
                           key={topic.id}
-                          className="rounded-2xl border border-white/[0.05] bg-white/[0.015] p-3"
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Open ${topic.title} topic`}
+                          onClick={() =>
+                            navigate({
+                              to: "/learn/$roadmapId/$topicId",
+                              params: { roadmapId: roadmap.id, topicId: topic.id },
+                              search: { phaseId: phase.id },
+                            })
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              navigate({
+                                to: "/learn/$roadmapId/$topicId",
+                                params: { roadmapId: roadmap.id, topicId: topic.id },
+                                search: { phaseId: phase.id },
+                              });
+                            }
+                          }}
+                          className="cursor-pointer rounded-2xl border border-white/[0.05] bg-white/[0.015] p-3 transition-colors hover:bg-white/[0.025]"
                         >
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() =>
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 updateTopic(roadmap.id, phase.id, topic.id, {
                                   done: !topic.done,
-                                })
-                              }
+                                });
+                              }}
                               aria-label="Toggle topic"
                               className="flex h-5 w-5 items-center justify-center"
                             >
@@ -250,12 +273,7 @@ function RoadmapDetail() {
                                 <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
                               )}
                             </button>
-                            <Link
-                              to="/learn/$roadmapId/$topicId"
-                              params={{ roadmapId: roadmap.id, topicId: topic.id }}
-                              search={{ phaseId: phase.id }}
-                              className="flex-1 text-left"
-                            >
+                            <div className="flex-1 text-left">
                               <div className="text-[13.5px] font-medium">
                                 {topic.title}
                               </div>
@@ -271,14 +289,15 @@ function RoadmapDetail() {
                                   <StickyNote className="h-3 w-3" />
                                 ) : null}
                               </div>
-                            </Link>
+                            </div>
                             <IconButton
                               size="sm"
                               aria-label="Up"
                               disabled={topicIdx === 0}
-                              onClick={() =>
-                                moveTopic(roadmap.id, phase.id, topic.id, -1)
-                              }
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                moveTopic(roadmap.id, phase.id, topic.id, -1);
+                              }}
                             >
                               <ArrowUp className="h-3.5 w-3.5" />
                             </IconButton>
@@ -286,9 +305,10 @@ function RoadmapDetail() {
                               size="sm"
                               aria-label="Down"
                               disabled={topicIdx === phase.topics.length - 1}
-                              onClick={() =>
-                                moveTopic(roadmap.id, phase.id, topic.id, 1)
-                              }
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                moveTopic(roadmap.id, phase.id, topic.id, 1);
+                              }}
                             >
                               <ArrowDown className="h-3.5 w-3.5" />
                             </IconButton>
@@ -296,13 +316,14 @@ function RoadmapDetail() {
                               size="sm"
                               aria-label="Delete topic"
                               variant="danger"
-                              onClick={() =>
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setConfirm({
                                   kind: "topic",
                                   phaseId: phase.id,
                                   topicId: topic.id,
-                                })
-                              }
+                                });
+                              }}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </IconButton>

@@ -35,6 +35,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Roadmaps, projects, habits, and daily focus in one place.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Dashboard,

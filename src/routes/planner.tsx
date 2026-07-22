@@ -18,6 +18,8 @@ export const Route = createFileRoute("/planner")({
       { name: "description", content: "Daily and weekly planner for focused work." },
       { property: "og:title", content: "Planner — SkillSync" },
       { property: "og:description", content: "Plan your week with intention." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: PlannerPage,

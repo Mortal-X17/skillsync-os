@@ -2,13 +2,20 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, GraduationCap, FolderKanban, CalendarRange, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const items = [
+type NavItem = {
+  to: "/" | "/learn" | "/projects" | "/planner" | "/profile";
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+};
+
+const items: NavItem[] = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/learn", label: "Learn", icon: GraduationCap },
   { to: "/projects", label: "Projects", icon: FolderKanban },
   { to: "/planner", label: "Planner", icon: CalendarRange },
   { to: "/profile", label: "Profile", icon: User },
-] as const;
+];
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

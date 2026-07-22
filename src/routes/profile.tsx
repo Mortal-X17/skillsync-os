@@ -136,6 +136,58 @@ function ProfilePage() {
     }
   };
 
+  const handleDevToggle = (v: boolean) => {
+    if (!v) {
+      updatePreferences({ developerMode: false });
+      toast("Developer mode disabled");
+      return;
+    }
+    setDevNameInput("");
+    setOpenDevVerify(true);
+  };
+
+  const submitDevVerify = () => {
+    const expected = (profile.name || "").trim().toLowerCase();
+    const got = devNameInput.trim().toLowerCase();
+    setOpenDevVerify(false);
+    if (expected && got === expected) {
+      updatePreferences({ developerMode: true });
+      toast.success("Developer mode enabled");
+    } else {
+      toast.error("Entered name doesn't match. Developer mode was not enabled.");
+    }
+    setDevNameInput("");
+  };
+
+  const beginReset = (mode: "demo" | "all") => {
+    setResetMode(mode);
+    setResetPhraseInput("");
+    setResetStep(1);
+  };
+
+  const closeReset = () => {
+    setResetStep(0);
+    setResetMode(null);
+    setResetPhraseInput("");
+  };
+
+  const resetPhrase = resetMode === "all" ? "wipe everything" : "reset demo";
+
+  const submitResetPhrase = () => {
+    const ok = resetPhraseInput.trim().toLowerCase() === resetPhrase;
+    const mode = resetMode;
+    closeReset();
+    if (ok) {
+      resetAll();
+      toast.success(
+        mode === "all" ? "All data wiped. Fresh start." : "Reset to starter demo data.",
+      );
+    } else {
+      toast.error("The entered text was wrong. No data was wiped.");
+    }
+  };
+
+
   const storageSize = useMemo(() => {
     if (typeof window === "undefined") return 0;
     try {

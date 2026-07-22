@@ -14,6 +14,8 @@ export const Route = createFileRoute("/analytics")({
       { name: "description", content: "Learning, projects and habit trends." },
       { property: "og:title", content: "Analytics — SkillSync" },
       { property: "og:description", content: "Growth, measured." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AnalyticsPage,

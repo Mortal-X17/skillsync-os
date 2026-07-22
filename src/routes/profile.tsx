@@ -34,6 +34,8 @@ export const Route = createFileRoute("/profile")({
       { name: "description", content: "Your level, preferences and backups." },
       { property: "og:title", content: "Profile — SkillSync" },
       { property: "og:description", content: "Your growth, at a glance." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ProfilePage,
@@ -146,9 +148,6 @@ function ProfilePage() {
       <div className="space-y-6 px-5">
         {/* Identity */}
         <Card className="relative overflow-hidden p-5">
-          <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#7c3aed]/25 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-[#2563eb]/20 blur-3xl" />
-
           <div className="relative flex items-center gap-4">
             <button
               onClick={() => avatarFileRef.current?.click()}

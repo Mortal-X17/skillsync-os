@@ -17,6 +17,8 @@ export const Route = createFileRoute("/projects")({
       { name: "description", content: "Ship real work. Track status, deadlines and tech stack." },
       { property: "og:title", content: "Projects — SkillSync" },
       { property: "og:description", content: "Ship real work and track progress." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ProjectsPage,

@@ -33,6 +33,10 @@ export const Route = createFileRoute("/learn/$roadmapId_/$topicId")({
     meta: [
       { title: "Topic — SkillSync" },
       { name: "description", content: "Topic notes, checklist and resources." },
+      { property: "og:title", content: "Topic — SkillSync" },
+      { property: "og:description", content: "Topic notes, checklist and resources." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: TopicDetail,

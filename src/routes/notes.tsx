@@ -17,6 +17,8 @@ export const Route = createFileRoute("/notes")({
       { name: "description", content: "Capture ideas, autosaved and searchable." },
       { property: "og:title", content: "Notes — SkillSync" },
       { property: "og:description", content: "Ideas, autosaved and searchable." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NotesPage,

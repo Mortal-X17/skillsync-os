@@ -58,6 +58,7 @@ function RoadmapDetail() {
   const movePhase = useAppStore((s) => s.movePhase);
   const addTopic = useAppStore((s) => s.addTopic);
   const updateTopic = useAppStore((s) => s.updateTopic);
+  const updateSubtopic = useAppStore((s) => s.updateSubtopic);
   const deleteTopic = useAppStore((s) => s.deleteTopic);
   const moveTopic = useAppStore((s) => s.moveTopic);
   const renameRoadmap = useAppStore((s) => s.renameRoadmap);
@@ -328,6 +329,47 @@ function RoadmapDetail() {
                               <Trash2 className="h-3.5 w-3.5" />
                             </IconButton>
                           </div>
+                          {topic.subtopics.length > 0 ? (
+                            <ul className="mt-2 space-y-1 pl-7">
+                              {topic.subtopics.map((sub) => {
+                                const sPct = subtopicPct(sub);
+                                const complete = sPct === 100;
+                                return (
+                                  <li key={sub.id}>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateSubtopic(
+                                          roadmap.id,
+                                          phase.id,
+                                          topic.id,
+                                          sub.id,
+                                          { done: !complete },
+                                        );
+                                      }}
+                                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/[0.03]"
+                                    >
+                                      {complete ? (
+                                        <CheckCircle2 className="h-4 w-4 shrink-0 text-[#7c3aed]" />
+                                      ) : (
+                                        <Circle className="h-4 w-4 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                                      )}
+                                      <span
+                                        className={`flex-1 truncate text-[12.5px] ${complete ? "text-muted-foreground line-through" : "text-foreground/85"}`}
+                                      >
+                                        {sub.title}
+                                      </span>
+                                      {sub.checklist.length > 0 ? (
+                                        <span className="text-[10.5px] text-muted-foreground">
+                                          {sPct}%
+                                        </span>
+                                      ) : null}
+                                    </button>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          ) : null}
                         </div>
                       );
                     })

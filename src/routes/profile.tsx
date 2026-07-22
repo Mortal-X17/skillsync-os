@@ -509,6 +509,7 @@ function ProfilePage() {
         confirmLabel="Reset"
         onConfirm={resetAll}
       />
+      <AppFooter />
     </AppShell>
   );
 }

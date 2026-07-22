@@ -261,7 +261,7 @@ function Dashboard() {
           />
           <Card>
             <div className="space-y-4">
-              {roadmaps.slice(0, 4).map((r) => {
+              {hydrated && roadmaps.slice(0, 4).map((r) => {
                 const pct = roadmapPct(r);
                 return (
                   <Link

@@ -95,7 +95,7 @@ function HabitsPage() {
             }
           />
         ) : null}
-        {habits.map((h) => {
+        {hydrated && habits.map((h) => {
           const doneToday = habitLogs.some(
             (l) => l.habitId === h.id && l.date === today,
           );

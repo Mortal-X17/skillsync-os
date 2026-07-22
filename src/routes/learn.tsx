@@ -46,7 +46,10 @@ function LearnPage() {
         }
       />
       <div className="space-y-4 px-5">
-        {roadmaps.map((r) => {
+        {!hydrated ? (
+          <div className="text-muted-foreground">Loading…</div>
+        ) : null}
+        {hydrated && roadmaps.map((r) => {
           const pct = hydrated ? roadmapPct(r) : 0;
           const counts = roadmapCounts(r);
           return (

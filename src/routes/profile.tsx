@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
-  Cloud,
   Palette,
   Info,
   Bell,
@@ -13,6 +12,13 @@ import {
   RotateCcw,
   BarChart3,
   Activity,
+  Camera,
+  Trash2,
+  Code2,
+  Database,
+  FileJson,
+  Sparkles,
+  HardDrive,
 } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
@@ -33,6 +39,34 @@ export const Route = createFileRoute("/profile")({
   component: ProfilePage,
 });
 
+const APP_VERSION = "0.3";
+
+async function fileToResizedDataUrl(
+  file: File,
+  max = 256,
+): Promise<string> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = url;
+    });
+    const scale = Math.min(1, max / Math.max(img.width, img.height));
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(img, 0, 0, w, h);
+    return canvas.toDataURL("image/jpeg", 0.88);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 function ProfilePage() {
   const hydrated = useHydrated();
   const profile = useAppStore((s) => s.profile);
@@ -46,8 +80,10 @@ function ProfilePage() {
 
   const [openProfile, setOpenProfile] = useState(false);
   const [openReset, setOpenReset] = useState(false);
+  const [openJson, setOpenJson] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const avatarFileRef = useRef<HTMLInputElement>(null);
 
   const initials =
     (profile.name || "L")
@@ -76,6 +112,31 @@ function ProfilePage() {
     setTimeout(() => setImportMsg(null), 4000);
   };
 
+  const handleAvatarPick = async (file: File) => {
+    try {
+      const dataUrl = await fileToResizedDataUrl(file, 256);
+      updateProfile({ avatar: dataUrl });
+    } catch {
+      setImportMsg("Couldn't read that image.");
+      setTimeout(() => setImportMsg(null), 3000);
+    }
+  };
+
+  const storageSize = useMemo(() => {
+    if (typeof window === "undefined") return 0;
+    try {
+      const raw = window.localStorage.getItem("skillsync:data:v1") ?? "";
+      return new Blob([raw]).size;
+    } catch {
+      return 0;
+    }
+  }, [hydrated, profile, preferences, stats]);
+
+  const jsonPreview = useMemo(
+    () => (openJson ? exportJSON() : ""),
+    [openJson, exportJSON],
+  );
+
   const xpToNext = stats.xp % 100;
 
   return (
@@ -89,26 +150,71 @@ function ProfilePage() {
           <div className="pointer-events-none absolute -bottom-24 -left-20 h-56 w-56 rounded-full bg-[#2563eb]/20 blur-3xl" />
 
           <div className="relative flex items-center gap-4">
-            <div className="relative">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#7c3aed] to-[#2563eb] text-[20px] font-semibold text-white">
-                {initials}
-              </div>
-              <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full gradient-primary text-[10px] font-semibold text-white shadow-lg">
+            <button
+              onClick={() => avatarFileRef.current?.click()}
+              className="group relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#7c3aed] to-[#2563eb] text-[20px] font-semibold text-white ring-2 ring-white/[0.06] transition-transform active:scale-95"
+              aria-label="Change profile picture"
+            >
+              {hydrated && profile.avatar ? (
+                <img
+                  src={profile.avatar}
+                  alt="Avatar"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
+              <span className="absolute inset-x-0 bottom-0 flex h-5 items-center justify-center bg-black/45 opacity-0 transition-opacity group-hover:opacity-100 group-active:opacity-100">
+                <Camera className="h-3 w-3 text-white" />
+              </span>
+              <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full gradient-primary text-[10px] font-semibold text-white shadow-lg ring-2 ring-[#141416]">
                 {hydrated ? stats.level : "—"}
               </div>
-            </div>
+            </button>
             <div className="flex-1">
               <div className="text-[16px] font-semibold tracking-tight">
                 {hydrated ? profile.name || "Learner" : "…"}
               </div>
-              <button
-                onClick={() => setOpenProfile(true)}
-                className="text-[12px] text-muted-foreground underline-offset-2 hover:underline"
-              >
-                Edit profile
-              </button>
+              <div className="mt-1 flex items-center gap-3 text-[12px] text-muted-foreground">
+                <button
+                  onClick={() => setOpenProfile(true)}
+                  className="underline-offset-2 hover:underline"
+                >
+                  Edit name
+                </button>
+                <span className="text-white/10">·</span>
+                <button
+                  onClick={() => avatarFileRef.current?.click()}
+                  className="underline-offset-2 hover:underline"
+                >
+                  Change photo
+                </button>
+                {hydrated && profile.avatar ? (
+                  <>
+                    <span className="text-white/10">·</span>
+                    <button
+                      onClick={() => updateProfile({ avatar: "" })}
+                      className="text-[#fca5a5] underline-offset-2 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </>
+                ) : null}
+              </div>
             </div>
           </div>
+
+          <input
+            ref={avatarFileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleAvatarPick(f);
+              e.target.value = "";
+            }}
+          />
 
           <div className="relative mt-5 space-y-2">
             <div className="flex items-center justify-between text-[12px] text-muted-foreground">
@@ -194,18 +300,75 @@ function ProfilePage() {
                 }
               />
               <SettingRow icon={Palette} label="Theme" hint="Dark" />
-              <SettingRow
-                icon={Settings2}
-                label="Developer mode"
-                right={
+            </div>
+          </Card>
+
+          {/* Developer mode explainer */}
+          <Card className="p-4">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.03]">
+                <Code2 className="h-[16px] w-[16px] text-muted-foreground" strokeWidth={1.75} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-[14px] font-semibold tracking-tight">
+                    Developer mode
+                  </div>
                   <Toggle
                     on={preferences.developerMode}
                     onChange={(v) => updatePreferences({ developerMode: v })}
                   />
-                }
-              />
+                </div>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+                  Unlocks tools built for power-users and testing.
+                </p>
+                <ul className="mt-3 space-y-1.5 text-[12.5px] text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <span className="h-1 w-1 rounded-full bg-white/30" />
+                    Raw JSON data viewer
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1 w-1 rounded-full bg-white/30" />
+                    Storage size & diagnostics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1 w-1 rounded-full bg-white/30" />
+                    Reset to demo (seed) data
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1 w-1 rounded-full bg-white/30" />
+                    Roadmap import helpers &amp; experimental features
+                  </li>
+                </ul>
+              </div>
             </div>
           </Card>
+
+          {preferences.developerMode ? (
+            <Card className="p-2">
+              <div className="px-3 pb-1 pt-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+                Developer tools
+              </div>
+              <div className="divide-y divide-white/[0.05]">
+                <SettingRow
+                  icon={HardDrive}
+                  label="Storage size"
+                  hint={hydrated ? formatBytes(storageSize) : "—"}
+                />
+                <SettingButtonRow
+                  icon={FileJson}
+                  label="View raw JSON"
+                  onClick={() => setOpenJson(true)}
+                />
+                <SettingButtonRow
+                  icon={Database}
+                  label="Reset to demo data"
+                  onClick={() => setOpenReset(true)}
+                  danger
+                />
+              </div>
+            </Card>
+          ) : null}
         </section>
 
         {/* Backup */}
@@ -227,6 +390,10 @@ function ProfilePage() {
               />
             </div>
           </Card>
+          <p className="px-1 text-[11.5px] leading-relaxed text-muted-foreground">
+            Everything lives on this device. Export a JSON backup regularly to
+            keep your progress safe across updates and re-installs.
+          </p>
           {importMsg ? (
             <div className="text-center text-[12px] text-muted-foreground">
               {importMsg}
@@ -245,20 +412,49 @@ function ProfilePage() {
           />
         </section>
 
-        {/* System */}
+        {/* About */}
         <section className="space-y-3">
-          <SectionHeader title="System" />
-          <Card className="p-2">
-            <div className="divide-y divide-white/[0.05]">
-              <SettingRow icon={Shield} label="Privacy" hint="Local-only" />
-              <SettingRow icon={Cloud} label="Cloud sync" hint="Soon" />
-              <SettingRow icon={Info} label="About SkillSync" hint="v0.2" />
+          <SectionHeader title="About" />
+          <Card className="relative overflow-hidden p-5">
+            <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#7c3aed]/15 blur-3xl" />
+            <div className="relative flex items-start gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary">
+                <Sparkles className="h-5 w-5 text-white" strokeWidth={1.75} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[15px] font-semibold tracking-tight">
+                  SkillSync OS
+                </div>
+                <div className="text-[12.5px] text-muted-foreground">
+                  Your personal growth operating system.
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  <Chip>v{APP_VERSION}</Chip>
+                  <Chip>
+                    <Shield className="h-3 w-3" /> Local-first
+                  </Chip>
+                  <Chip>Offline</Chip>
+                  <Chip>Private</Chip>
+                </div>
+              </div>
             </div>
+            <div className="relative mt-4 grid grid-cols-2 gap-2 text-[12px]">
+              <AboutStat icon={Info} label="Build" value={`v${APP_VERSION}`} />
+              <AboutStat
+                icon={HardDrive}
+                label="Storage"
+                value={hydrated ? formatBytes(storageSize) : "—"}
+              />
+            </div>
+            <p className="relative mt-4 text-[11.5px] leading-relaxed text-muted-foreground">
+              Built for daily use. No accounts, no tracking, no cloud — every
+              roadmap, note and habit stays on your device.
+            </p>
           </Card>
         </section>
 
         <p className="pb-4 text-center text-[11px] text-muted-foreground">
-          SkillSync OS · Personal Growth Operating System
+          SkillSync · Made for the long game.
         </p>
       </div>
 
@@ -280,15 +476,67 @@ function ProfilePage() {
         </div>
       </BottomSheet>
 
+      <BottomSheet
+        open={openJson}
+        onClose={() => setOpenJson(false)}
+        title="Raw data"
+        className="max-h-[92dvh]"
+      >
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-[12px] text-muted-foreground">
+            <span>{formatBytes(storageSize)} in localStorage</span>
+            <button
+              onClick={() => {
+                navigator.clipboard?.writeText(jsonPreview).catch(() => {});
+              }}
+              className="rounded-lg bg-white/[0.04] px-2.5 py-1 text-[11.5px] font-medium text-foreground active:scale-95"
+            >
+              Copy
+            </button>
+          </div>
+          <pre className="max-h-[65dvh] overflow-auto rounded-xl border border-white/[0.06] bg-black/40 p-3 text-[11px] leading-relaxed text-muted-foreground">
+            {jsonPreview}
+          </pre>
+        </div>
+      </BottomSheet>
+
       <ConfirmDialog
         open={openReset}
         onClose={() => setOpenReset(false)}
         title="Reset all data?"
-        description="Every roadmap, note, project, planner task and habit log will be wiped."
+        description="Every roadmap, note, project, planner task and habit log will be wiped and replaced with the starter demo content."
         confirmLabel="Reset"
         onConfirm={resetAll}
       />
     </AppShell>
+  );
+}
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / 1024 / 1024).toFixed(2)} MB`;
+}
+
+function AboutStat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof Info;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2">
+      <Icon className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.75} />
+      <div className="min-w-0 flex-1">
+        <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground">
+          {label}
+        </div>
+        <div className="truncate text-[12.5px] font-medium">{value}</div>
+      </div>
+    </div>
   );
 }
 
@@ -298,7 +546,7 @@ function SettingRow({
   hint,
   right,
 }: {
-  icon: typeof Cloud;
+  icon: typeof Info;
   label: string;
   hint?: string;
   right?: React.ReactNode;
@@ -320,7 +568,7 @@ function SettingButtonRow({
   onClick,
   danger,
 }: {
-  icon: typeof Cloud;
+  icon: typeof Info;
   label: string;
   onClick: () => void;
   danger?: boolean;
@@ -345,7 +593,11 @@ function SettingButtonRow({
       >
         {label}
       </span>
-      <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+      {danger ? (
+        <Trash2 className="h-4 w-4 text-[#fca5a5]/70" />
+      ) : (
+        <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+      )}
     </button>
   );
 }

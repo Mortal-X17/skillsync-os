@@ -85,11 +85,19 @@ function ProfilePage() {
   const resetAll = useAppStore((s) => s.resetAll);
 
   const [openProfile, setOpenProfile] = useState(false);
-  const [openReset, setOpenReset] = useState(false);
   const [openJson, setOpenJson] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const avatarFileRef = useRef<HTMLInputElement>(null);
+
+  // Friction dialogs
+  const [openDevVerify, setOpenDevVerify] = useState(false);
+  const [devNameInput, setDevNameInput] = useState("");
+  // Reset flow: 'demo' or 'all'; step1 = confirm intent, step2 = type-to-confirm
+  const [resetMode, setResetMode] = useState<null | "demo" | "all">(null);
+  const [resetStep, setResetStep] = useState<0 | 1 | 2>(0);
+  const [resetPhraseInput, setResetPhraseInput] = useState("");
+
 
   const initials =
     (profile.name || "L")

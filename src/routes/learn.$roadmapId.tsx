@@ -250,10 +250,10 @@ function RoadmapDetail() {
                                 <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
                               )}
                             </button>
-                            <button
-                              onClick={() =>
-                                setEditing({ phaseId: phase.id, topic })
-                              }
+                            <Link
+                              to="/learn/$roadmapId/$topicId"
+                              params={{ roadmapId: roadmap.id, topicId: topic.id }}
+                              search={{ phaseId: phase.id }}
                               className="flex-1 text-left"
                             >
                               <div className="text-[13.5px] font-medium">
@@ -271,7 +271,7 @@ function RoadmapDetail() {
                                   <StickyNote className="h-3 w-3" />
                                 ) : null}
                               </div>
-                            </button>
+                            </Link>
                             <IconButton
                               size="sm"
                               aria-label="Up"

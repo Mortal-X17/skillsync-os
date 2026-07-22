@@ -399,8 +399,9 @@ function ProfilePage() {
               <SettingButtonRow
                 icon={RotateCcw}
                 label="Reset everything"
-                onClick={() => setOpenReset(true)}
+                onClick={() => beginReset("all")}
                 danger
+
               />
             </div>
           </Card>

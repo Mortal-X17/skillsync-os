@@ -567,14 +567,106 @@ function ProfilePage() {
         </div>
       </BottomSheet>
 
+      {/* Developer mode verification */}
+      <BottomSheet
+        open={openDevVerify}
+        onClose={() => setOpenDevVerify(false)}
+        title="Unlock developer mode"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#7c3aed]/15 text-[#c4b5fd]">
+              <Lock className="h-4 w-4" strokeWidth={1.75} />
+            </span>
+            <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+              Developer mode unlocks raw data access and destructive reset
+              tools. Type your profile name to confirm it's really you.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <label className="block text-[12px] text-muted-foreground">
+              Your profile name
+            </label>
+            <TextField
+              autoFocus
+              placeholder={profile.name || "Your name"}
+              value={devNameInput}
+              onChange={(e) => setDevNameInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") submitDevVerify();
+              }}
+            />
+          </div>
+          <ActionButton className="w-full" onClick={submitDevVerify}>
+            Unlock
+          </ActionButton>
+        </div>
+      </BottomSheet>
+
+      {/* Reset — step 1: intent */}
       <ConfirmDialog
-        open={openReset}
-        onClose={() => setOpenReset(false)}
-        title="Reset all data?"
-        description="Every roadmap, note, project, planner task and habit log will be wiped and replaced with the starter demo content."
-        confirmLabel="Reset"
-        onConfirm={resetAll}
+        open={resetStep === 1}
+        onClose={closeReset}
+        title={resetMode === "all" ? "Wipe everything?" : "Reset to demo data?"}
+        description={
+          resetMode === "all"
+            ? "This will permanently erase every roadmap, note, project, planner task, habit log and profile change on this device."
+            : "Your current data will be replaced with the starter demo content. This cannot be undone."
+        }
+        confirmLabel="Yes, continue"
+        onConfirm={() => setResetStep(2)}
       />
+
+      {/* Reset — step 2: type to confirm */}
+      <BottomSheet
+        open={resetStep === 2}
+        onClose={closeReset}
+        title={resetMode === "all" ? "Confirm wipe" : "Confirm reset"}
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/[0.06] p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#ef4444]/15 text-[#fca5a5]">
+              <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
+            </span>
+            <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+              This action is permanent. To proceed, type the phrase below
+              exactly and press Confirm.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <label className="block text-[12px] text-muted-foreground">
+              Type <span className="font-mono text-foreground">{resetPhrase}</span>
+            </label>
+            <TextField
+              autoFocus
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder={resetPhrase}
+              value={resetPhraseInput}
+              onChange={(e) => setResetPhraseInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") submitResetPhrase();
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={closeReset}
+              className="flex-1 rounded-xl border border-white/[0.08] py-2.5 text-[13.5px] font-medium text-foreground active:scale-[0.97]"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={submitResetPhrase}
+              className="flex-1 rounded-xl bg-[#ef4444] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </BottomSheet>
+
       <AppFooter />
     </AppShell>
   );

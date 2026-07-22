@@ -58,6 +58,7 @@ function RoadmapDetail() {
   const movePhase = useAppStore((s) => s.movePhase);
   const addTopic = useAppStore((s) => s.addTopic);
   const updateTopic = useAppStore((s) => s.updateTopic);
+  const updateSubtopic = useAppStore((s) => s.updateSubtopic);
   const deleteTopic = useAppStore((s) => s.deleteTopic);
   const moveTopic = useAppStore((s) => s.moveTopic);
   const renameRoadmap = useAppStore((s) => s.renameRoadmap);

@@ -487,23 +487,14 @@ function TopicEditorSheet({
   topic: Topic;
   onClose: () => void;
 }) {
-  const {
-    updateTopic,
-    addSubtopic,
-    updateSubtopic,
-    deleteSubtopic,
-    addChecklistItem,
-    updateChecklistItem,
-    deleteChecklistItem,
-  } = useAppStore((s) => ({
-    updateTopic: s.updateTopic,
-    addSubtopic: s.addSubtopic,
-    updateSubtopic: s.updateSubtopic,
-    deleteSubtopic: s.deleteSubtopic,
-    addChecklistItem: s.addChecklistItem,
-    updateChecklistItem: s.updateChecklistItem,
-    deleteChecklistItem: s.deleteChecklistItem,
-  }));
+  const updateTopic = useAppStore((s) => s.updateTopic);
+  const addSubtopic = useAppStore((s) => s.addSubtopic);
+  const updateSubtopic = useAppStore((s) => s.updateSubtopic);
+  const deleteSubtopic = useAppStore((s) => s.deleteSubtopic);
+  const addChecklistItem = useAppStore((s) => s.addChecklistItem);
+  const updateChecklistItem = useAppStore((s) => s.updateChecklistItem);
+  const deleteChecklistItem = useAppStore((s) => s.deleteChecklistItem);
+
 
   const [newCheck, setNewCheck] = useState("");
   const [newSub, setNewSub] = useState("");

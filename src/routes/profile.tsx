@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   ChevronRight,
   Palette,
@@ -19,6 +20,8 @@ import {
   FileJson,
   Sparkles,
   HardDrive,
+  Lock,
+  AlertTriangle,
 } from "lucide-react";
 import { AppShell, AppFooter, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
@@ -26,6 +29,7 @@ import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
 import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
+
 
 export const Route = createFileRoute("/profile")({
   head: () => ({

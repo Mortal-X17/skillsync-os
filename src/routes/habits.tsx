@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Plus, Trash2, Flame } from "lucide-react";
+import { ArrowLeft, Plus, Flame, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
-import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
+import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
@@ -28,15 +28,11 @@ function HabitsPage() {
   const habits = useAppStore((s) => s.habits);
   const habitLogs = useAppStore((s) => s.habitLogs);
   const addHabit = useAppStore((s) => s.addHabit);
-  const renameHabit = useAppStore((s) => s.renameHabit);
-  const deleteHabit = useAppStore((s) => s.deleteHabit);
   const toggleHabitToday = useAppStore((s) => s.toggleHabitToday);
 
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [emoji, setEmoji] = useState("✨");
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
   const today = todayISO();
   const last7 = useMemo(
@@ -83,13 +79,21 @@ function HabitsPage() {
           Habits.
         </h1>
         <p className="mt-1 text-[13.5px] text-muted-foreground">
-          Show up daily. Compound quietly.
+          Tap a habit to view stats. Tap the emoji to check in.
         </p>
       </div>
 
       <div className="space-y-3 px-5">
         {hydrated && habits.length === 0 ? (
-          <EmptyState title="No habits yet" hint="Add habits like Sleep, Reading, Workout." />
+          <EmptyState
+            title="No habits yet"
+            hint="Add habits like Sleep, Reading, Workout."
+            action={
+              <ActionButton onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" /> Add habit
+              </ActionButton>
+            }
+          />
         ) : null}
         {habits.map((h) => {
           const doneToday = habitLogs.some(
@@ -100,7 +104,12 @@ function HabitsPage() {
             <Card key={h.id} className="p-4">
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => toggleHabitToday(h.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleHabitToday(h.id);
+                  }}
+                  aria-label="Toggle today"
                   className={cn(
                     "flex h-11 w-11 items-center justify-center rounded-2xl text-[18px] transition-all active:scale-95",
                     doneToday
@@ -110,25 +119,21 @@ function HabitsPage() {
                 >
                   <span>{h.emoji}</span>
                 </button>
-                <button
-                  className="min-w-0 flex-1 text-left"
-                  onClick={() => setRenaming({ id: h.id, title: h.title })}
+                <Link
+                  to="/habits/$habitId"
+                  params={{ habitId: h.id }}
+                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
                 >
-                  <div className="truncate text-[14.5px] font-semibold tracking-tight">
-                    {h.title}
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14.5px] font-semibold tracking-tight">
+                      {h.title}
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-1 text-[11.5px] text-muted-foreground">
+                      <Flame className="h-3 w-3" /> {streak} day streak
+                    </div>
                   </div>
-                  <div className="mt-0.5 flex items-center gap-1 text-[11.5px] text-muted-foreground">
-                    <Flame className="h-3 w-3" /> {streak} day streak
-                  </div>
-                </button>
-                <IconButton
-                  size="sm"
-                  variant="danger"
-                  aria-label="Delete"
-                  onClick={() => setConfirmDelete(h.id)}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </IconButton>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+                </Link>
               </div>
 
               <div className="mt-4 flex justify-between gap-1.5">
@@ -190,39 +195,6 @@ function HabitsPage() {
           </ActionButton>
         </div>
       </BottomSheet>
-
-      <BottomSheet
-        open={!!renaming}
-        onClose={() => setRenaming(null)}
-        title="Rename habit"
-      >
-        {renaming ? (
-          <div className="space-y-3">
-            <TextField
-              autoFocus
-              value={renaming.title}
-              onChange={(e) => setRenaming({ ...renaming, title: e.target.value })}
-            />
-            <ActionButton
-              className="w-full"
-              onClick={() => {
-                if (!renaming.title.trim()) return;
-                renameHabit(renaming.id, renaming.title.trim());
-                setRenaming(null);
-              }}
-            >
-              Save
-            </ActionButton>
-          </div>
-        ) : null}
-      </BottomSheet>
-
-      <ConfirmDialog
-        open={!!confirmDelete}
-        onClose={() => setConfirmDelete(null)}
-        title="Delete habit?"
-        onConfirm={() => confirmDelete && deleteHabit(confirmDelete)}
-      />
     </AppShell>
   );
 }

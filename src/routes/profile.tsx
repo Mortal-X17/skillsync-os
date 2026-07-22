@@ -152,7 +152,7 @@ function ProfilePage() {
           <div className="relative flex items-center gap-4">
             <button
               onClick={() => avatarFileRef.current?.click()}
-              className="group relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#7c3aed] to-[#2563eb] text-[20px] font-semibold text-white ring-2 ring-white/[0.06] transition-transform active:scale-95"
+              className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-white/[0.04] text-[20px] font-semibold text-white ring-1 ring-white/[0.08] transition-transform active:scale-95"
               aria-label="Change profile picture"
             >
               {hydrated && profile.avatar ? (
@@ -162,20 +162,21 @@ function ProfilePage() {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <span>{initials}</span>
+                <span
+                  className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#7c3aed] to-[#2563eb]"
+                >
+                  {initials}
+                </span>
               )}
-              <span className="absolute inset-x-0 bottom-0 flex h-5 items-center justify-center bg-black/45 opacity-0 transition-opacity group-hover:opacity-100 group-active:opacity-100">
-                <Camera className="h-3 w-3 text-white" />
-              </span>
-              <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full gradient-primary text-[10px] font-semibold text-white shadow-lg ring-2 ring-[#141416]">
-                {hydrated ? stats.level : "—"}
-              </div>
             </button>
             <div className="flex-1">
-              <div className="text-[16px] font-semibold tracking-tight">
-                {hydrated ? profile.name || "Learner" : "…"}
+              <div className="flex items-center gap-2">
+                <div className="text-[16px] font-semibold tracking-tight">
+                  {hydrated ? profile.name || "Learner" : "…"}
+                </div>
+                <Chip tone="primary">Lv {hydrated ? stats.level : "—"}</Chip>
               </div>
-              <div className="mt-1 flex items-center gap-3 text-[12px] text-muted-foreground">
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-muted-foreground">
                 <button
                   onClick={() => setOpenProfile(true)}
                   className="underline-offset-2 hover:underline"
@@ -185,9 +186,9 @@ function ProfilePage() {
                 <span className="text-white/10">·</span>
                 <button
                   onClick={() => avatarFileRef.current?.click()}
-                  className="underline-offset-2 hover:underline"
+                  className="inline-flex items-center gap-1 underline-offset-2 hover:underline"
                 >
-                  Change photo
+                  <Camera className="h-3 w-3" /> Change photo
                 </button>
                 {hydrated && profile.avatar ? (
                   <>

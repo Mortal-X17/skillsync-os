@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { AppShell, AppFooter, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
-import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
+import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
 import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";

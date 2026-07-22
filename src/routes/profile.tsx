@@ -328,8 +328,9 @@ function ProfilePage() {
                   </div>
                   <Toggle
                     on={preferences.developerMode}
-                    onChange={(v) => updatePreferences({ developerMode: v })}
+                    onChange={handleDevToggle}
                   />
+
                 </div>
                 <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
                   Unlocks tools built for power-users and testing.

@@ -82,20 +82,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
       },
       { name: "theme-color", content: "#09090b" },
-      { title: "SkillSync — Personal Growth OS" },
+      { title: "SkillSync" },
       {
         name: "description",
         content:
-          "SkillSync is a premium operating system for students to manage learning, projects, goals, habits and personal growth.",
+          "Your personal growth dashboard: streaks, XP, focus and progress.",
       },
-      { property: "og:title", content: "SkillSync — Personal Growth OS" },
+      { property: "og:title", content: "SkillSync" },
       {
         property: "og:description",
         content:
-          "A calm, elegant OS for learning, projects, planning and personal growth.",
+          "Your personal growth dashboard: streaks, XP, focus and progress.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "SkillSync" },
+      { name: "twitter:description", content: "Your personal growth dashboard: streaks, XP, focus and progress." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c1d8af59-e603-45c3-b949-53766a800395/id-preview-664b8a9d--93a5a497-860b-4d1a-82aa-cc3285e5a54c.lovable.app-1784707193992.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c1d8af59-e603-45c3-b949-53766a800395/id-preview-664b8a9d--93a5a497-860b-4d1a-82aa-cc3285e5a54c.lovable.app-1784707193992.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -112,7 +116,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,

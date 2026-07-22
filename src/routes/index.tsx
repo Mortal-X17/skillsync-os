@@ -26,15 +26,15 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — SkillSync" },
+      { title: "SkillSync" },
       {
         name: "description",
         content: "Your personal growth dashboard: streaks, XP, focus and progress.",
       },
-      { property: "og:title", content: "Dashboard — SkillSync" },
+      { property: "og:title", content: "SkillSync" },
       {
         property: "og:description",
-        content: "Your personal growth dashboard at a glance.",
+        content: "Your personal growth dashboard: streaks, XP, focus and progress.",
       },
     ],
   }),

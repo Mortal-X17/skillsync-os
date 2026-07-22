@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, CircleDot, CircleDashed, CheckCircle2, Filter } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Plus, FolderKanban, Trash2, ExternalLink } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
-import { Card, Chip, ProgressBar, Skeleton } from "@/components/ui/primitives";
+import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
+import { EmptyState } from "@/components/common/EmptyState";
+import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
+import { TextField, TextArea } from "@/components/edit/Fields";
+import { ActionButton, IconButton } from "@/components/edit/Buttons";
+import { useAppStore, useHydrated } from "@/store/useAppStore";
+import type { Project } from "@/lib/schema";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -15,13 +22,31 @@ export const Route = createFileRoute("/projects")({
   component: ProjectsPage,
 });
 
-const filters = [
-  { label: "All", icon: CircleDot },
-  { label: "Active", icon: CircleDashed },
-  { label: "Done", icon: CheckCircle2 },
-];
+type Filter = "all" | "planning" | "active" | "done";
 
 function ProjectsPage() {
+  const hydrated = useHydrated();
+  const projects = useAppStore((s) => s.projects);
+  const addProject = useAppStore((s) => s.addProject);
+  const updateProject = useAppStore((s) => s.updateProject);
+  const deleteProject = useAppStore((s) => s.deleteProject);
+  const addProjectTask = useAppStore((s) => s.addProjectTask);
+  const updateProjectTask = useAppStore((s) => s.updateProjectTask);
+  const deleteProjectTask = useAppStore((s) => s.deleteProjectTask);
+
+  const [filter, setFilter] = useState<Filter>("all");
+  const [editing, setEditing] = useState<Project | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [newTask, setNewTask] = useState("");
+  const [newTech, setNewTech] = useState("");
+
+  const filtered = useMemo(
+    () => (filter === "all" ? projects : projects.filter((p) => p.status === filter)),
+    [projects, filter],
+  );
+
+  const current = editing ? projects.find((p) => p.id === editing.id) ?? editing : null;
+
   return (
     <AppShell>
       <PageHeader
@@ -29,80 +54,385 @@ function ProjectsPage() {
         title="Projects."
         subtitle="Everything you're building, in one place."
         right={
-          <button
-            aria-label="Filter"
-            className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
+          <IconButton
+            variant="primary"
+            size="lg"
+            aria-label="New project"
+            onClick={() => {
+              const p = addProject({ title: "Untitled project" });
+              setEditing(p);
+            }}
           >
-            <Filter className="h-[17px] w-[17px] text-muted-foreground" strokeWidth={1.75} />
-          </button>
+            <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
+          </IconButton>
         }
       />
 
       <div className="mb-5 flex gap-2 px-5">
-        {filters.map((f, i) => {
-          const Icon = f.icon;
-          const active = i === 0;
+        {(["all", "planning", "active", "done"] as Filter[]).map((f) => {
+          const active = filter === f;
           return (
             <button
-              key={f.label}
+              key={f}
+              onClick={() => setFilter(f)}
               className={
-                "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition-colors " +
+                "rounded-full border px-3 py-1.5 text-[12px] font-medium capitalize transition-colors " +
                 (active
                   ? "border-white/10 bg-white/[0.06] text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground/80")
               }
             >
-              <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-              {f.label}
+              {f}
             </button>
           );
         })}
       </div>
 
       <div className="space-y-4 px-5">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i} className="p-5">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Chip tone={i % 2 === 0 ? "primary" : "success"}>
-                    {i % 2 === 0 ? "In progress" : "Planning"}
-                  </Chip>
-                  <Chip>Due — · —</Chip>
+        {hydrated && filtered.length === 0 ? (
+          <EmptyState
+            icon={FolderKanban}
+            title="No projects yet"
+            hint="Every skill compounds when you ship."
+            action={
+              <ActionButton
+                onClick={() => {
+                  const p = addProject({ title: "Untitled project" });
+                  setEditing(p);
+                }}
+              >
+                <Plus className="h-4 w-4" /> New project
+              </ActionButton>
+            }
+          />
+        ) : null}
+
+        {filtered.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => setEditing(p)}
+            className="block w-full text-left"
+          >
+            <Card className="p-5">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Chip
+                      tone={
+                        p.status === "active"
+                          ? "primary"
+                          : p.status === "done"
+                            ? "success"
+                            : "default"
+                      }
+                    >
+                      {p.status === "active"
+                        ? "In progress"
+                        : p.status === "done"
+                          ? "Done"
+                          : "Planning"}
+                    </Chip>
+                    {p.deadline ? <Chip>Due {p.deadline}</Chip> : null}
+                  </div>
+                  <div className="text-[15px] font-semibold tracking-tight">
+                    {p.title}
+                  </div>
+                  {p.description ? (
+                    <div className="line-clamp-2 text-[12.5px] text-muted-foreground">
+                      {p.description}
+                    </div>
+                  ) : null}
                 </div>
-                <Skeleton className="h-3.5 w-2/3" />
-                <Skeleton className="h-2.5 w-1/2" />
               </div>
-            </div>
 
-            <div className="mt-5 space-y-2">
-              <div className="flex items-center justify-between text-[12px] text-muted-foreground">
-                <span>Progress</span>
-                <span className="text-foreground/80">— %</span>
+              <div className="mt-5 space-y-2">
+                <div className="flex items-center justify-between text-[12px] text-muted-foreground">
+                  <span>Progress</span>
+                  <span className="text-foreground/80">{p.progress}%</span>
+                </div>
+                <ProgressBar value={p.progress} tone="gradient" />
               </div>
-              <ProgressBar value={0} tone="gradient" />
-            </div>
 
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {["—", "—", "—"].map((t, j) => (
-                <span
-                  key={j}
-                  className="rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[10.5px] font-medium text-muted-foreground"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </Card>
+              {p.techStack.length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {p.techStack.map((t, j) => (
+                    <span
+                      key={j}
+                      className="rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[10.5px] font-medium text-muted-foreground"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </Card>
+          </button>
         ))}
       </div>
 
-      <button
-        aria-label="New project"
-        className="fixed bottom-28 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full gradient-primary shadow-[0_10px_40px_-10px_rgba(124,58,237,0.7)] transition-transform active:scale-95"
+      <BottomSheet
+        open={!!current}
+        onClose={() => setEditing(null)}
+        title="Edit project"
+        className="max-h-[95dvh]"
       >
-        <Plus className="h-6 w-6 text-white" strokeWidth={2.25} />
-      </button>
+        {current ? (
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Title
+              </label>
+              <TextField
+                value={current.title}
+                onChange={(e) => updateProject(current.id, { title: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Description
+              </label>
+              <TextArea
+                rows={3}
+                value={current.description}
+                onChange={(e) =>
+                  updateProject(current.id, { description: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Status
+                </label>
+                <select
+                  value={current.status}
+                  onChange={(e) =>
+                    updateProject(current.id, {
+                      status: e.target.value as Project["status"],
+                    })
+                  }
+                  className="w-full rounded-xl border border-white/[0.07] bg-white/[0.03] px-3 py-2.5 text-[13.5px] outline-none"
+                >
+                  <option value="planning">Planning</option>
+                  <option value="active">Active</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Deadline
+                </label>
+                <TextField
+                  type="date"
+                  value={current.deadline ?? ""}
+                  onChange={(e) =>
+                    updateProject(current.id, {
+                      deadline: e.target.value || null,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Progress
+                </label>
+                <span className="text-[12px] text-muted-foreground">
+                  {current.progress}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={current.progress}
+                onChange={(e) =>
+                  updateProject(current.id, {
+                    progress: Number(e.target.value),
+                  })
+                }
+                className="w-full accent-[#7c3aed]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Tech stack
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {current.techStack.map((t, i) => (
+                  <button
+                    key={i}
+                    onClick={() =>
+                      updateProject(current.id, {
+                        techStack: current.techStack.filter((_, j) => j !== i),
+                      })
+                    }
+                    className="rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[10.5px] font-medium text-muted-foreground"
+                  >
+                    {t} ×
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <TextField
+                  value={newTech}
+                  onChange={(e) => setNewTech(e.target.value)}
+                  placeholder="Add tech (e.g. React)"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newTech.trim()) {
+                      updateProject(current.id, {
+                        techStack: [...current.techStack, newTech.trim()],
+                      });
+                      setNewTech("");
+                    }
+                  }}
+                />
+                <IconButton
+                  variant="primary"
+                  size="lg"
+                  aria-label="Add tech"
+                  onClick={() => {
+                    if (!newTech.trim()) return;
+                    updateProject(current.id, {
+                      techStack: [...current.techStack, newTech.trim()],
+                    });
+                    setNewTech("");
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </IconButton>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                GitHub URL
+              </label>
+              <div className="flex gap-2">
+                <TextField
+                  value={current.githubUrl}
+                  onChange={(e) =>
+                    updateProject(current.id, { githubUrl: e.target.value })
+                  }
+                  placeholder="https://github.com/..."
+                />
+                {current.githubUrl ? (
+                  <a
+                    href={current.githubUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.04] text-muted-foreground"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Tasks
+              </label>
+              <div className="space-y-1.5">
+                {current.tasks.map((t) => (
+                  <div key={t.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={t.done}
+                      onChange={(e) =>
+                        updateProjectTask(current.id, t.id, {
+                          done: e.target.checked,
+                        })
+                      }
+                      className="h-4 w-4 accent-[#7c3aed]"
+                    />
+                    <input
+                      value={t.title}
+                      onChange={(e) =>
+                        updateProjectTask(current.id, t.id, {
+                          title: e.target.value,
+                        })
+                      }
+                      className="flex-1 bg-transparent text-[13px] outline-none"
+                    />
+                    <IconButton
+                      size="sm"
+                      variant="danger"
+                      aria-label="Remove"
+                      onClick={() => deleteProjectTask(current.id, t.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </IconButton>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <TextField
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  placeholder="Add task"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && newTask.trim()) {
+                      addProjectTask(current.id, newTask.trim());
+                      setNewTask("");
+                    }
+                  }}
+                />
+                <IconButton
+                  variant="primary"
+                  size="lg"
+                  aria-label="Add"
+                  onClick={() => {
+                    if (!newTask.trim()) return;
+                    addProjectTask(current.id, newTask.trim());
+                    setNewTask("");
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </IconButton>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                Notes
+              </label>
+              <TextArea
+                rows={4}
+                value={current.notes}
+                onChange={(e) =>
+                  updateProject(current.id, { notes: e.target.value })
+                }
+              />
+            </div>
+
+            <ActionButton
+              variant="danger"
+              className="w-full"
+              onClick={() => setConfirmDelete(current.id)}
+            >
+              <Trash2 className="h-4 w-4" /> Delete project
+            </ActionButton>
+          </div>
+        ) : null}
+      </BottomSheet>
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        onClose={() => setConfirmDelete(null)}
+        title="Delete project?"
+        onConfirm={() => {
+          if (confirmDelete) {
+            deleteProject(confirmDelete);
+            setEditing(null);
+          }
+        }}
+      />
     </AppShell>
   );
 }

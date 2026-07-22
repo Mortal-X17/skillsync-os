@@ -376,8 +376,9 @@ function ProfilePage() {
                 <SettingButtonRow
                   icon={Database}
                   label="Reset to demo data"
-                  onClick={() => setOpenReset(true)}
+                  onClick={() => beginReset("demo")}
                   danger
+
                 />
               </div>
             </Card>

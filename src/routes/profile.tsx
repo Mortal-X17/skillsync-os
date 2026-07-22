@@ -20,7 +20,7 @@ import {
   Sparkles,
   HardDrive,
 } from "lucide-react";
-import { AppShell, PageHeader } from "@/components/layout/AppShell";
+import { AppShell, AppFooter, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";

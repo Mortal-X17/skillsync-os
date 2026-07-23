@@ -30,6 +30,8 @@ type State = AppData & {
   addRoadmap: (title: string) => void;
   renameRoadmap: (id: string, title: string) => void;
   deleteRoadmap: (id: string) => void;
+  importRoadmap: (roadmap: Roadmap) => void;
+  replaceRoadmap: (id: string, roadmap: Roadmap) => void;
 
   addPhase: (roadmapId: string, title: string) => void;
   renamePhase: (roadmapId: string, phaseId: string, title: string) => void;
@@ -211,6 +213,12 @@ export const useAppStore = create<State>()(
         set((s) => updateRoadmap(s, id, (r) => ({ ...r, title }))),
       deleteRoadmap: (id) =>
         set((s) => ({ roadmaps: s.roadmaps.filter((r) => r.id !== id) })),
+      importRoadmap: (roadmap) =>
+        set((s) => ({ roadmaps: [...s.roadmaps, roadmap] })),
+      replaceRoadmap: (id, roadmap) =>
+        set((s) => ({
+          roadmaps: s.roadmaps.map((r) => (r.id === id ? roadmap : r)),
+        })),
 
       addPhase: (roadmapId, title) =>
         set((s) =>
@@ -601,6 +609,8 @@ export const useAppStore = create<State>()(
           addRoadmap,
           renameRoadmap,
           deleteRoadmap,
+          importRoadmap,
+          replaceRoadmap,
           addPhase,
           renamePhase,
           deletePhase,
@@ -645,6 +655,8 @@ export const useAppStore = create<State>()(
         void addRoadmap;
         void renameRoadmap;
         void deleteRoadmap;
+        void importRoadmap;
+        void replaceRoadmap;
         void addPhase;
         void renamePhase;
         void deletePhase;

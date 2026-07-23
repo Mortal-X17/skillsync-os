@@ -30,6 +30,8 @@ type State = AppData & {
   addRoadmap: (title: string) => void;
   renameRoadmap: (id: string, title: string) => void;
   deleteRoadmap: (id: string) => void;
+  importRoadmap: (roadmap: Roadmap) => void;
+  replaceRoadmap: (id: string, roadmap: Roadmap) => void;
 
   addPhase: (roadmapId: string, title: string) => void;
   renamePhase: (roadmapId: string, phaseId: string, title: string) => void;

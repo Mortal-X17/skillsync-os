@@ -213,6 +213,12 @@ export const useAppStore = create<State>()(
         set((s) => updateRoadmap(s, id, (r) => ({ ...r, title }))),
       deleteRoadmap: (id) =>
         set((s) => ({ roadmaps: s.roadmaps.filter((r) => r.id !== id) })),
+      importRoadmap: (roadmap) =>
+        set((s) => ({ roadmaps: [...s.roadmaps, roadmap] })),
+      replaceRoadmap: (id, roadmap) =>
+        set((s) => ({
+          roadmaps: s.roadmaps.map((r) => (r.id === id ? roadmap : r)),
+        })),
 
       addPhase: (roadmapId, title) =>
         set((s) =>

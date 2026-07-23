@@ -609,6 +609,8 @@ export const useAppStore = create<State>()(
           addRoadmap,
           renameRoadmap,
           deleteRoadmap,
+          importRoadmap,
+          replaceRoadmap,
           addPhase,
           renamePhase,
           deletePhase,

@@ -153,9 +153,20 @@ function LearnPage() {
   return (
     <AppShell>
       <PageHeader
+        sticky
         eyebrow="Roadmaps"
         title="Learn."
         subtitle="Curated paths built for depth, not noise."
+        right={
+          <button
+            type="button"
+            onClick={() => setFabOpen(true)}
+            aria-label="Create or import roadmap"
+            className="mt-0.5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full gradient-primary text-white shadow-[0_16px_40px_-12px_rgba(124,58,237,0.7)] transition-all active:scale-95"
+          >
+            <Plus className="h-6 w-6" strokeWidth={2.25} />
+          </button>
+        }
       />
       <div className="space-y-4 px-5 pb-28">
         {!hydrated ? (
@@ -233,17 +244,6 @@ function LearnPage() {
           );
         })}
       </div>
-
-      {/* Floating Action Button */}
-      <button
-        type="button"
-        onClick={() => setFabOpen(true)}
-        aria-label="Create or import roadmap"
-        className="fixed right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full gradient-primary text-white shadow-[0_16px_40px_-12px_rgba(124,58,237,0.7)] transition-all active:scale-95"
-        style={{ bottom: "calc(env(safe-area-inset-bottom) + 96px)" }}
-      >
-        <Plus className="h-6 w-6" strokeWidth={2.25} />
-      </button>
 
       {/* Hidden file input */}
       <input

@@ -245,17 +245,6 @@ function LearnPage() {
         })}
       </div>
 
-      {/* Floating Action Button */}
-      <button
-        type="button"
-        onClick={() => setFabOpen(true)}
-        aria-label="Create or import roadmap"
-        className="fixed right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full gradient-primary text-white shadow-[0_16px_40px_-12px_rgba(124,58,237,0.7)] transition-all active:scale-95"
-        style={{ bottom: "calc(env(safe-area-inset-bottom) + 96px)" }}
-      >
-        <Plus className="h-6 w-6" strokeWidth={2.25} />
-      </button>
-
       {/* Hidden file input */}
       <input
         ref={fileRef}

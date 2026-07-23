@@ -36,14 +36,22 @@ export function PageHeader({
   title,
   subtitle,
   right,
+  sticky = false,
 }: {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   right?: ReactNode;
+  sticky?: boolean;
 }) {
   return (
-    <header className="mb-6 flex items-start justify-between gap-4 px-5">
+    <header
+      className={cn(
+        "mb-6 flex items-start justify-between gap-4 px-5",
+        sticky &&
+          "sticky top-0 z-50 bg-background/95 py-5 backdrop-blur-xl transition-colors",
+      )}
+    >
       <div className="min-w-0">
         {eyebrow ? (
           <div className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">

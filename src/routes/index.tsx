@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Activity,
   LineChart,
+  GraduationCap,
 } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
@@ -69,6 +70,8 @@ function Dashboard() {
   const planner = useAppStore((s) => s.planner);
   const habits = useAppStore((s) => s.habits);
   const habitLogs = useAppStore((s) => s.habitLogs);
+  const modules = useAppStore((s) => s.preferences.modules);
+  const subjects = useAppStore((s) => s.attendance.subjects);
 
   const today = todayISO();
   const todaysTasks = useMemo(
@@ -85,6 +88,21 @@ function Dashboard() {
   );
   const todayHabitCount = habitLogs.filter((l) => l.date === today).length;
   const xpToNext = stats.xp % 100;
+
+  const attendance = useMemo(() => {
+    let p = 0;
+    let a = 0;
+    for (const s of subjects) {
+      p += s.present;
+      a += s.absent;
+    }
+    const total = p + a;
+    const pct = total > 0 ? Math.round((p / total) * 100) : 0;
+    const currentSem = subjects.length > 0
+      ? Math.max(...subjects.map((s) => s.semester))
+      : null;
+    return { present: p, total, pct, currentSem };
+  }, [subjects]);
 
   return (
     <AppShell>
@@ -388,6 +406,41 @@ function Dashboard() {
             </div>
           </Card>
         </section>
+
+        {hydrated && modules.attendance ? (
+          <section className="space-y-3">
+            <SectionHeader
+              title="Attendance"
+              action={<Link to="/attendance">Open</Link>}
+            />
+            <Link
+              to="/attendance"
+              className="card-surface flex items-center gap-3 p-4 transition-all active:scale-[0.98]"
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary">
+                <GraduationCap className="h-5 w-5 text-white" strokeWidth={1.75} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[13.5px] font-semibold tracking-tight">
+                  {attendance.total > 0
+                    ? `${attendance.pct}% overall attendance`
+                    : "No attendance data yet"}
+                </div>
+                <div className="mt-0.5 text-[11.5px] text-muted-foreground">
+                  {attendance.currentSem
+                    ? `Semester ${attendance.currentSem} · ${attendance.present}/${attendance.total} classes`
+                    : "Add subjects to start tracking"}
+                </div>
+                {attendance.total > 0 ? (
+                  <div className="mt-2">
+                    <ProgressBar value={attendance.pct} tone="gradient" />
+                  </div>
+                ) : null}
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+            </Link>
+          </section>
+        ) : null}
 
         <div className="h-4" />
 

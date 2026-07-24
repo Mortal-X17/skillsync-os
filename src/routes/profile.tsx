@@ -7,7 +7,6 @@ import {
   Info,
   Bell,
   Shield,
-  Settings2,
   BarChart3,
   Activity,
   Camera,
@@ -19,6 +18,10 @@ import {
   HardDrive,
   Lock,
   AlertTriangle,
+  Save,
+  SlidersHorizontal,
+  GraduationCap,
+  Wallet,
 } from "lucide-react";
 import { AppShell, AppFooter, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
@@ -26,7 +29,6 @@ import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
 import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
-import { BackupSection } from "@/components/profile/BackupSection";
 
 
 
@@ -420,7 +422,87 @@ function ProfilePage() {
           ) : null}
         </section>
 
-        <BackupSection onRequestReset={() => beginReset("all")} />
+        {/* Data */}
+        <section className="space-y-3">
+          <SectionHeader title="Data" />
+          <Link
+            to="/profile/backup"
+            className="card-surface flex items-center gap-3 p-4 transition-all active:scale-[0.98]"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary">
+              <Save className="h-5 w-5 text-white" strokeWidth={1.75} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[14px] font-semibold tracking-tight">
+                Backup &amp; Restore
+              </div>
+              <div className="text-[12px] text-muted-foreground">
+                Snapshots, restores and reset controls
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+          </Link>
+        </section>
+
+        {/* Modules */}
+        <section className="space-y-3">
+          <SectionHeader title="Modules" />
+          <Link
+            to="/profile/modules"
+            className="card-surface flex items-center gap-3 p-4 transition-all active:scale-[0.98]"
+          >
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.04]">
+              <SlidersHorizontal className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[14px] font-semibold tracking-tight">
+                Optional modules
+              </div>
+              <div className="text-[12px] text-muted-foreground">
+                Enable Attendance, Expenses and more
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+          </Link>
+          {preferences.modules.attendance ? (
+            <Link
+              to="/attendance"
+              className="card-surface flex items-center gap-3 p-4 transition-all active:scale-[0.98]"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.04]">
+                <GraduationCap className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold tracking-tight">
+                  College Attendance
+                </div>
+                <div className="text-[12px] text-muted-foreground">
+                  Semester-wise attendance tracker
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+            </Link>
+          ) : null}
+          {preferences.modules.expenses ? (
+            <Link
+              to="/expenses"
+              className="card-surface flex items-center gap-3 p-4 transition-all active:scale-[0.98]"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.04]">
+                <Wallet className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold tracking-tight">
+                  Expense Manager
+                </div>
+                <div className="text-[12px] text-muted-foreground">
+                  Track monthly credits and debits
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+            </Link>
+          ) : null}
+        </section>
 
 
         {/* About */}

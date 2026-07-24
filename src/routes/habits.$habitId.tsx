@@ -40,11 +40,17 @@ function HabitDetail() {
 
   const habit = useAppStore((s) => s.habits.find((h) => h.id === habitId));
   const habitLogs = useAppStore((s) => s.habitLogs);
+  const startISO =
+    habit?.startDate ?? (habit ? todayISO(new Date(habit.createdAt)) : todayISO());
   const logs = useMemo(
-    () => habitLogs.filter((l) => l.habitId === habitId),
-    [habitLogs, habitId],
+    () =>
+      habitLogs.filter(
+        (l) => l.habitId === habitId && l.date >= startISO,
+      ),
+    [habitLogs, habitId, startISO],
   );
   const renameHabit = useAppStore((s) => s.renameHabit);
+  const updateHabit = useAppStore((s) => s.updateHabit);
   const deleteHabit = useAppStore((s) => s.deleteHabit);
   const toggleHabitToday = useAppStore((s) => s.toggleHabitToday);
 
@@ -52,6 +58,7 @@ function HabitDetail() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [title, setTitle] = useState("");
   const [emoji, setEmoji] = useState("✨");
+  const [startInput, setStartInput] = useState("");
   const [monthOffset, setMonthOffset] = useState(0);
 
   const doneSet = useMemo(() => new Set(logs.map((l) => l.date)), [logs]);
@@ -100,14 +107,13 @@ function HabitDetail() {
 
   const overallPct = useMemo(() => {
     if (!habit) return 0;
-    const created = new Date(habit.createdAt);
-    const start = new Date(created.getFullYear(), created.getMonth(), created.getDate());
+    const start = new Date(startISO);
     const now = new Date();
     const days =
       Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     if (days <= 0) return 0;
     return Math.round((logs.length / days) * 100);
-  }, [habit, logs]);
+  }, [habit, logs, startISO]);
 
   const calendarCells = useMemo(() => {
     const now = new Date();
@@ -165,6 +171,7 @@ function HabitDetail() {
             onClick={() => {
               setTitle(habit.title);
               setEmoji(habit.emoji);
+              setStartInput(startISO);
               setEditOpen(true);
             }}
           >
@@ -247,7 +254,7 @@ function HabitDetail() {
           <ProgressBar value={overallPct} tone="gradient" />
           <div className="mt-3 flex flex-wrap gap-1.5">
             <Chip>{logs.length} check-ins</Chip>
-            <Chip>Since {fromISO(new Date(habit.createdAt).toISOString().slice(0, 10)).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</Chip>
+            <Chip>Since {fromISO(startISO).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</Chip>
           </div>
         </Card>
       </section>
@@ -325,17 +332,31 @@ function HabitDetail() {
               className="flex-1"
             />
           </div>
+          <div className="space-y-1.5">
+            <label className="block text-[12px] text-muted-foreground">
+              Start date
+            </label>
+            <TextField
+              type="date"
+              value={startInput}
+              max={today}
+              onChange={(e) => setStartInput(e.target.value)}
+            />
+            <p className="text-[11.5px] text-muted-foreground/80">
+              Stats and calendar are calculated from this date. Check-ins before
+              this date are preserved but ignored in totals.
+            </p>
+          </div>
           <ActionButton
             className="w-full"
             onClick={() => {
               if (!title.trim()) return;
               renameHabit(habit.id, title.trim());
-              // emoji not directly editable in store; update via internal setter
-              useAppStore.setState((s) => ({
-                habits: s.habits.map((h) =>
-                  h.id === habit.id ? { ...h, emoji: emoji || "✨" } : h,
-                ),
-              }));
+              const nextStart = startInput && startInput <= today ? startInput : startISO;
+              updateHabit(habit.id, {
+                emoji: emoji || "✨",
+                startDate: nextStart,
+              });
               setEditOpen(false);
             }}
           >

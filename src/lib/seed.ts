@@ -1,6 +1,7 @@
 import { newId } from "./id";
 import type { AppData, Roadmap, Habit, Phase, Topic } from "./schema";
 import { CURRENT_SCHEMA_VERSION } from "./schema";
+import { todayISO } from "./date";
 
 function makeTopic(title: string): Topic {
   return {
@@ -41,7 +42,7 @@ function makeRoadmap(
 }
 
 function makeHabit(title: string, emoji: string): Habit {
-  return { id: newId(), title, emoji, createdAt: Date.now() };
+  return { id: newId(), title, emoji, createdAt: Date.now(), startDate: todayISO() };
 }
 
 export function createInitialData(): AppData {
@@ -160,7 +161,13 @@ export function createInitialData(): AppData {
     ],
     habitLogs: [],
     profile: { name: "Learner", avatar: "" },
-    preferences: { notifications: true, developerMode: false },
+    preferences: {
+      notifications: true,
+      developerMode: false,
+      modules: { attendance: false, expenses: false },
+    },
     stats: { xp: 0, level: 1, streak: 0, lastActive: "" },
+    attendance: { subjects: [] },
+    expenses: { transactions: [] },
   };
 }

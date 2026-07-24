@@ -59,6 +59,10 @@ function RoadmapDetail() {
   const addTopic = useAppStore((s) => s.addTopic);
   const updateTopic = useAppStore((s) => s.updateTopic);
   const updateSubtopic = useAppStore((s) => s.updateSubtopic);
+  const setPhaseComplete = useAppStore((s) => s.setPhaseComplete);
+  const setTopicComplete = useAppStore((s) => s.setTopicComplete);
+  const setSubtopicComplete = useAppStore((s) => s.setSubtopicComplete);
+  const updateChecklistItem = useAppStore((s) => s.updateChecklistItem);
   const deleteTopic = useAppStore((s) => s.deleteTopic);
   const moveTopic = useAppStore((s) => s.moveTopic);
   const renameRoadmap = useAppStore((s) => s.renameRoadmap);
@@ -66,6 +70,7 @@ function RoadmapDetail() {
 
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [subOpen, setSubOpen] = useState<Record<string, boolean>>({});
   const [newPhase, setNewPhase] = useState(false);
   const [phaseTitle, setPhaseTitle] = useState("");
   const [addTopicToPhase, setAddTopicToPhase] = useState<string | null>(null);
@@ -171,6 +176,20 @@ function RoadmapDetail() {
             <Card key={phase.id} className="space-y-3 p-4">
               <div className="flex items-center gap-2">
                 <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPhaseComplete(roadmap.id, phase.id, pPct !== 100);
+                  }}
+                  aria-label={pPct === 100 ? "Mark phase incomplete" : "Mark phase complete"}
+                  className="flex h-6 w-6 shrink-0 items-center justify-center"
+                >
+                  {pPct === 100 ? (
+                    <CheckCircle2 className="h-5 w-5 text-[#7c3aed]" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
+                  )}
+                </button>
+                <button
                   onClick={() =>
                     setCollapsed((c) => ({ ...c, [phase.id]: !c[phase.id] }))
                   }
@@ -261,9 +280,12 @@ function RoadmapDetail() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                updateTopic(roadmap.id, phase.id, topic.id, {
-                                  done: !topic.done,
-                                });
+                                setTopicComplete(
+                                  roadmap.id,
+                                  phase.id,
+                                  topic.id,
+                                  tPct !== 100,
+                                );
                               }}
                               aria-label="Toggle topic"
                               className="flex h-5 w-5 items-center justify-center"
@@ -334,37 +356,101 @@ function RoadmapDetail() {
                               {topic.subtopics.map((sub) => {
                                 const sPct = subtopicPct(sub);
                                 const complete = sPct === 100;
+                                const expanded = !!subOpen[sub.id];
+                                const hasChecklist = sub.checklist.length > 0;
                                 return (
                                   <li key={sub.id}>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        updateSubtopic(
-                                          roadmap.id,
-                                          phase.id,
-                                          topic.id,
-                                          sub.id,
-                                          { done: !complete },
-                                        );
-                                      }}
-                                      className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-white/[0.03]"
-                                    >
-                                      {complete ? (
-                                        <CheckCircle2 className="h-4 w-4 shrink-0 text-[#7c3aed]" />
-                                      ) : (
-                                        <Circle className="h-4 w-4 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
-                                      )}
-                                      <span
-                                        className={`flex-1 truncate text-[12.5px] ${complete ? "text-muted-foreground line-through" : "text-foreground/85"}`}
-                                      >
-                                        {sub.title}
-                                      </span>
-                                      {sub.checklist.length > 0 ? (
-                                        <span className="text-[10.5px] text-muted-foreground">
-                                          {sPct}%
-                                        </span>
+                                    <div className="rounded-lg transition-colors hover:bg-white/[0.02]">
+                                      <div className="flex w-full items-center gap-1 py-0.5">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSubtopicComplete(
+                                              roadmap.id,
+                                              phase.id,
+                                              topic.id,
+                                              sub.id,
+                                              !complete,
+                                            );
+                                          }}
+                                          aria-label={complete ? "Mark subtopic incomplete" : "Mark subtopic complete"}
+                                          className="flex h-6 w-6 shrink-0 items-center justify-center"
+                                        >
+                                          {complete ? (
+                                            <CheckCircle2 className="h-4 w-4 text-[#7c3aed]" />
+                                          ) : (
+                                            <Circle className="h-4 w-4 text-muted-foreground/60" strokeWidth={1.5} />
+                                          )}
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (hasChecklist) {
+                                              setSubOpen((o) => ({
+                                                ...o,
+                                                [sub.id]: !o[sub.id],
+                                              }));
+                                            }
+                                          }}
+                                          className="flex flex-1 items-center gap-1.5 rounded-lg px-1.5 py-1 text-left"
+                                        >
+                                          {hasChecklist ? (
+                                            expanded ? (
+                                              <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground transition-transform" />
+                                            ) : (
+                                              <ChevronRight className="h-3 w-3 shrink-0 text-muted-foreground transition-transform" />
+                                            )
+                                          ) : (
+                                            <span className="h-3 w-3 shrink-0" />
+                                          )}
+                                          <span
+                                            className={`flex-1 truncate text-[12.5px] ${complete ? "text-muted-foreground line-through" : "text-foreground/85"}`}
+                                          >
+                                            {sub.title}
+                                          </span>
+                                          {hasChecklist ? (
+                                            <span className="text-[10.5px] text-muted-foreground">
+                                              {sPct}%
+                                            </span>
+                                          ) : null}
+                                        </button>
+                                      </div>
+                                      {expanded && hasChecklist ? (
+                                        <ul className="ml-6 space-y-0.5 pb-1.5 pl-1">
+                                          {sub.checklist.map((c) => (
+                                            <li key={c.id}>
+                                              <button
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  updateChecklistItem(
+                                                    {
+                                                      roadmapId: roadmap.id,
+                                                      phaseId: phase.id,
+                                                      topicId: topic.id,
+                                                      subtopicId: sub.id,
+                                                    },
+                                                    c.id,
+                                                    { done: !c.done },
+                                                  );
+                                                }}
+                                                className="flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-white/[0.03]"
+                                              >
+                                                {c.done ? (
+                                                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#7c3aed]" />
+                                                ) : (
+                                                  <Circle className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                                                )}
+                                                <span
+                                                  className={`flex-1 truncate text-[11.5px] ${c.done ? "text-muted-foreground line-through" : "text-foreground/75"}`}
+                                                >
+                                                  {c.title}
+                                                </span>
+                                              </button>
+                                            </li>
+                                          ))}
+                                        </ul>
                                       ) : null}
-                                    </button>
+                                    </div>
                                   </li>
                                 );
                               })}

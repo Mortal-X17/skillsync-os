@@ -436,47 +436,8 @@ function ProfilePage() {
           ) : null}
         </section>
 
-        {/* Backup */}
-        <section className="space-y-3">
-          <SectionHeader title="Backup" />
-          <Card className="p-2">
-            <div className="divide-y divide-white/[0.05]">
-              <SettingButtonRow icon={Download} label="Export data" onClick={handleExport} />
-              <SettingButtonRow
-                icon={Upload}
-                label="Import data"
-                onClick={() => fileRef.current?.click()}
-              />
-              <SettingButtonRow
-                icon={RotateCcw}
-                label="Reset everything"
-                onClick={() => beginReset("all")}
-                danger
+        <BackupSection onRequestReset={() => beginReset("all")} />
 
-              />
-            </div>
-          </Card>
-          <p className="px-1 text-[11.5px] leading-relaxed text-muted-foreground">
-            Everything lives on this device. Export a JSON backup regularly to
-            keep your progress safe across updates and re-installs.
-          </p>
-          {importMsg ? (
-            <div className="text-center text-[12px] text-muted-foreground">
-              {importMsg}
-            </div>
-          ) : null}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) handleImport(f);
-              e.target.value = "";
-            }}
-          />
-        </section>
 
         {/* About */}
         <section className="space-y-3">

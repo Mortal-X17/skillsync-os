@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PlannerRouteImport } from './routes/planner'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as LearnRouteImport } from './routes/learn'
@@ -39,6 +40,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlannerRoute = PlannerRouteImport.update({
@@ -82,9 +88,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfileRoute,
 } as any)
 const LearnIndexRoute = LearnIndexRouteImport.update({
   id: '/',
@@ -107,14 +113,14 @@ const AttendanceIndexRoute = AttendanceIndexRouteImport.update({
   getParentRoute: () => AttendanceRoute,
 } as any)
 const ProfileModulesRoute = ProfileModulesRouteImport.update({
-  id: '/profile/modules',
-  path: '/profile/modules',
-  getParentRoute: () => rootRouteImport,
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => ProfileRoute,
 } as any)
 const ProfileBackupRoute = ProfileBackupRouteImport.update({
-  id: '/profile/backup',
-  path: '/profile/backup',
-  getParentRoute: () => rootRouteImport,
+  id: '/backup',
+  path: '/backup',
+  getParentRoute: () => ProfileRoute,
 } as any)
 const LearnRoadmapIdRoute = LearnRoadmapIdRouteImport.update({
   id: '/$roadmapId',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/learn': typeof LearnRouteWithChildren
   '/notes': typeof NotesRoute
   '/planner': typeof PlannerRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/projects': typeof ProjectsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/attendance/$semester': typeof AttendanceSemesterRoute
@@ -189,6 +196,7 @@ export interface FileRoutesById {
   '/learn': typeof LearnRouteWithChildren
   '/notes': typeof NotesRoute
   '/planner': typeof PlannerRoute
+  '/profile': typeof ProfileRouteWithChildren
   '/projects': typeof ProjectsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/attendance/$semester': typeof AttendanceSemesterRoute
@@ -214,6 +222,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/notes'
     | '/planner'
+    | '/profile'
     | '/projects'
     | '/sitemap.xml'
     | '/attendance/$semester'
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/notes'
     | '/planner'
+    | '/profile'
     | '/projects'
     | '/sitemap.xml'
     | '/attendance/$semester'
@@ -280,11 +290,9 @@ export interface RootRouteChildren {
   LearnRoute: typeof LearnRouteWithChildren
   NotesRoute: typeof NotesRoute
   PlannerRoute: typeof PlannerRoute
+  ProfileRoute: typeof ProfileRouteWithChildren
   ProjectsRoute: typeof ProjectsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ProfileBackupRoute: typeof ProfileBackupRoute
-  ProfileModulesRoute: typeof ProfileModulesRoute
-  ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -301,6 +309,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/planner': {
@@ -361,10 +376,10 @@ declare module '@tanstack/react-router' {
     }
     '/profile/': {
       id: '/profile/'
-      path: '/profile'
+      path: '/'
       fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ProfileRoute
     }
     '/learn/': {
       id: '/learn/'
@@ -396,17 +411,17 @@ declare module '@tanstack/react-router' {
     }
     '/profile/modules': {
       id: '/profile/modules'
-      path: '/profile/modules'
+      path: '/modules'
       fullPath: '/profile/modules'
       preLoaderRoute: typeof ProfileModulesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ProfileRoute
     }
     '/profile/backup': {
       id: '/profile/backup'
-      path: '/profile/backup'
+      path: '/backup'
       fullPath: '/profile/backup'
       preLoaderRoute: typeof ProfileBackupRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ProfileRoute
     }
     '/learn/$roadmapId': {
       id: '/learn/$roadmapId'
@@ -492,6 +507,21 @@ const LearnRouteChildren: LearnRouteChildren = {
 
 const LearnRouteWithChildren = LearnRoute._addFileChildren(LearnRouteChildren)
 
+interface ProfileRouteChildren {
+  ProfileBackupRoute: typeof ProfileBackupRoute
+  ProfileModulesRoute: typeof ProfileModulesRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
+}
+
+const ProfileRouteChildren: ProfileRouteChildren = {
+  ProfileBackupRoute: ProfileBackupRoute,
+  ProfileModulesRoute: ProfileModulesRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
+}
+
+const ProfileRouteWithChildren =
+  ProfileRoute._addFileChildren(ProfileRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyticsRoute: AnalyticsRoute,
@@ -501,12 +531,20 @@ const rootRouteChildren: RootRouteChildren = {
   LearnRoute: LearnRouteWithChildren,
   NotesRoute: NotesRoute,
   PlannerRoute: PlannerRoute,
+  ProfileRoute: ProfileRouteWithChildren,
   ProjectsRoute: ProjectsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ProfileBackupRoute: ProfileBackupRoute,
-  ProfileModulesRoute: ProfileModulesRoute,
-  ProfileIndexRoute: ProfileIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -1,12 +1,37 @@
 import { CURRENT_SCHEMA_VERSION, AppDataSchema, type AppData } from "./schema";
 import { createInitialData } from "./seed";
+import { todayISO } from "./date";
 
 /**
- * Run version-to-version migrations here. Never wipe user data.
- * Each entry migrates FROM its key TO key+1.
+ * v1 → v2: adds habit.startDate, attendance module, expenses module,
+ * preferences.modules flags.
  */
 const migrators: Record<number, (data: any) => any> = {
-  // 0: (data) => ({ ...data, schemaVersion: 1 }),
+  1: (data) => {
+    const habits = Array.isArray(data.habits)
+      ? data.habits.map((h: any) => {
+          if (h && typeof h === "object" && h.startDate === undefined) {
+            const createdAt = typeof h.createdAt === "number" ? h.createdAt : Date.now();
+            return { ...h, startDate: todayISO(new Date(createdAt)) };
+          }
+          return h;
+        })
+      : [];
+    const preferences = {
+      notifications: true,
+      developerMode: false,
+      modules: { attendance: false, expenses: false },
+      ...(data.preferences ?? {}),
+    };
+    if (!preferences.modules) preferences.modules = { attendance: false, expenses: false };
+    return {
+      ...data,
+      habits,
+      preferences,
+      attendance: data.attendance ?? { subjects: [] },
+      expenses: data.expenses ?? { transactions: [] },
+    };
+  },
 };
 
 export function migrate(input: unknown): AppData {
@@ -24,6 +49,5 @@ export function migrate(input: unknown): AppData {
 
   const parsed = AppDataSchema.safeParse(data);
   if (parsed.success) return parsed.data;
-  // fall back but keep as much as possible
   return { ...seed, ...data, schemaVersion: CURRENT_SCHEMA_VERSION };
 }

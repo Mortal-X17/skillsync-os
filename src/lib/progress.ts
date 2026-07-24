@@ -1,44 +1,82 @@
 import type { Roadmap, Phase, Topic, Subtopic } from "./schema";
 
-function subtopicPct(s: Subtopic): number {
-  if (s.checklist.length === 0) return s.done ? 100 : 0;
-  const done = s.checklist.filter((c) => c.done).length;
-  return Math.round((done / s.checklist.length) * 100);
+/**
+ * Progress is derived from checklist "leaves" only.
+ * When a subtopic (or topic) has no checklist items, its own `done` flag
+ * counts as a single synthetic leaf so pre-existing data still contributes.
+ */
+export function subtopicLeaves(s: Subtopic): { done: number; total: number } {
+  if (s.checklist.length > 0) {
+    return {
+      done: s.checklist.filter((c) => c.done).length,
+      total: s.checklist.length,
+    };
+  }
+  return { done: s.done ? 1 : 0, total: 1 };
+}
+
+export function topicLeaves(t: Topic): { done: number; total: number } {
+  let done = 0;
+  let total = 0;
+  if (t.checklist.length > 0) {
+    done += t.checklist.filter((c) => c.done).length;
+    total += t.checklist.length;
+  }
+  if (t.subtopics.length > 0) {
+    for (const s of t.subtopics) {
+      const l = subtopicLeaves(s);
+      done += l.done;
+      total += l.total;
+    }
+  }
+  if (total === 0) {
+    // No checklist and no subtopics anywhere → fall back to topic.done.
+    return { done: t.done ? 1 : 0, total: 1 };
+  }
+  return { done, total };
+}
+
+export function phaseLeaves(p: Phase): { done: number; total: number } {
+  let done = 0;
+  let total = 0;
+  for (const t of p.topics) {
+    const l = topicLeaves(t);
+    done += l.done;
+    total += l.total;
+  }
+  return { done, total };
+}
+
+export function roadmapLeaves(r: Roadmap): { done: number; total: number } {
+  let done = 0;
+  let total = 0;
+  for (const p of r.phases) {
+    const l = phaseLeaves(p);
+    done += l.done;
+    total += l.total;
+  }
+  return { done, total };
+}
+
+function pct({ done, total }: { done: number; total: number }): number {
+  if (total <= 0) return 0;
+  return Math.round((done / total) * 100);
+}
+
+export function subtopicPct(s: Subtopic): number {
+  return pct(subtopicLeaves(s));
 }
 
 export function topicPct(t: Topic): number {
-  const parts: number[] = [];
-  if (t.checklist.length > 0) {
-    parts.push(
-      Math.round(
-        (t.checklist.filter((c) => c.done).length / t.checklist.length) * 100,
-      ),
-    );
-  }
-  if (t.subtopics.length > 0) {
-    parts.push(
-      Math.round(
-        t.subtopics.reduce((sum, s) => sum + subtopicPct(s), 0) /
-          t.subtopics.length,
-      ),
-    );
-  }
-  if (parts.length === 0) return t.done ? 100 : 0;
-  return Math.round(parts.reduce((a, b) => a + b, 0) / parts.length);
+  return pct(topicLeaves(t));
 }
 
 export function phasePct(p: Phase): number {
-  if (p.topics.length === 0) return 0;
-  return Math.round(
-    p.topics.reduce((s, t) => s + topicPct(t), 0) / p.topics.length,
-  );
+  return pct(phaseLeaves(p));
 }
 
 export function roadmapPct(r: Roadmap): number {
-  if (r.phases.length === 0) return 0;
-  return Math.round(
-    r.phases.reduce((s, p) => s + phasePct(p), 0) / r.phases.length,
-  );
+  return pct(roadmapLeaves(r));
 }
 
 export function roadmapCounts(r: Roadmap) {
@@ -52,5 +90,3 @@ export function roadmapCounts(r: Roadmap) {
   }
   return { topics, done };
 }
-
-export { subtopicPct };

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 export const ChecklistItemSchema = z.object({
   id: z.string(),
@@ -89,7 +89,7 @@ export const ProjectSchema = z.object({
 export const PlannerTaskSchema = z.object({
   id: z.string(),
   title: z.string(),
-  date: z.string(), // YYYY-MM-DD
+  date: z.string(),
   time: z.string().default(""),
   done: z.boolean().default(false),
   createdAt: z.number(),
@@ -100,11 +100,12 @@ export const HabitSchema = z.object({
   title: z.string(),
   emoji: z.string().default("✨"),
   createdAt: z.number(),
+  startDate: z.string().nullable().default(null),
 });
 
 export const HabitLogSchema = z.object({
   habitId: z.string(),
-  date: z.string(), // YYYY-MM-DD
+  date: z.string(),
 });
 
 export const ProfileSchema = z.object({
@@ -112,16 +113,49 @@ export const ProfileSchema = z.object({
   avatar: z.string().default(""),
 });
 
+export const ModuleFlagsSchema = z.object({
+  attendance: z.boolean().default(false),
+  expenses: z.boolean().default(false),
+});
+
 export const PreferencesSchema = z.object({
   notifications: z.boolean().default(true),
   developerMode: z.boolean().default(false),
+  modules: ModuleFlagsSchema.default({ attendance: false, expenses: false }),
 });
 
 export const StatsSchema = z.object({
   xp: z.number().default(0),
   level: z.number().default(1),
   streak: z.number().default(0),
-  lastActive: z.string().default(""), // YYYY-MM-DD
+  lastActive: z.string().default(""),
+});
+
+export const SubjectSchema = z.object({
+  id: z.string(),
+  semester: z.number().int().min(1).max(8),
+  name: z.string(),
+  faculty: z.string().default(""),
+  minRequired: z.number().min(0).max(100).default(75),
+  present: z.number().int().min(0).default(0),
+  absent: z.number().int().min(0).default(0),
+  createdAt: z.number(),
+});
+
+export const AttendanceSchema = z.object({
+  subjects: z.array(SubjectSchema).default([]),
+});
+
+export const TransactionSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  amount: z.number(),
+  type: z.enum(["credit", "debit"]),
+  at: z.number(),
+});
+
+export const ExpensesSchema = z.object({
+  transactions: z.array(TransactionSchema).default([]),
 });
 
 export const AppDataSchema = z.object({
@@ -136,8 +170,11 @@ export const AppDataSchema = z.object({
   preferences: PreferencesSchema.default({
     notifications: true,
     developerMode: false,
+    modules: { attendance: false, expenses: false },
   }),
   stats: StatsSchema.default({ xp: 0, level: 1, streak: 0, lastActive: "" }),
+  attendance: AttendanceSchema.default({ subjects: [] }),
+  expenses: ExpensesSchema.default({ transactions: [] }),
 });
 
 export type ChecklistItem = z.infer<typeof ChecklistItemSchema>;
@@ -155,4 +192,8 @@ export type HabitLog = z.infer<typeof HabitLogSchema>;
 export type Profile = z.infer<typeof ProfileSchema>;
 export type Preferences = z.infer<typeof PreferencesSchema>;
 export type Stats = z.infer<typeof StatsSchema>;
+export type Subject = z.infer<typeof SubjectSchema>;
+export type Attendance = z.infer<typeof AttendanceSchema>;
+export type Transaction = z.infer<typeof TransactionSchema>;
+export type Expenses = z.infer<typeof ExpensesSchema>;
 export type AppData = z.infer<typeof AppDataSchema>;

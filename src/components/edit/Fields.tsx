@@ -3,18 +3,9 @@ import { cn } from "@/lib/utils";
 
 /**
  * Global autofill suppression props applied to every reusable input.
- *
- * SkillSync has no auth surface (no email/password fields), so Android's
- * Autofill Framework, Password Managers and Credential Manager should
- * never activate anywhere in the app.
- *
- * These attributes are the widest compatible set:
- *  - autoComplete="off" is the standard HTML opt-out (respected by Chrome / WebView)
- *  - autoCorrect / autoCapitalize / spellCheck give plain-text keyboard behavior
- *  - data-form-type="other", data-lpignore, data-1p-ignore, data-bwignore
- *    silence LastPass / 1Password / Bitwarden / other browser extensions
+ * Exported so bare <input> / <textarea> elsewhere can spread it.
  */
-const NO_AUTOFILL_PROPS = {
+export const NO_AUTOFILL_PROPS = {
   autoComplete: "off",
   autoCorrect: "off",
   autoCapitalize: "off",

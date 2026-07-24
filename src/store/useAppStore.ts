@@ -14,13 +14,16 @@ import type {
   Habit,
   Preferences,
   Profile,
-  Stats,
+  Subject,
+  Transaction,
 } from "@/lib/schema";
 import { AppDataSchema } from "@/lib/schema";
 import { createInitialData } from "@/lib/seed";
 import { migrate } from "@/lib/migrations";
 import { newId } from "@/lib/id";
 import { todayISO } from "@/lib/date";
+
+type ModuleKey = "attendance" | "expenses";
 
 type State = AppData & {
   _hydrated: boolean;
@@ -102,6 +105,26 @@ type State = AppData & {
     itemId: string,
   ) => void;
 
+  // hierarchical completion cascades
+  setPhaseComplete: (
+    roadmapId: string,
+    phaseId: string,
+    done: boolean,
+  ) => void;
+  setTopicComplete: (
+    roadmapId: string,
+    phaseId: string,
+    topicId: string,
+    done: boolean,
+  ) => void;
+  setSubtopicComplete: (
+    roadmapId: string,
+    phaseId: string,
+    topicId: string,
+    subtopicId: string,
+    done: boolean,
+  ) => void;
+
   // notes
   addNote: (partial?: Partial<Note>) => Note;
   updateNote: (id: string, patch: Partial<Note>) => void;
@@ -127,14 +150,25 @@ type State = AppData & {
   // habits
   addHabit: (title: string, emoji?: string) => void;
   renameHabit: (id: string, title: string) => void;
+  updateHabit: (id: string, patch: Partial<Habit>) => void;
   deleteHabit: (id: string) => void;
   toggleHabitToday: (id: string, dateISO?: string) => void;
 
   // profile / prefs / stats
   updateProfile: (patch: Partial<Profile>) => void;
   updatePreferences: (patch: Partial<Preferences>) => void;
+  setModuleEnabled: (key: ModuleKey, enabled: boolean) => void;
   addXp: (amount: number) => void;
   touchStreak: () => void;
+
+  // attendance
+  addSubject: (partial: Omit<Subject, "id" | "createdAt" | "present" | "absent"> & Partial<Subject>) => Subject;
+  updateSubject: (id: string, patch: Partial<Subject>) => void;
+  deleteSubject: (id: string) => void;
+
+  // expenses
+  addTransaction: (partial: Omit<Transaction, "id" | "at"> & Partial<Transaction>) => Transaction;
+  deleteTransaction: (id: string) => void;
 
   // backup
   exportJSON: () => string;
@@ -144,6 +178,7 @@ type State = AppData & {
 
 const STORAGE_KEY = "skillsync:data:v1";
 
+// ---------- helpers ----------
 function updateRoadmap(
   state: State,
   id: string,
@@ -186,6 +221,46 @@ function move<T>(arr: T[], idx: number, dir: -1 | 1): T[] {
   const [item] = copy.splice(idx, 1);
   copy.splice(j, 0, item);
   return copy;
+}
+
+// Cascade: set every checklist item + subtopic.done inside a subtopic.
+function propagateSubtopic(sub: Subtopic, done: boolean): Subtopic {
+  return {
+    ...sub,
+    done,
+    checklist: sub.checklist.map((c) => ({ ...c, done })),
+  };
+}
+// Cascade: set every checklist + subtopics under a topic.
+function propagateTopic(topic: Topic, done: boolean): Topic {
+  return {
+    ...topic,
+    done,
+    checklist: topic.checklist.map((c) => ({ ...c, done })),
+    subtopics: topic.subtopics.map((s) => propagateSubtopic(s, done)),
+  };
+}
+// Reverse-sync: subtopic.done ↔ all its checklist items done.
+function normalizeSubtopic(sub: Subtopic): Subtopic {
+  if (sub.checklist.length === 0) return sub;
+  const allDone = sub.checklist.every((c) => c.done);
+  if (sub.done === allDone) return sub;
+  return { ...sub, done: allDone };
+}
+// Reverse-sync: topic.done ↔ (all its checklist done AND all subtopics done).
+function normalizeTopic(topic: Topic): Topic {
+  const next: Topic = {
+    ...topic,
+    subtopics: topic.subtopics.map(normalizeSubtopic),
+  };
+  const checksAllDone =
+    next.checklist.length === 0 || next.checklist.every((c) => c.done);
+  const subsAllDone =
+    next.subtopics.length === 0 || next.subtopics.every((s) => s.done);
+  const hasAny = next.checklist.length > 0 || next.subtopics.length > 0;
+  const allDone = hasAny && checksAllDone && subsAllDone;
+  if (next.done === allDone) return next;
+  return { ...next, done: allDone };
 }
 
 export const useAppStore = create<State>()(
@@ -310,19 +385,23 @@ export const useAppStore = create<State>()(
         ),
       updateSubtopic: (roadmapId, phaseId, topicId, subtopicId, patch) =>
         set((s) =>
-          updateTopicIn(s, roadmapId, phaseId, topicId, (t) => ({
-            ...t,
-            subtopics: t.subtopics.map((sub) =>
-              sub.id === subtopicId ? { ...sub, ...patch } : sub,
-            ),
-          })),
+          updateTopicIn(s, roadmapId, phaseId, topicId, (t) =>
+            normalizeTopic({
+              ...t,
+              subtopics: t.subtopics.map((sub) =>
+                sub.id === subtopicId ? { ...sub, ...patch } : sub,
+              ),
+            }),
+          ),
         ),
       deleteSubtopic: (roadmapId, phaseId, topicId, subtopicId) =>
         set((s) =>
-          updateTopicIn(s, roadmapId, phaseId, topicId, (t) => ({
-            ...t,
-            subtopics: t.subtopics.filter((sub) => sub.id !== subtopicId),
-          })),
+          updateTopicIn(s, roadmapId, phaseId, topicId, (t) =>
+            normalizeTopic({
+              ...t,
+              subtopics: t.subtopics.filter((sub) => sub.id !== subtopicId),
+            }),
+          ),
         ),
 
       addChecklistItem: (path, title) =>
@@ -335,23 +414,26 @@ export const useAppStore = create<State>()(
               createdAt: Date.now(),
             };
             if (path.subtopicId) {
-              return {
+              return normalizeTopic({
                 ...t,
                 subtopics: t.subtopics.map((sub) =>
                   sub.id === path.subtopicId
                     ? { ...sub, checklist: [...sub.checklist, item] }
                     : sub,
                 ),
-              };
+              });
             }
-            return { ...t, checklist: [...t.checklist, item] };
+            return normalizeTopic({
+              ...t,
+              checklist: [...t.checklist, item],
+            });
           }),
         ),
       updateChecklistItem: (path, itemId, patch) =>
         set((s) =>
           updateTopicIn(s, path.roadmapId, path.phaseId, path.topicId, (t) => {
             if (path.subtopicId) {
-              return {
+              return normalizeTopic({
                 ...t,
                 subtopics: t.subtopics.map((sub) =>
                   sub.id === path.subtopicId
@@ -363,21 +445,21 @@ export const useAppStore = create<State>()(
                       }
                     : sub,
                 ),
-              };
+              });
             }
-            return {
+            return normalizeTopic({
               ...t,
               checklist: t.checklist.map((c) =>
                 c.id === itemId ? { ...c, ...patch } : c,
               ),
-            };
+            });
           }),
         ),
       deleteChecklistItem: (path, itemId) =>
         set((s) =>
           updateTopicIn(s, path.roadmapId, path.phaseId, path.topicId, (t) => {
             if (path.subtopicId) {
-              return {
+              return normalizeTopic({
                 ...t,
                 subtopics: t.subtopics.map((sub) =>
                   sub.id === path.subtopicId
@@ -387,13 +469,38 @@ export const useAppStore = create<State>()(
                       }
                     : sub,
                 ),
-              };
+              });
             }
-            return {
+            return normalizeTopic({
               ...t,
               checklist: t.checklist.filter((c) => c.id !== itemId),
-            };
+            });
           }),
+        ),
+
+      setSubtopicComplete: (roadmapId, phaseId, topicId, subtopicId, done) =>
+        set((s) =>
+          updateTopicIn(s, roadmapId, phaseId, topicId, (t) =>
+            normalizeTopic({
+              ...t,
+              subtopics: t.subtopics.map((sub) =>
+                sub.id === subtopicId ? propagateSubtopic(sub, done) : sub,
+              ),
+            }),
+          ),
+        ),
+      setTopicComplete: (roadmapId, phaseId, topicId, done) =>
+        set((s) =>
+          updateTopicIn(s, roadmapId, phaseId, topicId, (t) =>
+            propagateTopic(t, done),
+          ),
+        ),
+      setPhaseComplete: (roadmapId, phaseId, done) =>
+        set((s) =>
+          updatePhase(s, roadmapId, phaseId, (p) => ({
+            ...p,
+            topics: p.topics.map((t) => propagateTopic(t, done)),
+          })),
         ),
 
       addNote: (partial) => {
@@ -508,12 +615,22 @@ export const useAppStore = create<State>()(
         set((s) => ({
           habits: [
             ...s.habits,
-            { id: newId(), title, emoji, createdAt: Date.now() },
+            {
+              id: newId(),
+              title,
+              emoji,
+              createdAt: Date.now(),
+              startDate: todayISO(),
+            },
           ],
         })),
       renameHabit: (id, title) =>
         set((s) => ({
           habits: s.habits.map((h) => (h.id === id ? { ...h, title } : h)),
+        })),
+      updateHabit: (id, patch) =>
+        set((s) => ({
+          habits: s.habits.map((h) => (h.id === id ? { ...h, ...patch } : h)),
         })),
       deleteHabit: (id) =>
         set((s) => ({
@@ -544,6 +661,13 @@ export const useAppStore = create<State>()(
         set((s) => ({ profile: { ...s.profile, ...patch } })),
       updatePreferences: (patch) =>
         set((s) => ({ preferences: { ...s.preferences, ...patch } })),
+      setModuleEnabled: (key, enabled) =>
+        set((s) => ({
+          preferences: {
+            ...s.preferences,
+            modules: { ...s.preferences.modules, [key]: enabled },
+          },
+        })),
       addXp: (amount) =>
         set((s) => {
           const xp = Math.max(0, s.stats.xp + amount);
@@ -562,11 +686,68 @@ export const useAppStore = create<State>()(
           };
         }),
 
+      addSubject: (partial) => {
+        const subject: Subject = {
+          id: newId(),
+          semester: partial.semester,
+          name: partial.name,
+          faculty: partial.faculty ?? "",
+          minRequired: partial.minRequired ?? 75,
+          present: partial.present ?? 0,
+          absent: partial.absent ?? 0,
+          createdAt: Date.now(),
+        };
+        set((s) => ({
+          attendance: {
+            ...s.attendance,
+            subjects: [...s.attendance.subjects, subject],
+          },
+        }));
+        return subject;
+      },
+      updateSubject: (id, patch) =>
+        set((s) => ({
+          attendance: {
+            ...s.attendance,
+            subjects: s.attendance.subjects.map((x) =>
+              x.id === id ? { ...x, ...patch } : x,
+            ),
+          },
+        })),
+      deleteSubject: (id) =>
+        set((s) => ({
+          attendance: {
+            ...s.attendance,
+            subjects: s.attendance.subjects.filter((x) => x.id !== id),
+          },
+        })),
+
+      addTransaction: (partial) => {
+        const tx: Transaction = {
+          id: newId(),
+          title: partial.title,
+          amount: partial.amount,
+          type: partial.type,
+          at: partial.at ?? Date.now(),
+        };
+        set((s) => ({
+          expenses: {
+            ...s.expenses,
+            transactions: [tx, ...s.expenses.transactions],
+          },
+        }));
+        return tx;
+      },
+      deleteTransaction: (id) =>
+        set((s) => ({
+          expenses: {
+            ...s.expenses,
+            transactions: s.expenses.transactions.filter((t) => t.id !== id),
+          },
+        })),
+
       exportJSON: () => {
-        const { _hydrated, markHydrated, ...rest } = get() as any;
-        void _hydrated;
-        void markHydrated;
-        // strip functions
+        const rest = get() as any;
         const data: AppData = {
           schemaVersion: rest.schemaVersion,
           roadmaps: rest.roadmaps,
@@ -578,6 +759,8 @@ export const useAppStore = create<State>()(
           profile: rest.profile,
           preferences: rest.preferences,
           stats: rest.stats,
+          attendance: rest.attendance,
+          expenses: rest.expenses,
         };
         return JSON.stringify(data, null, 2);
       },
@@ -603,98 +786,22 @@ export const useAppStore = create<State>()(
           : (undefined as any),
       ),
       partialize: (state) => {
-        const {
-          _hydrated,
-          markHydrated,
-          addRoadmap,
-          renameRoadmap,
-          deleteRoadmap,
-          importRoadmap,
-          replaceRoadmap,
-          addPhase,
-          renamePhase,
-          deletePhase,
-          movePhase,
-          addTopic,
-          updateTopic,
-          deleteTopic,
-          moveTopic,
-          addSubtopic,
-          updateSubtopic,
-          deleteSubtopic,
-          addChecklistItem,
-          updateChecklistItem,
-          deleteChecklistItem,
-          addNote,
-          updateNote,
-          deleteNote,
-          addProject,
-          updateProject,
-          deleteProject,
-          addProjectTask,
-          updateProjectTask,
-          deleteProjectTask,
-          addPlannerTask,
-          updatePlannerTask,
-          deletePlannerTask,
-          addHabit,
-          renameHabit,
-          deleteHabit,
-          toggleHabitToday,
-          updateProfile,
-          updatePreferences,
-          addXp,
-          touchStreak,
-          exportJSON,
-          importJSON,
-          resetAll,
-          ...data
-        } = state;
-        void _hydrated;
-        void markHydrated;
-        void addRoadmap;
-        void renameRoadmap;
-        void deleteRoadmap;
-        void importRoadmap;
-        void replaceRoadmap;
-        void addPhase;
-        void renamePhase;
-        void deletePhase;
-        void movePhase;
-        void addTopic;
-        void updateTopic;
-        void deleteTopic;
-        void moveTopic;
-        void addSubtopic;
-        void updateSubtopic;
-        void deleteSubtopic;
-        void addChecklistItem;
-        void updateChecklistItem;
-        void deleteChecklistItem;
-        void addNote;
-        void updateNote;
-        void deleteNote;
-        void addProject;
-        void updateProject;
-        void deleteProject;
-        void addProjectTask;
-        void updateProjectTask;
-        void deleteProjectTask;
-        void addPlannerTask;
-        void updatePlannerTask;
-        void deletePlannerTask;
-        void addHabit;
-        void renameHabit;
-        void deleteHabit;
-        void toggleHabitToday;
-        void updateProfile;
-        void updatePreferences;
-        void addXp;
-        void touchStreak;
-        void exportJSON;
-        void importJSON;
-        void resetAll;
-        return data;
+        // Only persist plain data fields.
+        const data: AppData = {
+          schemaVersion: state.schemaVersion,
+          roadmaps: state.roadmaps,
+          notes: state.notes,
+          projects: state.projects,
+          planner: state.planner,
+          habits: state.habits,
+          habitLogs: state.habitLogs,
+          profile: state.profile,
+          preferences: state.preferences,
+          stats: state.stats,
+          attendance: state.attendance,
+          expenses: state.expenses,
+        };
+        return data as any;
       },
       onRehydrateStorage: () => (state) => {
         state?.markHydrated();

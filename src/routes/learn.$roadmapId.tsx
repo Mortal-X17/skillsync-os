@@ -59,6 +59,10 @@ function RoadmapDetail() {
   const addTopic = useAppStore((s) => s.addTopic);
   const updateTopic = useAppStore((s) => s.updateTopic);
   const updateSubtopic = useAppStore((s) => s.updateSubtopic);
+  const setPhaseComplete = useAppStore((s) => s.setPhaseComplete);
+  const setTopicComplete = useAppStore((s) => s.setTopicComplete);
+  const setSubtopicComplete = useAppStore((s) => s.setSubtopicComplete);
+  const updateChecklistItem = useAppStore((s) => s.updateChecklistItem);
   const deleteTopic = useAppStore((s) => s.deleteTopic);
   const moveTopic = useAppStore((s) => s.moveTopic);
   const renameRoadmap = useAppStore((s) => s.renameRoadmap);
@@ -66,6 +70,7 @@ function RoadmapDetail() {
 
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [subOpen, setSubOpen] = useState<Record<string, boolean>>({});
   const [newPhase, setNewPhase] = useState(false);
   const [phaseTitle, setPhaseTitle] = useState("");
   const [addTopicToPhase, setAddTopicToPhase] = useState<string | null>(null);

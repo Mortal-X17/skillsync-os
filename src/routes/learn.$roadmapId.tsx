@@ -176,6 +176,20 @@ function RoadmapDetail() {
             <Card key={phase.id} className="space-y-3 p-4">
               <div className="flex items-center gap-2">
                 <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPhaseComplete(roadmap.id, phase.id, pPct !== 100);
+                  }}
+                  aria-label={pPct === 100 ? "Mark phase incomplete" : "Mark phase complete"}
+                  className="flex h-6 w-6 shrink-0 items-center justify-center"
+                >
+                  {pPct === 100 ? (
+                    <CheckCircle2 className="h-5 w-5 text-[#7c3aed]" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
+                  )}
+                </button>
+                <button
                   onClick={() =>
                     setCollapsed((c) => ({ ...c, [phase.id]: !c[phase.id] }))
                   }

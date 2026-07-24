@@ -407,6 +407,41 @@ function Dashboard() {
           </Card>
         </section>
 
+        {hydrated && modules.attendance ? (
+          <section className="space-y-3">
+            <SectionHeader
+              title="Attendance"
+              action={<Link to="/attendance">Open</Link>}
+            />
+            <Link
+              to="/attendance"
+              className="card-surface flex items-center gap-3 p-4 transition-all active:scale-[0.98]"
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary">
+                <GraduationCap className="h-5 w-5 text-white" strokeWidth={1.75} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[13.5px] font-semibold tracking-tight">
+                  {attendance.total > 0
+                    ? `${attendance.pct}% overall attendance`
+                    : "No attendance data yet"}
+                </div>
+                <div className="mt-0.5 text-[11.5px] text-muted-foreground">
+                  {attendance.currentSem
+                    ? `Semester ${attendance.currentSem} · ${attendance.present}/${attendance.total} classes`
+                    : "Add subjects to start tracking"}
+                </div>
+                {attendance.total > 0 ? (
+                  <div className="mt-2">
+                    <ProgressBar value={attendance.pct} tone="gradient" />
+                  </div>
+                ) : null}
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+            </Link>
+          </section>
+        ) : null}
+
         <div className="h-4" />
 
         {/* Floating quick add → planner */}

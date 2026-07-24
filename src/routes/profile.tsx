@@ -8,9 +8,6 @@ import {
   Bell,
   Shield,
   Settings2,
-  Download,
-  Upload,
-  RotateCcw,
   BarChart3,
   Activity,
   Camera,
@@ -29,6 +26,8 @@ import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
 import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
+import { BackupSection } from "@/components/profile/BackupSection";
+
 
 
 export const Route = createFileRoute("/profile")({
@@ -87,7 +86,7 @@ function ProfilePage() {
   const [openProfile, setOpenProfile] = useState(false);
   const [openJson, setOpenJson] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  
   const avatarFileRef = useRef<HTMLInputElement>(null);
 
   // Friction dialogs
@@ -107,24 +106,8 @@ function ProfilePage() {
       .join("")
       .toUpperCase() || "L";
 
-  const handleExport = () => {
-    const blob = new Blob([exportJSON()], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `skillsync-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
+  // export/import handled by BackupSection now
 
-  const handleImport = async (file: File) => {
-    const text = await file.text();
-    const result = importJSON(text);
-    setImportMsg(result.ok ? "Import successful." : `Import failed: ${result.error}`);
-    setTimeout(() => setImportMsg(null), 4000);
-  };
 
   const handleAvatarPick = async (file: File) => {
     try {
@@ -437,47 +420,8 @@ function ProfilePage() {
           ) : null}
         </section>
 
-        {/* Backup */}
-        <section className="space-y-3">
-          <SectionHeader title="Backup" />
-          <Card className="p-2">
-            <div className="divide-y divide-white/[0.05]">
-              <SettingButtonRow icon={Download} label="Export data" onClick={handleExport} />
-              <SettingButtonRow
-                icon={Upload}
-                label="Import data"
-                onClick={() => fileRef.current?.click()}
-              />
-              <SettingButtonRow
-                icon={RotateCcw}
-                label="Reset everything"
-                onClick={() => beginReset("all")}
-                danger
+        <BackupSection onRequestReset={() => beginReset("all")} />
 
-              />
-            </div>
-          </Card>
-          <p className="px-1 text-[11.5px] leading-relaxed text-muted-foreground">
-            Everything lives on this device. Export a JSON backup regularly to
-            keep your progress safe across updates and re-installs.
-          </p>
-          {importMsg ? (
-            <div className="text-center text-[12px] text-muted-foreground">
-              {importMsg}
-            </div>
-          ) : null}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) handleImport(f);
-              e.target.value = "";
-            }}
-          />
-        </section>
 
         {/* About */}
         <section className="space-y-3">

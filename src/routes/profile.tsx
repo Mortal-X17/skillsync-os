@@ -8,9 +8,6 @@ import {
   Bell,
   Shield,
   Settings2,
-  Download,
-  Upload,
-  RotateCcw,
   BarChart3,
   Activity,
   Camera,
@@ -29,6 +26,8 @@ import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
 import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
+import { BackupSection } from "@/components/profile/BackupSection";
+
 
 
 export const Route = createFileRoute("/profile")({

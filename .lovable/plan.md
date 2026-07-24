@@ -1,148 +1,80 @@
-## Scope
+This is a large batch. I'll ship it in one coherent pass, grouped by area. Everything stays local-first, matches the existing premium dark UI, and plugs into the current Zustand store + backup envelope.
 
-Turn the current visual foundation into a fully functional, offline, local-first SkillSync OS you can use daily. Keep the existing dark premium aesthetic — no restyle. Prepare for Android via Capacitor with clear build steps.
+## 1. Autofill audit
+- Verify every `<input>` / `<textarea>` in the app routes through `TextField` / `TextArea` from `src/components/edit/Fields.tsx` (which already applies `autoComplete="off"`, `autoCorrect="off"`, `autoCapitalize="off"`, `spellCheck={false}`, `data-form-type`, `data-lpignore`, `data-1p-ignore`, `data-bwignore`).
+- Sweep `src/routes/*` and `src/components/**` with ripgrep for raw `<input`/`<textarea`; migrate any stragglers (search bars, planner inputs, habit rename, subject/expense forms) to the shared components. New forms below use `TextField`/`TextArea` from day one.
 
-Given the size of the request, I'll build this in one continuous pass but focused on **stability and daily usability over feature breadth**. Advanced flourishes (rich analytics charts, drag reordering with animations) will be present but lean.
+## 2. Roadmap interaction upgrade (`src/routes/learn.$roadmapId.tsx`, `src/lib/progress.ts`, `src/store/useAppStore.ts`)
+Data model stays as-is. Behavior changes:
+- Every subtopic is now expandable and lazily renders its checklist. Expand state is kept in a local `Set<string>` per topic/subtopic keyed by id, lost on route unmount (per spec: "while the page is open").
+- Progress is derived purely from checklist leaves:
+  - Subtopic: if it has checklist → `done/total`; otherwise treat the subtopic's own `done` flag as a synthetic single leaf (backwards compatible with topics/subtopics created without checklist).
+  - Topic %: average of (its direct checklist leaves + each subtopic's leaves), flattened — a single pool of leaves under the topic, so weighting is by leaf count, not by nesting level.
+  - Phase %: flattened leaves across its topics. Roadmap %: flattened leaves across all phases.
+- `progress.ts` gets `leafStats(node)` returning `{done,total}`; existing `topicPct/phasePct/roadmapPct` become thin wrappers.
+- Cascading writes (new store actions):
+  - `setPhaseComplete(rid, pid, done)` → set every checklist item + subtopic.done + topic.done under that phase.
+  - `setTopicComplete(rid, pid, tid, done)` → every checklist + subtopic.done under it.
+  - `setSubtopicComplete(rid, pid, tid, sid, done)` → every checklist in it + subtopic.done.
+- Reverse sync: after any checklist toggle, walk up and set subtopic.done / topic.done based on `allLeavesDone()`. Existing checklist toggle actions get a post-update normalization step so parents stay in sync automatically. Any incomplete leaf → all ancestors flip to incomplete.
+- UI: `▶` / `▼` chevrons on topics and subtopics with `animate-accordion-down/up`. One-tap "complete section" is a checkbox on phase, topic, and subtopic rows that calls the corresponding cascade action. Collapsed subtopics don't render checklist DOM.
 
-## What ships in this release
+## 3. Habit start date editing (`src/routes/habits.$habitId.tsx`, `HabitSchema`, migrations, stats)
+- Add optional `startDate: string | null` to `HabitSchema` (YYYY-MM-DD). Migration fills it from the earliest log or `createdAt`.
+- Edit Habit sheet gains a Start Date row using the shadcn `Popover` + `Calendar` pattern (`pointer-events-auto`), disabled for future dates.
+- All stats (Since, success rate, total tracking days, weekly/monthly, calendar) filter logs by `date >= startDate`. Existing check-ins before the new start date are preserved but excluded from math.
+- If new start date changes the effective tracking window vs. current, show a confirm dialog before saving.
 
-### 1. Local-first data layer (foundation)
-- Versioned JSON schema (`schemaVersion: 1`) in `localStorage` under a single key `skillsync:data:v1`.
-- Migration runner ready for future versions (no-op today).
-- Zustand store with autosave on every mutation (debounced write).
-- Zod validation for import.
-- Manual **Export** (download `.json`) and **Import** (file picker, validate, replace) in Profile → Backup.
+## 4. Backup section redesign
+- New route `src/routes/profile.backup.tsx` housing: Status card, Create Backup, Restore Backup, Backup Information, and Danger Zone (Reset SkillSync).
+- Move all logic from `BackupSection.tsx` into this route; the component keeps the sheets/previews. Delete the "What's Included" tile — Backup Information is the single source.
+- `src/routes/profile.tsx` Backup section collapses to one tile: `🛡️ Backup & Restore →` linking to `/profile/backup`. Reset SkillSync no longer appears on Profile.
 
-Entities: `roadmaps`, `phases`, `topics`, `subtopics`, `checklistItems`, `notes`, `projects`, `habits`, `habitLogs`, `plannerTasks`, `profile`, `stats` (xp, level, streak).
+## 5. Learn page UI consistency (`src/routes/learn.index.tsx`, `AppShell` `PageHeader`)
+- Roadmap card icon becomes a fixed `h-11 w-11 shrink-0 rounded-full` (was larger / could stretch). Text column gets `min-w-0` + `truncate` where needed so long titles never squeeze the icon.
+- Learn `PageHeader` uses the same title/subtitle sizing + top padding as Projects (align tokens; drop the oversized variant on Learn).
+- FAB (`+`) in the header shrinks to match Projects' add button diameter and margin from the top/right safe area. Same color, icon, animation.
 
-### 2. Learn (Learning Engine) — core module
-- Default scaffolded roadmaps: Python, AI/ML, DSA, Web Dev (empty phases, ready to fill).
-- Tree: Roadmap → Phase → Topic → Subtopic → Checklist items.
-- Every node: create / rename / delete / reorder (up/down buttons — no DnD in v1) / collapse.
-- Topics & subtopics: notes, resources (list of {label,url}), completion toggle.
-- Progress auto-rolls up from checklist → subtopic → topic → phase → roadmap.
-- Detail screen per roadmap with inline editors (sheet/dialog).
+## 6. College Attendance Tracker V1
+- Schema additions (`src/lib/schema.ts` + migration bump):
+  - `Subject { id, semester: 1..8, name, faculty?, minRequired: number (default 75), present: number, absent: number, createdAt }`.
+  - `AppData.attendance.subjects: Subject[]`.
+  - `PreferencesSchema.modules: { attendance: boolean, expenses: boolean }` (default both `false`).
+- Store actions: `addSubject`, `updateSubject`, `deleteSubject`, `setModuleEnabled`. Selectors compute per-subject %, per-semester % (sum present / sum total), overall % (all subjects pooled — never average of %).
+- Routes:
+  - `profile.modules.tsx` toggle page (Attendance + Expense Manager toggles).
+  - `attendance.tsx` layout → `attendance.index.tsx` (Overall + 8 semester tiles) → `attendance.$semester.tsx` (subject list + FAB Add Subject + edit/delete via ⋮).
+- Dashboard shows a compact widget only when `preferences.modules.attendance` is true: Overall %, current semester (highest semester with data, fallback to 1), and a Quick Access link.
+- Present/Absent are read-only in V1 (spec: no manual entry). Cards show `0 / 0 / 0%` initially. Architecture ready for date-wise marking later.
 
-### 3. Notes
-- Standalone + attached (via `linkedTo: {type, id}`).
-- Title, body (textarea), tags, pinned, search, autosave.
-- List with pinned first, search bar, tag chips.
+## 7. Expense Manager V1
+- Schema: `Transaction { id, title, amount: number, type: 'credit'|'debit', at: number }`; stored in `AppData.expenses.transactions`. No categories/filters etc.
+- Routes: `expenses.tsx` layout → `expenses.index.tsx` current month by default with month switcher (prev/next chevrons + label). Summary: Total Credit (green), Total Debit (red), Balance. List grouped by month, reverse chronological. FAB opens Add Transaction bottom sheet.
+- Entry point: Profile tile `Expense Manager` (visible only when module toggle on, matching Attendance).
+- Automatically included in backups (already covered — backup envelope serializes full `AppData`).
 
-### 4. Dashboard
-- Greeting + date, streak / XP / level cards (real values from store).
-- Today's focus (top 3 planner tasks due today).
-- Learning progress summary (per roadmap % bars).
-- Recent notes (last 3).
-- Quick actions.
-
-### 5. Projects
-- CRUD: title, description, status (planning/active/done), progress %, deadline, techStack[], tasks[], notes, githubUrl.
-- Card list + detail sheet with edit.
-
-### 6. Planner
-- Daily tasks with date, title, done toggle, time (optional).
-- Week strip navigates dates; add/edit/delete.
-- Today section pulls from selected date.
-
-### 7. Operation Rebirth (Habits) — new route `/habits`
-- Habit list: sleep, workout, reading, coding, screen time, walking, meditation, custom.
-- Daily check-off, streak per habit.
-- Added to bottom nav? No — keep 5 tabs. Access from Dashboard quick action + Profile. (Bottom nav stays: Dashboard, Learn, Projects, Planner, Profile.)
-
-### 8. Profile / Settings
-- Profile: name, avatar initials, level, XP, streak (from stats).
-- Preferences: theme (dark only for now, shown as info), notifications toggle (stored, non-functional stub).
-- Backup: Export, Import, Reset.
-- Developer mode toggle (unlocks a "Danger zone" and shows storage size).
-- About.
-
-### 9. Analytics
-- Reachable from Profile ("View analytics").
-- Cards: roadmap completion %, topic completion, habit consistency (7-day), streak, project progress. Simple bars — no chart lib.
-
-### 10. Android / APK packaging
-- Add Capacitor config + `capacitor.config.ts` targeting `com.skillsync.os`.
-- Add `scripts/android-setup.md` with exact steps:
-  1. `bun run build`
-  2. `bunx cap add android`
-  3. `bunx cap sync`
-  4. `cd android && ./gradlew assembleDebug` → APK at `android/app/build/outputs/apk/debug/app-debug.apk`
-- Note: **I cannot generate the APK inside this sandbox** (no Android SDK / Gradle). The project will be Android-ready — you run the two commands above on any machine with Android Studio installed.
-- Ensure no Lovable badge on the deployed/exported build.
-
-### 11. Lovable badge
-- Disable the Lovable badge on published site via publish settings.
-
-## What is intentionally NOT in this release
-- Drag-and-drop reordering (using up/down arrow buttons).
-- Rich text notes (plain textarea).
-- Cloud sync, Google Drive.
-- Real notifications (toggle stored only).
-- Chart library (bars only).
-- Auth (not needed — personal, local).
+## 8. Backup envelope & migrations
+- Bump `CURRENT_SCHEMA_VERSION` to 2. `migrate()` fills `habits[].startDate`, `attendance`, `expenses`, and `preferences.modules` defaults so old backups restore cleanly.
+- `BACKUP_VERSION` stays 1 (envelope shape unchanged, only inner `AppData` grew) — restore keeps working on older/newer devices.
 
 ## Technical notes
-
-- Storage: `localStorage` behind `src/lib/storage.ts` abstraction so it can swap to IndexedDB later without touching store logic.
-- State: `zustand` + `zustand/middleware` `persist` with custom storage adapter and versioned migrations.
-- Validation: `zod` schemas for the whole data tree; used on import.
-- Editing UX: shadcn `Sheet` / `Dialog` + inline forms. Delete uses confirm dialog.
-- All new routes registered under `src/routes/` (`learn.$roadmap.tsx`, `habits.tsx`, `notes.tsx`, `analytics.tsx`, project/planner detail sheets stay inline).
-- Existing `AppShell`, `BottomNav`, `Card`, `Chip`, `ProgressBar` reused as-is.
-- Data survives updates because it lives in `localStorage` keyed by schema version — future schema bumps run migrations, never wipe.
-
-## File map (new / changed)
+- Zustand actions use immer-style shallow copies as already established in `useAppStore.ts`.
+- Recursive completion helpers live in `src/lib/roadmap-ops.ts` (new) to keep the store lean.
+- Date picker uses existing shadcn `Calendar` + `Popover`, `pointer-events-auto`.
+- New routes registered by TanStack file-based routing (auto). Each new leaf route gets its own `head()` with unique title + description.
 
 ```text
-src/
-  lib/
-    storage.ts            # localStorage adapter + JSON codec
-    schema.ts             # zod types + TS types
-    migrations.ts         # version -> version fns
-    id.ts                 # nanoid wrapper
-    seed.ts               # default empty roadmaps
-    progress.ts           # rollup helpers
-    date.ts               # date helpers
-  store/
-    useAppStore.ts        # zustand root store (persist)
-    selectors.ts
-  components/
-    edit/
-      InlineEditField.tsx
-      ConfirmDialog.tsx
-    learn/
-      RoadmapCard.tsx
-      PhaseBlock.tsx
-      TopicRow.tsx
-      SubtopicRow.tsx
-      ChecklistEditor.tsx
-      NotesEditor.tsx
-    notes/NoteCard.tsx
-    projects/ProjectSheet.tsx
-    planner/TaskRow.tsx
-    habits/HabitRow.tsx
-    common/EmptyState.tsx
-  routes/
-    index.tsx             # rebuilt dashboard (real data)
-    learn.tsx             # roadmap grid (real progress)
-    learn.$roadmapId.tsx  # roadmap detail (tree editor)
-    projects.tsx          # CRUD
-    planner.tsx           # CRUD
-    profile.tsx           # settings + backup
-    notes.tsx             # notes list
-    habits.tsx            # Operation Rebirth
-    analytics.tsx         # summary
-capacitor.config.ts
-scripts/android-setup.md
+routes/
+  attendance.tsx
+  attendance.index.tsx
+  attendance.$semester.tsx
+  expenses.tsx
+  expenses.index.tsx
+  profile.backup.tsx
+  profile.modules.tsx
 ```
 
-Packages added: `zustand`, `zod`, `nanoid`, `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`.
+## Out of scope (deferred per spec)
+Attendance date marking, analytics, safe-bunk math; expense categories/charts/budgets/search/filters/notes/export.
 
-## Delivery
-
-After build:
-1. App fully usable at the preview URL — create/edit/delete everything, data persists on refresh.
-2. Export/import verified.
-3. Android setup doc + Capacitor config committed.
-4. Lovable badge disabled on published site.
-5. You run the 4 Android commands locally to produce `app-debug.apk`.
+Reply "go" to build, or tell me what to adjust.

@@ -47,6 +47,20 @@ export function migrate(input: unknown): AppData {
   }
   data.schemaVersion = CURRENT_SCHEMA_VERSION;
 
+  // Defensive: guarantee shape even if older persisted state slipped through.
+  data.preferences = {
+    notifications: true,
+    developerMode: false,
+    ...(data.preferences ?? {}),
+    modules: {
+      attendance: false,
+      expenses: false,
+      ...((data.preferences ?? {}).modules ?? {}),
+    },
+  };
+  data.attendance = data.attendance ?? { subjects: [] };
+  data.expenses = data.expenses ?? { transactions: [] };
+
   const parsed = AppDataSchema.safeParse(data);
   if (parsed.success) return parsed.data;
   return { ...seed, ...data, schemaVersion: CURRENT_SCHEMA_VERSION };

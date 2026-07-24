@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Card, Chip, SectionHeader } from "@/components/ui/primitives";
 import { BottomSheet } from "@/components/edit/Sheet";
-import { TextField } from "@/components/edit/Fields";
+
 import { useAppStore } from "@/store/useAppStore";
 import {
   APP_VERSION,

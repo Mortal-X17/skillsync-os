@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Activity,
   LineChart,
+  GraduationCap,
 } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
@@ -69,6 +70,8 @@ function Dashboard() {
   const planner = useAppStore((s) => s.planner);
   const habits = useAppStore((s) => s.habits);
   const habitLogs = useAppStore((s) => s.habitLogs);
+  const modules = useAppStore((s) => s.preferences.modules);
+  const subjects = useAppStore((s) => s.attendance.subjects);
 
   const today = todayISO();
   const todaysTasks = useMemo(
@@ -85,6 +88,21 @@ function Dashboard() {
   );
   const todayHabitCount = habitLogs.filter((l) => l.date === today).length;
   const xpToNext = stats.xp % 100;
+
+  const attendance = useMemo(() => {
+    let p = 0;
+    let a = 0;
+    for (const s of subjects) {
+      p += s.present;
+      a += s.absent;
+    }
+    const total = p + a;
+    const pct = total > 0 ? Math.round((p / total) * 100) : 0;
+    const currentSem = subjects.length > 0
+      ? Math.max(...subjects.map((s) => s.semester))
+      : null;
+    return { present: p, total, pct, currentSem };
+  }, [subjects]);
 
   return (
     <AppShell>

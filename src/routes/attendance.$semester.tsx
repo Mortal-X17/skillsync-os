@@ -36,8 +36,10 @@ function SemesterPage() {
   const hydrated = useHydrated();
   const semNum = Math.max(1, Math.min(8, Number(semester) || 1));
 
-  const subjects = useAppStore((s) =>
-    s.attendance.subjects.filter((x) => x.semester === semNum),
+  const allSubjects = useAppStore((s) => s.attendance.subjects);
+  const subjects = useMemo(
+    () => allSubjects.filter((x) => x.semester === semNum),
+    [allSubjects, semNum],
   );
   const addSubject = useAppStore((s) => s.addSubject);
   const updateSubject = useAppStore((s) => s.updateSubject);

@@ -21,7 +21,7 @@ import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { roadmapCounts, roadmapPct } from "@/lib/progress";
 import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
-import { ActionButton } from "@/components/edit/Buttons";
+import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import {
   parseImportJSON,
   buildRoadmapFromImport,
@@ -153,19 +153,18 @@ function LearnPage() {
   return (
     <AppShell>
       <PageHeader
-        sticky
         eyebrow="Roadmaps"
         title="Learn."
         subtitle="Curated paths built for depth, not noise."
         right={
-          <button
-            type="button"
-            onClick={() => setFabOpen(true)}
+          <IconButton
+            variant="primary"
+            size="lg"
             aria-label="Create or import roadmap"
-            className="mt-0.5 flex h-14 w-14 shrink-0 items-center justify-center rounded-full gradient-primary text-white shadow-[0_16px_40px_-12px_rgba(124,58,237,0.7)] transition-all active:scale-95"
+            onClick={() => setFabOpen(true)}
           >
-            <Plus className="h-6 w-6" strokeWidth={2.25} />
-          </button>
+            <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
+          </IconButton>
         }
       />
       <div className="space-y-4 px-5 pb-28">
@@ -199,13 +198,13 @@ function LearnPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
                         style={{
                           background: `linear-gradient(135deg, ${r.color}, #2563eb)`,
                           boxShadow: `0 10px 30px -10px ${r.color}80`,
                         }}
                       >
-                        <BookOpen className="h-5 w-5 text-white" strokeWidth={1.75} />
+                        <BookOpen className="h-[18px] w-[18px] text-white" strokeWidth={1.75} />
                       </div>
                       <div>
                         <div className="text-[16px] font-semibold tracking-tight">

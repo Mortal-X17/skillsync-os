@@ -106,24 +106,8 @@ function ProfilePage() {
       .join("")
       .toUpperCase() || "L";
 
-  const handleExport = () => {
-    const blob = new Blob([exportJSON()], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `skillsync-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
+  // export/import handled by BackupSection now
 
-  const handleImport = async (file: File) => {
-    const text = await file.text();
-    const result = importJSON(text);
-    setImportMsg(result.ok ? "Import successful." : `Import failed: ${result.error}`);
-    setTimeout(() => setImportMsg(null), 4000);
-  };
 
   const handleAvatarPick = async (file: File) => {
     try {

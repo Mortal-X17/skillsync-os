@@ -668,6 +668,3 @@ function SummaryGrid({ data, sizeBytes }: { data: AppData; sizeBytes: number }) 
 
 // exported to keep tree-shaking happy if unused
 export type { ResetIntent };
-
-// silence unused import if TextField is only referenced conditionally
-void TextField;

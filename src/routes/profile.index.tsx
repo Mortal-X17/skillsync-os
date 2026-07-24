@@ -32,7 +32,7 @@ import { useAppStore, useHydrated } from "@/store/useAppStore";
 
 
 
-export const Route = createFileRoute("/profile")({
+export const Route = createFileRoute("/profile/")({
   head: () => ({
     meta: [
       { title: "Profile — SkillSync" },

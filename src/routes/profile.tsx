@@ -86,7 +86,7 @@ function ProfilePage() {
   const [openProfile, setOpenProfile] = useState(false);
   const [openJson, setOpenJson] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  
   const avatarFileRef = useRef<HTMLInputElement>(null);
 
   // Friction dialogs

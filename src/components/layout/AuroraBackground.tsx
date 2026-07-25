@@ -63,26 +63,32 @@ const BLOBS: Blob[] = [
 ];
 
 export function AuroraBackground({
-  blur = 300,
+  blur = 110,
 }: {
   blur?: number;
 }) {
   const styleTag = useMemo(
     () => `
       @keyframes aurora-a {
-        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
-        50%  { transform: translate3d(6vw, 4vh, 0) scale(1.15) rotate(8deg); }
-        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.45; }
+        25%  { transform: translate3d(10vw, 6vh, 0) scale(1.2) rotate(12deg); opacity: 0.6; }
+        50%  { transform: translate3d(18vw, -2vh, 0) scale(1.35) rotate(22deg); opacity: 0.5; }
+        75%  { transform: translate3d(4vw, -8vh, 0) scale(1.1) rotate(6deg); opacity: 0.65; }
+        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.45; }
       }
       @keyframes aurora-b {
-        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
-        50%  { transform: translate3d(-7vw, -5vh, 0) scale(1.2) rotate(-10deg); }
-        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.35; }
+        25%  { transform: translate3d(-12vw, -8vh, 0) scale(1.25) rotate(-14deg); opacity: 0.55; }
+        50%  { transform: translate3d(-4vw, 4vh, 0) scale(1.15) rotate(-6deg); opacity: 0.4; }
+        75%  { transform: translate3d(-16vw, -2vh, 0) scale(1.3) rotate(-18deg); opacity: 0.5; }
+        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.35; }
       }
       @keyframes aurora-c {
-        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
-        50%  { transform: translate3d(5vw, -6vh, 0) scale(1.1) rotate(6deg); }
-        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); }
+        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.25; }
+        25%  { transform: translate3d(8vw, -10vh, 0) scale(1.18) rotate(10deg); opacity: 0.45; }
+        50%  { transform: translate3d(14vw, 2vh, 0) scale(1.28) rotate(18deg); opacity: 0.35; }
+        75%  { transform: translate3d(2vw, 6vh, 0) scale(1.08) rotate(4deg); opacity: 0.5; }
+        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.25; }
       }
       @media (prefers-reduced-motion: reduce) {
         .aurora-blob { animation: none !important; }

@@ -90,10 +90,7 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(1200px 600px at 20% -10%, oklch(0.35 0.12 290 / 0.18), transparent 60%),
-    radial-gradient(900px 500px at 100% 10%, oklch(0.35 0.15 260 / 0.12), transparent 60%),
-    var(--background);
+  background: transparent;
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

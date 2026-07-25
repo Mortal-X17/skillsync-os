@@ -36,7 +36,7 @@ const BLOBS: Blob[] = [
     top: "-25vmax",
     left: "-20vmax",
     opacity: 0.45,
-    duration: 42,
+    duration: 28,
     delay: 0,
     track: "a",
   },
@@ -46,8 +46,8 @@ const BLOBS: Blob[] = [
     top: "40vh",
     left: "55vw",
     opacity: 0.35,
-    duration: 54,
-    delay: -18,
+    duration: 34,
+    delay: -12,
     track: "b",
   },
   {
@@ -56,14 +56,14 @@ const BLOBS: Blob[] = [
     top: "70vh",
     left: "-15vmax",
     opacity: 0.25,
-    duration: 36,
-    delay: -34,
+    duration: 22,
+    delay: -22,
     track: "c",
   },
 ];
 
 export function AuroraBackground({
-  blur = 110,
+  blur = 75,
 }: {
   blur?: number;
 }) {
@@ -71,23 +71,26 @@ export function AuroraBackground({
     () => `
       @keyframes aurora-a {
         0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.45; }
-        25%  { transform: translate3d(10vw, 6vh, 0) scale(1.2) rotate(12deg); opacity: 0.6; }
-        50%  { transform: translate3d(18vw, -2vh, 0) scale(1.35) rotate(22deg); opacity: 0.5; }
-        75%  { transform: translate3d(4vw, -8vh, 0) scale(1.1) rotate(6deg); opacity: 0.65; }
+        20%  { transform: translate3d(16vw, 10vh, 0) scale(1.35) rotate(18deg); opacity: 0.75; }
+        40%  { transform: translate3d(28vw, -4vh, 0) scale(1.55) rotate(32deg); opacity: 0.55; }
+        60%  { transform: translate3d(8vw, -16vh, 0) scale(1.25) rotate(12deg); opacity: 0.8; }
+        80%  { transform: translate3d(-6vw, 4vh, 0) scale(1.1) rotate(-6deg); opacity: 0.6; }
         100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.45; }
       }
       @keyframes aurora-b {
         0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.35; }
-        25%  { transform: translate3d(-12vw, -8vh, 0) scale(1.25) rotate(-14deg); opacity: 0.55; }
-        50%  { transform: translate3d(-4vw, 4vh, 0) scale(1.15) rotate(-6deg); opacity: 0.4; }
-        75%  { transform: translate3d(-16vw, -2vh, 0) scale(1.3) rotate(-18deg); opacity: 0.5; }
+        20%  { transform: translate3d(-18vw, -12vh, 0) scale(1.4) rotate(-22deg); opacity: 0.65; }
+        40%  { transform: translate3d(-6vw, 8vh, 0) scale(1.2) rotate(-8deg); opacity: 0.45; }
+        60%  { transform: translate3d(-24vw, -4vh, 0) scale(1.45) rotate(-26deg); opacity: 0.55; }
+        80%  { transform: translate3d(-10vw, -14vh, 0) scale(1.15) rotate(-12deg); opacity: 0.7; }
         100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.35; }
       }
       @keyframes aurora-c {
         0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.25; }
-        25%  { transform: translate3d(8vw, -10vh, 0) scale(1.18) rotate(10deg); opacity: 0.45; }
-        50%  { transform: translate3d(14vw, 2vh, 0) scale(1.28) rotate(18deg); opacity: 0.35; }
-        75%  { transform: translate3d(2vw, 6vh, 0) scale(1.08) rotate(4deg); opacity: 0.5; }
+        20%  { transform: translate3d(12vw, -16vh, 0) scale(1.28) rotate(16deg); opacity: 0.55; }
+        40%  { transform: translate3d(22vw, 4vh, 0) scale(1.48) rotate(28deg); opacity: 0.4; }
+        60%  { transform: translate3d(4vw, 10vh, 0) scale(1.18) rotate(8deg); opacity: 0.5; }
+        80%  { transform: translate3d(18vw, -8vh, 0) scale(1.32) rotate(20deg); opacity: 0.6; }
         100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.25; }
       }
       @media (prefers-reduced-motion: reduce) {

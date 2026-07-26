@@ -2,7 +2,7 @@ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { ArrowLeft, ChevronRight, GraduationCap } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
+import { Card, Chip, CircularProgress, CountUp, ProgressBar } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 

@@ -182,7 +182,7 @@ function SemesterPage() {
                   onClick={() =>
                     updateSubject(sub.id, { absent: sub.absent + 1 })
                   }
-                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[#ef4444]/20 bg-[#ef4444]/[0.08] py-2 text-[12.5px] font-medium text-[#fca5a5] active:scale-[0.97]"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-[var(--danger)]/20 bg-[var(--danger)]/[0.08] py-2 text-[12.5px] font-medium text-[var(--danger)] active:scale-[0.97]"
                 >
                   <Plus className="h-3.5 w-3.5" /> Absent
                 </button>

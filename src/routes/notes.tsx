@@ -115,7 +115,7 @@ function NotesPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     {n.pinned ? (
-                      <Pin className="h-3.5 w-3.5 text-[#c4b5fd]" />
+                      <Pin className="h-3.5 w-3.5 text-[var(--primary-glow)]" />
                     ) : null}
                     <div className="truncate text-[14.5px] font-semibold tracking-tight">
                       {n.title}

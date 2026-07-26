@@ -257,7 +257,7 @@ function ProjectsPage() {
                     progress: Number(e.target.value),
                   })
                 }
-                className="w-full accent-[#7c3aed]"
+                className="w-full accent-[var(--primary)]"
               />
             </div>
 
@@ -351,7 +351,7 @@ function ProjectsPage() {
                           done: e.target.checked,
                         })
                       }
-                      className="h-4 w-4 accent-[#7c3aed]"
+                      className="h-4 w-4 accent-[var(--primary)]"
                     />
                     <input
                       value={t.title}

@@ -1,14 +1,15 @@
 import { useMemo } from "react";
 
 /**
- * AuroraBackground
- * A premium, extremely subtle animated aurora that sits behind all app content.
- * - Deep matte black base
- * - 3 huge, heavily-blurred gradient blobs drifting slowly & independently
- * - GPU-friendly transforms only; no blur recalculation per frame
- * - Respects prefers-reduced-motion (static aurora)
+ * AuroraBackground — layered premium environment.
  *
- * All tunables live in the `blobs` config below.
+ * Layer 1: deep matte black base (--background)
+ * Layer 2: animated aurora blobs (accent-token driven, GPU transforms only)
+ * Layer 3: subtle noise / grain (1–2%)
+ * Layer 4: soft edge vignette
+ *
+ * Respects prefers-reduced-motion (static aurora).
+ * All tunables are props / the BLOBS config below.
  */
 
 type Blob = {
@@ -16,56 +17,66 @@ type Blob = {
   color: string;
   /** Size in viewport units — kept huge so edges never appear */
   size: string;
-  /** Initial position (top / left) */
   top: string;
   left: string;
-  /** Opacity 0..1 (keep 0.03–0.08) */
+  /** Base opacity 0..1 */
   opacity: number;
-  /** Animation duration seconds (45–90) */
+  /** Animation duration seconds */
   duration: number;
   /** Animation delay seconds (desyncs blobs) */
   delay: number;
-  /** Which keyframe track to use */
   track: "a" | "b" | "c";
 };
 
 const BLOBS: Blob[] = [
   {
-    color: "#7c3aed", // purple
-    size: "70vmax",
-    top: "-25vmax",
-    left: "-20vmax",
-    opacity: 0.32,
-    duration: 28,
+    color: "var(--primary)",
+    size: "72vmax",
+    top: "-26vmax",
+    left: "-22vmax",
+    opacity: 0.11,
+    duration: 62,
     delay: 0,
     track: "a",
   },
   {
-    color: "#2563eb", // royal blue / indigo
-    size: "65vmax",
-    top: "40vh",
-    left: "55vw",
-    opacity: 0.24,
-    duration: 34,
-    delay: -12,
+    color: "var(--secondary)",
+    size: "66vmax",
+    top: "38vh",
+    left: "52vw",
+    opacity: 0.09,
+    duration: 78,
+    delay: -24,
     track: "b",
   },
   {
-    color: "#22d3ee", // subtle cyan hint
-    size: "55vmax",
+    color: "#22d3ee",
+    size: "56vmax",
     top: "70vh",
-    left: "-15vmax",
-    opacity: 0.18,
-    duration: 22,
-    delay: -22,
+    left: "-16vmax",
+    opacity: 0.07,
+    duration: 54,
+    delay: -40,
     track: "c",
   },
 ];
 
+const NOISE =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")";
+
 export function AuroraBackground({
-  blur = 75,
+  blur = 280,
+  intensity = 1,
+  grain = 0.035,
+  vignette = 0.7,
 }: {
   blur?: number;
+  /** Multiplier on all blob opacities */
+  intensity?: number;
+  /** Noise opacity 0..1 (keep 0.01–0.05) */
+  grain?: number;
+  /** Vignette strength 0..1 */
+  vignette?: number;
 }) {
   const styleTag = useMemo(
     () => `
@@ -105,17 +116,17 @@ export function AuroraBackground({
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       style={{
-        // Base matte black + very faint global mesh (kept from styles.css body)
-        backgroundColor: "#09090b",
+        backgroundColor: "var(--background)",
         contain: "strict",
       }}
     >
       <style>{styleTag}</style>
+
+      {/* Layer 2 — aurora */}
       <div
         className="absolute inset-0"
         style={{
           filter: `blur(${blur}px)`,
-          // Promote to its own layer so blur is rasterized once
           transform: "translateZ(0)",
           willChange: "transform",
         }}
@@ -123,20 +134,46 @@ export function AuroraBackground({
         {BLOBS.map((b, i) => (
           <div
             key={i}
-            className="aurora-blob absolute rounded-full"
+            className="absolute"
             style={{
               width: b.size,
               height: b.size,
               top: b.top,
               left: b.left,
-              opacity: b.opacity,
-              background: `radial-gradient(circle at center, ${b.color} 0%, ${b.color} 35%, transparent 70%)`,
-              animation: `aurora-${b.track} ${b.duration}s ease-in-out ${b.delay}s infinite`,
-              willChange: "transform",
+              opacity: b.opacity * intensity,
             }}
-          />
+          >
+            <div
+              className="aurora-blob h-full w-full rounded-full"
+              style={{
+                background: `radial-gradient(circle at center, ${b.color} 0%, ${b.color} 35%, transparent 70%)`,
+                animation: `aurora-${b.track} ${b.duration}s ease-in-out ${b.delay}s infinite`,
+                willChange: "transform",
+              }}
+            />
+          </div>
         ))}
+
       </div>
+
+      {/* Layer 3 — grain */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: NOISE,
+          backgroundRepeat: "repeat",
+          opacity: grain,
+          mixBlendMode: "overlay",
+        }}
+      />
+
+      {/* Layer 4 — vignette */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(120% 90% at 50% 40%, transparent 42%, rgba(0,0,0,${vignette * 0.55}) 78%, rgba(0,0,0,${vignette}) 100%)`,
+        }}
+      />
     </div>
   );
 }

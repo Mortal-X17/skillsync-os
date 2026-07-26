@@ -242,7 +242,7 @@ function PlannerPage() {
                 return (
                   <div key={iso} className="flex flex-col items-center gap-2">
                     <div
-                      className="w-full rounded-md bg-gradient-to-t from-[#7c3aed]/40 to-[#7c3aed]/70"
+                      className="w-full rounded-md bg-gradient-to-t from-[var(--primary)]/40 to-[var(--primary)]/70"
                       style={{ height: `${h}px` }}
                     />
                     <span className="text-[10px] text-muted-foreground">

@@ -13,14 +13,28 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.015] px-6 py-10 text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.04]">
-        <Icon className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
+    <div className="animate-float-in flex flex-col items-center justify-center gap-4 rounded-[20px] border border-dashed border-white/[0.09] bg-white/[0.012] px-6 py-12 text-center">
+      <div className="relative">
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 rounded-full blur-2xl"
+          style={{
+            background:
+              "radial-gradient(circle, color-mix(in oklab, var(--primary) 40%, transparent), transparent 70%)",
+          }}
+        />
+        <div className="icon-tile-accent h-14 w-14 rounded-[18px]">
+          <Icon className="h-6 w-6" strokeWidth={1.6} />
+        </div>
       </div>
-      <div className="space-y-1">
-        <div className="text-[14px] font-medium text-foreground">{title}</div>
+      <div className="space-y-1.5">
+        <div className="text-[15px] font-semibold tracking-tight text-foreground">
+          {title}
+        </div>
         {hint ? (
-          <div className="text-[12px] text-muted-foreground">{hint}</div>
+          <div className="mx-auto max-w-[260px] text-[13px] leading-relaxed text-muted-foreground">
+            {hint}
+          </div>
         ) : null}
       </div>
       {action}

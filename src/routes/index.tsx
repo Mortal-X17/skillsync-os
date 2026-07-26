@@ -173,7 +173,7 @@ function Dashboard() {
         {/* Level card */}
         <Card className="relative overflow-hidden border-white/[0.08] p-5">
           <div className="pointer-events-none absolute inset-0 gradient-mesh opacity-70" />
-          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#7c3aed]/25 blur-3xl" />
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[var(--primary)]/25 blur-3xl" />
           <div className="relative">
             <div className="flex items-start justify-between">
               <div>
@@ -387,7 +387,7 @@ function Dashboard() {
             action={<Link to="/habits">Habits</Link>}
           />
           <Card className="relative overflow-hidden">
-            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#2563eb]/20 blur-3xl" />
+            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[var(--secondary)]/20 blur-3xl" />
             <div className="relative space-y-4">
               <div className="flex items-center justify-between">
                 <div className="text-[13px] font-medium">

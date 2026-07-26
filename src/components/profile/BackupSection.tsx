@@ -249,20 +249,20 @@ export function BackupSection({
       <div className="pt-2">
         <button
           onClick={onRequestReset}
-          className="flex w-full items-center gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/[0.05] px-4 py-3.5 text-left transition-colors active:scale-[0.98]"
+          className="flex w-full items-center gap-3 rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger)]/[0.05] px-4 py-3.5 text-left transition-colors active:scale-[0.98]"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ef4444]/15 text-[#fca5a5]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--danger)]/15 text-[var(--danger)]">
             <RotateCcw className="h-[17px] w-[17px]" strokeWidth={1.75} />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-[14px] font-semibold tracking-tight text-[#fca5a5]">
+            <span className="block text-[14px] font-semibold tracking-tight text-[var(--danger)]">
               Reset SkillSync
             </span>
             <span className="block text-[11.5px] text-muted-foreground">
               Permanently delete all local data
             </span>
           </span>
-          <ChevronRight className="h-4 w-4 text-[#fca5a5]/60" />
+          <ChevronRight className="h-4 w-4 text-[var(--danger)]/60" />
         </button>
       </div>
 
@@ -417,8 +417,8 @@ export function BackupSection({
         title="Restore backup?"
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/[0.06] p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#ef4444]/15 text-[#fca5a5]">
+          <div className="flex items-start gap-3 rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger)]/[0.06] p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--danger)]/15 text-[var(--danger)]">
               <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
             </span>
             <p className="text-[12.5px] leading-relaxed text-muted-foreground">
@@ -437,7 +437,7 @@ export function BackupSection({
             <button
               disabled={restoring}
               onClick={confirmRestore}
-              className="flex-1 rounded-xl bg-[#ef4444] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97] disabled:opacity-70"
+              className="flex-1 rounded-xl bg-[var(--danger)] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97] disabled:opacity-70"
             >
               {restoring ? (
                 <span className="inline-flex items-center justify-center gap-2">
@@ -570,7 +570,7 @@ function StatusIcon({ tone }: { tone: "none" | "green" | "yellow" | "red" }) {
     );
   if (tone === "red")
     return (
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#ef4444]/15 text-[#fca5a5]">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--danger)]/15 text-[var(--danger)]">
         <ShieldX className="h-5 w-5" strokeWidth={1.75} />
       </span>
     );

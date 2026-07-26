@@ -65,7 +65,7 @@ export function BottomNav() {
                 {item.label}
               </span>
               {active ? (
-                <span className="absolute -bottom-0.5 h-[3px] w-[3px] rounded-full bg-[#7c3aed]" />
+                <span className="absolute -bottom-0.5 h-[3px] w-[3px] rounded-full bg-[var(--primary)]" />
               ) : null}
             </Link>
           );

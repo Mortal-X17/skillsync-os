@@ -211,7 +211,7 @@ function ProfilePage() {
                 />
               ) : (
                 <span
-                  className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#7c3aed] to-[#2563eb]"
+                  className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)]"
                 >
                   {initials}
                 </span>
@@ -243,7 +243,7 @@ function ProfilePage() {
                     <span className="text-white/10">·</span>
                     <button
                       onClick={() => updateProfile({ avatar: "" })}
-                      className="text-[#fca5a5] underline-offset-2 hover:underline"
+                      className="text-[var(--danger)] underline-offset-2 hover:underline"
                     >
                       Remove
                     </button>
@@ -511,7 +511,7 @@ function ProfilePage() {
         <section className="space-y-3">
           <SectionHeader title="About" />
           <Card className="relative overflow-hidden p-5">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#7c3aed]/15 blur-3xl" />
+            <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[var(--primary)]/15 blur-3xl" />
             <div className="relative flex items-start gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary">
                 <Sparkles className="h-5 w-5 text-white" strokeWidth={1.75} />
@@ -603,7 +603,7 @@ function ProfilePage() {
       >
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#7c3aed]/15 text-[#c4b5fd]">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/15 text-[var(--primary-glow)]">
               <Lock className="h-4 w-4" strokeWidth={1.75} />
             </span>
             <p className="text-[12.5px] leading-relaxed text-muted-foreground">
@@ -638,8 +638,8 @@ function ProfilePage() {
         title={resetMode === "all" ? "Wipe everything?" : "Reset to demo data?"}
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/[0.06] p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#ef4444]/15 text-[#fca5a5]">
+          <div className="flex items-start gap-3 rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger)]/[0.06] p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--danger)]/15 text-[var(--danger)]">
               <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
             </span>
             <p className="text-[12.5px] leading-relaxed text-muted-foreground">
@@ -660,7 +660,7 @@ function ProfilePage() {
             </button>
             <button
               onClick={() => setResetStep(2)}
-              className="flex-1 rounded-xl bg-[#ef4444] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
+              className="flex-1 rounded-xl bg-[var(--danger)] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
             >
               Yes, continue
             </button>
@@ -675,8 +675,8 @@ function ProfilePage() {
         title={resetMode === "all" ? "Confirm wipe" : "Confirm reset"}
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/[0.06] p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#ef4444]/15 text-[#fca5a5]">
+          <div className="flex items-start gap-3 rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger)]/[0.06] p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--danger)]/15 text-[var(--danger)]">
               <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
             </span>
             <p className="text-[12.5px] leading-relaxed text-muted-foreground">
@@ -710,7 +710,7 @@ function ProfilePage() {
             </button>
             <button
               onClick={submitResetPhrase}
-              className="flex-1 rounded-xl bg-[#ef4444] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
+              className="flex-1 rounded-xl bg-[var(--danger)] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
             >
               Confirm
             </button>
@@ -792,20 +792,20 @@ function SettingButtonRow({
       <span
         className={
           "flex h-9 w-9 items-center justify-center rounded-xl " +
-          (danger ? "bg-[#ef4444]/10 text-[#fca5a5]" : "bg-white/[0.03] text-muted-foreground")
+          (danger ? "bg-[var(--danger)]/10 text-[var(--danger)]" : "bg-white/[0.03] text-muted-foreground")
         }
       >
         <Icon className="h-[16px] w-[16px]" strokeWidth={1.75} />
       </span>
       <span
         className={
-          "flex-1 text-[14px] font-medium " + (danger ? "text-[#fca5a5]" : "")
+          "flex-1 text-[14px] font-medium " + (danger ? "text-[var(--danger)]" : "")
         }
       >
         {label}
       </span>
       {danger ? (
-        <Trash2 className="h-4 w-4 text-[#fca5a5]/70" />
+        <Trash2 className="h-4 w-4 text-[var(--danger)]/70" />
       ) : (
         <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
       )}
@@ -826,7 +826,7 @@ function Toggle({
       aria-pressed={on}
       className={
         "relative h-6 w-11 rounded-full transition-colors " +
-        (on ? "bg-[#7c3aed]" : "bg-white/10")
+        (on ? "bg-[var(--primary)]" : "bg-white/10")
       }
     >
       <span

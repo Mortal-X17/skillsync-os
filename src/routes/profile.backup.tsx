@@ -69,8 +69,8 @@ function BackupPage() {
 
       <BottomSheet open={step === 1} onClose={() => setStep(0)} title="Wipe everything?">
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/[0.06] p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#ef4444]/15 text-[#fca5a5]">
+          <div className="flex items-start gap-3 rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger)]/[0.06] p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--danger)]/15 text-[var(--danger)]">
               <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
             </span>
             <p className="text-[12.5px] leading-relaxed text-muted-foreground">
@@ -87,7 +87,7 @@ function BackupPage() {
             </button>
             <button
               onClick={() => setStep(2)}
-              className="flex-1 rounded-xl bg-[#ef4444] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
+              className="flex-1 rounded-xl bg-[var(--danger)] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
             >
               Yes, continue
             </button>
@@ -97,8 +97,8 @@ function BackupPage() {
 
       <BottomSheet open={step === 2} onClose={() => setStep(0)} title="Confirm wipe">
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-2xl border border-[#ef4444]/20 bg-[#ef4444]/[0.06] p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#ef4444]/15 text-[#fca5a5]">
+          <div className="flex items-start gap-3 rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger)]/[0.06] p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--danger)]/15 text-[var(--danger)]">
               <AlertTriangle className="h-4 w-4" strokeWidth={1.75} />
             </span>
             <p className="text-[12.5px] leading-relaxed text-muted-foreground">
@@ -129,7 +129,7 @@ function BackupPage() {
             </button>
             <button
               onClick={submit}
-              className="flex-1 rounded-xl bg-[#ef4444] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
+              className="flex-1 rounded-xl bg-[var(--danger)] py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
             >
               Confirm
             </button>

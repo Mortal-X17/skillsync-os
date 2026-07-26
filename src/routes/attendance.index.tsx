@@ -2,7 +2,7 @@ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { ArrowLeft, ChevronRight, GraduationCap } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
-import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
+import { Card, Chip, CircularProgress, CountUp, ProgressBar } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 
@@ -76,29 +76,47 @@ function AttendancePage() {
       </header>
 
       <div className="space-y-5 px-5 pb-24">
-        <Card className="p-5">
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl gradient-primary">
-              <GraduationCap className="h-5 w-5 text-white" strokeWidth={1.75} />
-            </span>
-            <div className="flex-1">
-              <div className="text-[12px] text-muted-foreground">
-                Overall attendance
+        <Card elevated className="p-5">
+          <div className="flex items-center gap-4">
+            <CircularProgress
+              value={overall.pct}
+              size={84}
+              stroke={8}
+              label={<CountUp value={overall.pct} suffix="%" />}
+              sublabel="Overall"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Current attendance
               </div>
-              <div className="mt-1 flex items-baseline gap-1.5">
-                <span className="text-[28px] font-semibold tracking-tight">
-                  {overall.pct}%
-                </span>
-                <span className="text-[12px] text-muted-foreground">
-                  {overall.present}/{overall.total} classes
-                </span>
+              <div className="mt-1.5 text-[15px] font-medium tracking-tight text-foreground">
+                {overall.total === 0
+                  ? "No classes logged yet"
+                  : overall.pct >= 85
+                    ? "Excellent"
+                    : overall.pct >= 75
+                      ? "On track"
+                      : "Needs attention"}
+              </div>
+              <div className="mt-1 text-[12.5px] text-muted-foreground">
+                {overall.present}/{overall.total} classes attended
+              </div>
+              <div className="mt-3">
+                <ProgressBar
+                  value={overall.pct}
+                  tone={
+                    overall.pct >= 75
+                      ? "gradient"
+                      : overall.pct >= 60
+                        ? "warning"
+                        : "danger"
+                  }
+                />
               </div>
             </div>
           </div>
-          <div className="mt-4">
-            <ProgressBar value={overall.pct} tone="gradient" />
-          </div>
         </Card>
+
 
         {subjects.length === 0 ? (
           <EmptyState

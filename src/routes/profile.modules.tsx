@@ -25,7 +25,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
       aria-pressed={on}
       className={
         "relative h-6 w-11 shrink-0 rounded-full transition-colors " +
-        (on ? "bg-[#7c3aed]" : "bg-white/10")
+        (on ? "bg-[var(--primary)]" : "bg-white/10")
       }
     >
       <span

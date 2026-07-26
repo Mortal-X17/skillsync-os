@@ -169,7 +169,7 @@ function ExpensesPage() {
                   <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground">
                     Debit
                   </div>
-                  <div className="mt-1 text-[15px] font-semibold text-[#fca5a5]">
+                  <div className="mt-1 text-[15px] font-semibold text-[var(--danger)]">
                     {fmtMoney(g.debit)}
                   </div>
                 </div>
@@ -178,7 +178,7 @@ function ExpensesPage() {
                     Balance
                   </div>
                   <div
-                    className={`mt-1 text-[15px] font-semibold ${g.balance >= 0 ? "text-emerald-300" : "text-[#fca5a5]"}`}
+                    className={`mt-1 text-[15px] font-semibold ${g.balance >= 0 ? "text-emerald-300" : "text-[var(--danger)]"}`}
                   >
                     {fmtMoney(g.balance)}
                   </div>
@@ -196,7 +196,7 @@ function ExpensesPage() {
                       "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl " +
                       (t.type === "credit"
                         ? "bg-emerald-400/15 text-emerald-300"
-                        : "bg-[#ef4444]/15 text-[#fca5a5]")
+                        : "bg-[var(--danger)]/15 text-[var(--danger)]")
                     }
                   >
                     {t.type === "credit" ? (
@@ -217,7 +217,7 @@ function ExpensesPage() {
                     </div>
                   </div>
                   <div
-                    className={`shrink-0 text-[14px] font-semibold ${t.type === "credit" ? "text-emerald-300" : "text-[#fca5a5]"}`}
+                    className={`shrink-0 text-[14px] font-semibold ${t.type === "credit" ? "text-emerald-300" : "text-[var(--danger)]"}`}
                   >
                     {t.type === "credit" ? "+" : "−"}
                     {fmtMoney(t.amount)}
@@ -249,7 +249,7 @@ function ExpensesPage() {
                   (type === tp
                     ? tp === "credit"
                       ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
-                      : "border-[#ef4444]/30 bg-[#ef4444]/10 text-[#fca5a5]"
+                      : "border-[var(--danger)]/30 bg-[var(--danger)]/10 text-[var(--danger)]"
                     : "border-white/[0.06] bg-white/[0.02] text-muted-foreground")
                 }
               >

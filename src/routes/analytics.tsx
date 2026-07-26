@@ -109,7 +109,7 @@ function AnalyticsPage() {
               <span className="text-[28px] font-semibold tracking-tight">
                 {hydrated ? stats.streak : 0}
               </span>
-              <Flame className="h-4 w-4 text-[#f59e0b]" />
+              <Flame className="h-4 w-4 text-[var(--warning)]" />
             </div>
           </Card>
           <Card className="p-4">
@@ -158,7 +158,7 @@ function AnalyticsPage() {
               {habitBars.map(({ d, pct }) => (
                 <div key={d} className="flex flex-col items-center gap-2">
                   <div
-                    className="w-full rounded-md bg-gradient-to-t from-[#7c3aed]/40 to-[#7c3aed]/80"
+                    className="w-full rounded-md bg-gradient-to-t from-[var(--primary)]/40 to-[var(--primary)]/80"
                     style={{ height: `${8 + pct * 0.6}px` }}
                   />
                   <span className="text-[10px] text-muted-foreground">

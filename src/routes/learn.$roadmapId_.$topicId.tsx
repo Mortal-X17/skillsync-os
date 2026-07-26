@@ -258,7 +258,7 @@ function TopicDetail() {
                   className="flex h-5 w-5 items-center justify-center"
                 >
                   {c.done ? (
-                    <CheckCircle2 className="h-5 w-5 text-[#7c3aed]" />
+                    <CheckCircle2 className="h-5 w-5 text-[var(--primary)]" />
                   ) : (
                     <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
                   )}
@@ -515,7 +515,7 @@ function SubtopicBlock({
                   className="flex h-5 w-5 items-center justify-center"
                 >
                   {c.done ? (
-                    <CheckCircle2 className="h-4 w-4 text-[#7c3aed]" />
+                    <CheckCircle2 className="h-4 w-4 text-[var(--primary)]" />
                   ) : (
                     <Circle className="h-4 w-4 text-muted-foreground/60" strokeWidth={1.5} />
                   )}

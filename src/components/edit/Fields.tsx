@@ -16,6 +16,9 @@ export const NO_AUTOFILL_PROPS = {
   "data-bwignore": "true",
 } as const;
 
+const FIELD_BASE =
+  "w-full rounded-[14px] border border-border bg-white/[0.03] px-4 text-[14px] text-foreground placeholder:text-muted-foreground/60 outline-none transition-all duration-200 ease-[var(--ease-out-soft)] focus:border-[color-mix(in_oklab,var(--primary)_45%,transparent)] focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_18%,transparent)]";
+
 export const TextField = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   function TextField({ className, type, ...props }, ref) {
     return (
@@ -24,10 +27,7 @@ export const TextField = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLIn
         type={type ?? "text"}
         {...NO_AUTOFILL_PROPS}
         {...props}
-        className={cn(
-          "w-full rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground/60 outline-none transition-colors focus:border-white/[0.15] focus:bg-white/[0.05]",
-          className,
-        )}
+        className={cn(FIELD_BASE, "h-11", className)}
       />
     );
   },
@@ -40,10 +40,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
         ref={ref}
         {...NO_AUTOFILL_PROPS}
         {...props}
-        className={cn(
-          "w-full resize-none rounded-xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 text-[14px] leading-relaxed text-foreground placeholder:text-muted-foreground/60 outline-none transition-colors focus:border-white/[0.15] focus:bg-white/[0.05]",
-          className,
-        )}
+        className={cn(FIELD_BASE, "resize-none py-3 leading-relaxed", className)}
       />
     );
   },

@@ -184,7 +184,7 @@ function RoadmapDetail() {
                   className="flex h-6 w-6 shrink-0 items-center justify-center"
                 >
                   {pPct === 100 ? (
-                    <CheckCircle2 className="h-5 w-5 text-[#7c3aed]" />
+                    <CheckCircle2 className="h-5 w-5 text-[var(--primary)]" />
                   ) : (
                     <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
                   )}
@@ -291,7 +291,7 @@ function RoadmapDetail() {
                               className="flex h-5 w-5 items-center justify-center"
                             >
                               {tPct === 100 ? (
-                                <CheckCircle2 className="h-5 w-5 text-[#7c3aed]" />
+                                <CheckCircle2 className="h-5 w-5 text-[var(--primary)]" />
                               ) : (
                                 <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
                               )}
@@ -377,7 +377,7 @@ function RoadmapDetail() {
                                           className="flex h-6 w-6 shrink-0 items-center justify-center"
                                         >
                                           {complete ? (
-                                            <CheckCircle2 className="h-4 w-4 text-[#7c3aed]" />
+                                            <CheckCircle2 className="h-4 w-4 text-[var(--primary)]" />
                                           ) : (
                                             <Circle className="h-4 w-4 text-muted-foreground/60" strokeWidth={1.5} />
                                           )}
@@ -436,7 +436,7 @@ function RoadmapDetail() {
                                                 className="flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-left transition-colors hover:bg-white/[0.03]"
                                               >
                                                 {c.done ? (
-                                                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#7c3aed]" />
+                                                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[var(--primary)]" />
                                                 ) : (
                                                   <Circle className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
                                                 )}
@@ -701,7 +701,7 @@ function TopicEditorSheet({
                   className="flex h-5 w-5 items-center justify-center"
                 >
                   {c.done ? (
-                    <CheckCircle2 className="h-5 w-5 text-[#7c3aed]" />
+                    <CheckCircle2 className="h-5 w-5 text-[var(--primary)]" />
                   ) : (
                     <Circle className="h-5 w-5 text-muted-foreground/60" strokeWidth={1.5} />
                   )}
@@ -898,7 +898,7 @@ function SubtopicBlock({
                   className="flex h-5 w-5 items-center justify-center"
                 >
                   {c.done ? (
-                    <CheckCircle2 className="h-4.5 w-4.5 text-[#7c3aed]" />
+                    <CheckCircle2 className="h-4.5 w-4.5 text-[var(--primary)]" />
                   ) : (
                     <Circle className="h-4.5 w-4.5 text-muted-foreground/60" strokeWidth={1.5} />
                   )}

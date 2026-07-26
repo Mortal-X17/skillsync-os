@@ -54,7 +54,11 @@ function ProjectsPage() {
       <PageHeader
         eyebrow="Workspace"
         title="Projects."
-        subtitle="Everything you're building, in one place."
+        subtitle={
+          projects.length === 0
+            ? "Everything you're building, in one place."
+            : `${projects.filter((p) => p.status === "active").length} active · ${projects.filter((p) => p.status === "done").length} shipped`
+        }
         right={
           <IconButton
             variant="primary"
@@ -69,6 +73,7 @@ function ProjectsPage() {
           </IconButton>
         }
       />
+
 
       <div className="mb-5 flex gap-2 px-5">
         {(["all", "planning", "active", "done"] as Filter[]).map((f) => {
@@ -257,7 +262,7 @@ function ProjectsPage() {
                     progress: Number(e.target.value),
                   })
                 }
-                className="w-full accent-[#7c3aed]"
+                className="w-full accent-[var(--primary)]"
               />
             </div>
 
@@ -351,7 +356,7 @@ function ProjectsPage() {
                           done: e.target.checked,
                         })
                       }
-                      className="h-4 w-4 accent-[#7c3aed]"
+                      className="h-4 w-4 accent-[var(--primary)]"
                     />
                     <input
                       value={t.title}

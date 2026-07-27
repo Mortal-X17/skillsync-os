@@ -1,111 +1,61 @@
 import { useMemo } from "react";
 
 /**
- * AuroraBackground — layered premium environment.
+ * GeometricGridBeam — premium architectural background.
  *
  * Layer 1: deep matte black base (--background)
- * Layer 2: animated aurora blobs (accent-token driven, GPU transforms only)
- * Layer 3: subtle noise / grain (1–2%)
- * Layer 4: soft edge vignette
+ * Layer 2: soft top-center radial beam glow (primary/indigo family)
+ * Layer 3: subtle geometric grid lines
+ * Layer 4: fine noise texture for tactile depth
+ * Layer 5: soft edge vignette
  *
- * Respects prefers-reduced-motion (static aurora).
- * All tunables are props / the BLOBS config below.
+ * Respects prefers-reduced-motion (static beam and no drift).
+ * All tunables are props / the CSS variables below.
  */
 
-type Blob = {
-  /** CSS color for the radial gradient center */
-  color: string;
-  /** Size in viewport units — kept huge so edges never appear */
-  size: string;
-  top: string;
-  left: string;
-  /** Base opacity 0..1 */
-  opacity: number;
-  /** Animation duration seconds */
-  duration: number;
-  /** Animation delay seconds (desyncs blobs) */
-  delay: number;
-  track: "a" | "b" | "c";
+type GeometricGridBeamProps = {
+  /** Beam blur radius in px — lower = sharper light, higher = softer ambience */
+  beamBlur?: number;
+  /** Beam opacity multiplier 0..1 */
+  beamOpacity?: number;
+  /** Grid line spacing in px */
+  gridSize?: number;
+  /** Grid line opacity 0..1 */
+  gridOpacity?: number;
+  /** Noise texture opacity 0..1 (keep low, 0.01–0.05) */
+  grain?: number;
+  /** Vignette strength 0..1 */
+  vignette?: number;
+  /** Secondary beam color */
+  beamColor?: string;
 };
-
-const BLOBS: Blob[] = [
-  {
-    color: "var(--primary)",
-    size: "72vmax",
-    top: "-26vmax",
-    left: "-22vmax",
-    opacity: 0.11,
-    duration: 62,
-    delay: 0,
-    track: "a",
-  },
-  {
-    color: "var(--secondary)",
-    size: "66vmax",
-    top: "38vh",
-    left: "52vw",
-    opacity: 0.09,
-    duration: 78,
-    delay: -24,
-    track: "b",
-  },
-  {
-    color: "#22d3ee",
-    size: "56vmax",
-    top: "70vh",
-    left: "-16vmax",
-    opacity: 0.07,
-    duration: 54,
-    delay: -40,
-    track: "c",
-  },
-];
 
 const NOISE =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")";
 
 export function AuroraBackground({
-  blur = 280,
-  intensity = 1,
-  grain = 0.035,
+  beamBlur = 140,
+  beamOpacity = 0.55,
+  gridSize = 44,
+  gridOpacity = 0.045,
+  grain = 0.025,
   vignette = 0.7,
-}: {
-  blur?: number;
-  /** Multiplier on all blob opacities */
-  intensity?: number;
-  /** Noise opacity 0..1 (keep 0.01–0.05) */
-  grain?: number;
-  /** Vignette strength 0..1 */
-  vignette?: number;
-}) {
+  beamColor = "var(--primary)",
+}: GeometricGridBeamProps) {
   const styleTag = useMemo(
     () => `
-      @keyframes aurora-a {
-        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.45; }
-        20%  { transform: translate3d(16vw, 10vh, 0) scale(1.35) rotate(18deg); opacity: 0.75; }
-        40%  { transform: translate3d(28vw, -4vh, 0) scale(1.55) rotate(32deg); opacity: 0.55; }
-        60%  { transform: translate3d(8vw, -16vh, 0) scale(1.25) rotate(12deg); opacity: 0.8; }
-        80%  { transform: translate3d(-6vw, 4vh, 0) scale(1.1) rotate(-6deg); opacity: 0.6; }
-        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.45; }
-      }
-      @keyframes aurora-b {
-        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.35; }
-        20%  { transform: translate3d(-18vw, -12vh, 0) scale(1.4) rotate(-22deg); opacity: 0.65; }
-        40%  { transform: translate3d(-6vw, 8vh, 0) scale(1.2) rotate(-8deg); opacity: 0.45; }
-        60%  { transform: translate3d(-24vw, -4vh, 0) scale(1.45) rotate(-26deg); opacity: 0.55; }
-        80%  { transform: translate3d(-10vw, -14vh, 0) scale(1.15) rotate(-12deg); opacity: 0.7; }
-        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.35; }
-      }
-      @keyframes aurora-c {
-        0%   { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.25; }
-        20%  { transform: translate3d(12vw, -16vh, 0) scale(1.28) rotate(16deg); opacity: 0.55; }
-        40%  { transform: translate3d(22vw, 4vh, 0) scale(1.48) rotate(28deg); opacity: 0.4; }
-        60%  { transform: translate3d(4vw, 10vh, 0) scale(1.18) rotate(8deg); opacity: 0.5; }
-        80%  { transform: translate3d(18vw, -8vh, 0) scale(1.32) rotate(20deg); opacity: 0.6; }
-        100% { transform: translate3d(0,0,0) scale(1) rotate(0deg); opacity: 0.25; }
+      @keyframes beam-breathe {
+        0%, 100% {
+          opacity: 0.6;
+          transform: translate3d(-50%, 0, 0) scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: translate3d(-50%, 0, 0) scale(1.08);
+        }
       }
       @media (prefers-reduced-motion: reduce) {
-        .aurora-blob { animation: none !important; }
+        .grid-beam-glow { animation: none !important; }
       }
     `,
     [],
@@ -122,41 +72,36 @@ export function AuroraBackground({
     >
       <style>{styleTag}</style>
 
-      {/* Layer 2 — aurora */}
+      {/* Layer 2 — top-center radial beam glow */}
+      <div
+        className="grid-beam-glow absolute left-1/2 top-0"
+        style={{
+          width: "110vw",
+          height: "70vh",
+          transform: "translate3d(-50%, 0, 0)",
+          background: `radial-gradient(ellipse at 50% 0%, color-mix(in oklab, ${beamColor} ${beamOpacity * 24}%, transparent) 0%, transparent 65%)`,
+          filter: `blur(${beamBlur}px)`,
+          opacity: 0.8,
+          animation: "beam-breathe 14s ease-in-out infinite",
+          willChange: "transform, opacity",
+        }}
+      />
+
+      {/* Layer 3 — geometric grid */}
       <div
         className="absolute inset-0"
         style={{
-          filter: `blur(${blur}px)`,
-          transform: "translateZ(0)",
-          willChange: "transform",
+          backgroundImage: `
+            linear-gradient(to right, oklch(1 0 0 / ${gridOpacity}) 1px, transparent 1px),
+            linear-gradient(to bottom, oklch(1 0 0 / ${gridOpacity}) 1px, transparent 1px)
+          `,
+          backgroundSize: `${gridSize}px ${gridSize}px`,
+          maskImage: "radial-gradient(120% 100% at 50% 0%, black 30%, transparent 80%)",
+          WebkitMaskImage: "radial-gradient(120% 100% at 50% 0%, black 30%, transparent 80%)",
         }}
-      >
-        {BLOBS.map((b, i) => (
-          <div
-            key={i}
-            className="absolute"
-            style={{
-              width: b.size,
-              height: b.size,
-              top: b.top,
-              left: b.left,
-              opacity: b.opacity * intensity,
-            }}
-          >
-            <div
-              className="aurora-blob h-full w-full rounded-full"
-              style={{
-                background: `radial-gradient(circle at center, ${b.color} 0%, ${b.color} 35%, transparent 70%)`,
-                animation: `aurora-${b.track} ${b.duration}s ease-in-out ${b.delay}s infinite`,
-                willChange: "transform",
-              }}
-            />
-          </div>
-        ))}
+      />
 
-      </div>
-
-      {/* Layer 3 — grain */}
+      {/* Layer 4 — grain */}
       <div
         className="absolute inset-0"
         style={{
@@ -167,11 +112,11 @@ export function AuroraBackground({
         }}
       />
 
-      {/* Layer 4 — vignette */}
+      {/* Layer 5 — vignette */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(120% 90% at 50% 40%, transparent 42%, rgba(0,0,0,${vignette * 0.55}) 78%, rgba(0,0,0,${vignette}) 100%)`,
+          background: `radial-gradient(120% 100% at 50% 50%, transparent 35%, rgba(0,0,0,${vignette * 0.55}) 75%, rgba(0,0,0,${vignette}) 100%)`,
         }}
       />
     </div>

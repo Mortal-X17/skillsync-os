@@ -32,6 +32,13 @@ const migrators: Record<number, (data: any) => any> = {
       expenses: data.expenses ?? { transactions: [] },
     };
   },
+  2: (data) => ({
+    ...data,
+    preferences: {
+      ...(data.preferences ?? {}),
+      background: (data.preferences ?? {}).background ?? "aurora",
+    },
+  }),
 };
 
 export function migrate(input: unknown): AppData {
@@ -51,6 +58,7 @@ export function migrate(input: unknown): AppData {
   data.preferences = {
     notifications: true,
     developerMode: false,
+    background: "aurora",
     ...(data.preferences ?? {}),
     modules: {
       attendance: false,

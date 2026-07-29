@@ -31,7 +31,6 @@ import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import {
   BACKGROUND_OPTIONS,
-  BackgroundByStyle,
   type BackgroundStyle,
 } from "@/components/layout/backgrounds";
 

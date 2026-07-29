@@ -19,7 +19,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { phasePct, roadmapPct, topicPct, subtopicPct } from "@/lib/progress";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
-import { TextField, TextArea } from "@/components/edit/Fields";
+import { TextField, TextArea , NO_AUTOFILL_PROPS } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import type { Topic, Subtopic } from "@/lib/schema";
 
@@ -707,6 +707,7 @@ function TopicEditorSheet({
                   )}
                 </button>
                 <input
+                  {...NO_AUTOFILL_PROPS}
                   className="flex-1 bg-transparent text-[13.5px] outline-none"
                   value={c.title}
                   onChange={(e) =>
@@ -867,6 +868,7 @@ function SubtopicBlock({
           )}
         </button>
         <input
+          {...NO_AUTOFILL_PROPS}
           value={sub.title}
           onChange={(e) => onChange({ title: e.target.value })}
           className="flex-1 bg-transparent text-[13px] font-medium outline-none"
@@ -904,6 +906,7 @@ function SubtopicBlock({
                   )}
                 </button>
                 <input
+                  {...NO_AUTOFILL_PROPS}
                   className="flex-1 bg-transparent text-[13px] outline-none"
                   value={c.title}
                   onChange={(e) => updateCheck(c.id, { title: e.target.value })}

@@ -29,6 +29,11 @@ import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
 import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
+import {
+  BACKGROUND_OPTIONS,
+  BackgroundByStyle,
+  type BackgroundStyle,
+} from "@/components/layout/backgrounds";
 
 
 
@@ -87,6 +92,7 @@ function ProfilePage() {
 
   const [openProfile, setOpenProfile] = useState(false);
   const [openJson, setOpenJson] = useState(false);
+  const [openAppearance, setOpenAppearance] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -431,6 +437,26 @@ function ProfilePage() {
                 }
               />
               <SettingRow icon={Palette} label="Theme" hint="Dark" />
+              <button
+                type="button"
+                onClick={() => setOpenAppearance(true)}
+                className="w-full text-left transition-transform active:scale-[0.99]"
+              >
+                <SettingRow
+                  icon={Sparkles}
+                  label="Background"
+                  right={
+                    <span className="flex items-center gap-2">
+                      <span className="text-[13px] text-muted-foreground">
+                        {BACKGROUND_OPTIONS.find(
+                          (o) => o.id === (preferences.background ?? "aurora"),
+                        )?.label}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+                    </span>
+                  }
+                />
+              </button>
             </div>
           </Card>
 
@@ -552,6 +578,57 @@ function ProfilePage() {
           SkillSync · Made for the long game.
         </p>
       </div>
+
+      <BottomSheet
+        open={openAppearance}
+        onClose={() => setOpenAppearance(false)}
+        title="Background"
+      >
+        <p className="mb-4 text-[13px] leading-relaxed text-muted-foreground">
+          Tap a style to apply it instantly across the whole app.
+        </p>
+        <div className="space-y-3">
+          {BACKGROUND_OPTIONS.map((opt) => {
+            const active = (preferences.background ?? "aurora") === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() =>
+                  updatePreferences({ background: opt.id as BackgroundStyle })
+                }
+                className={
+                  "w-full overflow-hidden rounded-[18px] border text-left transition-all active:scale-[0.98] " +
+                  (active
+                    ? "border-[color-mix(in_oklab,var(--primary)_55%,transparent)] shadow-[var(--shadow-glow)]"
+                    : "border-border")
+                }
+              >
+                <div
+                  className="h-24 w-full"
+                  style={{ background: opt.swatch }}
+                  aria-hidden="true"
+                />
+                <div className="flex items-center justify-between gap-3 bg-white/[0.03] px-4 py-3">
+                  <div className="min-w-0">
+                    <div className="text-[14px] font-semibold tracking-tight">
+                      {opt.label}
+                    </div>
+                    <div className="text-[12px] leading-relaxed text-muted-foreground">
+                      {opt.description}
+                    </div>
+                  </div>
+                  {active ? (
+                    <span className="shrink-0 rounded-full bg-[var(--primary)] px-2.5 py-1 text-[11px] font-semibold text-primary-foreground">
+                      Active
+                    </span>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </BottomSheet>
 
       <BottomSheet
         open={openProfile}

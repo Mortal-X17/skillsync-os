@@ -5,7 +5,7 @@ import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
-import { TextField, TextArea } from "@/components/edit/Fields";
+import { TextField, TextArea , NO_AUTOFILL_PROPS } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import type { Project } from "@/lib/schema";
@@ -359,6 +359,7 @@ function ProjectsPage() {
                       className="h-4 w-4 accent-[var(--primary)]"
                     />
                     <input
+                      {...NO_AUTOFILL_PROPS}
                       value={t.title}
                       onChange={(e) =>
                         updateProjectTask(current.id, t.id, {

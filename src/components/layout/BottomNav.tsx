@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, GraduationCap, FolderKanban, CalendarRange, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useKeyboardOpen, useOverlayOpen } from "@/hooks/use-keyboard-inset";
 
 type NavItem = {
   to: "/" | "/learn" | "/projects" | "/planner" | "/profile";
@@ -19,13 +20,25 @@ const items: NavItem[] = [
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const keyboardOpen = useKeyboardOpen();
+  const overlayOpen = useOverlayOpen();
+  const hidden = keyboardOpen || overlayOpen;
 
   return (
     <nav
       aria-label="Primary"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[max(env(safe-area-inset-bottom),16px)]"
+      aria-hidden={hidden}
+      className={cn(
+        "pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[max(env(safe-area-inset-bottom),16px)] transition-all duration-200 ease-[var(--ease-out-soft)]",
+        hidden && "pointer-events-none translate-y-[140%] opacity-0",
+      )}
     >
-      <div className="pointer-events-auto glass mx-4 flex w-full max-w-md items-center justify-between rounded-full px-2 py-2 shadow-[var(--shadow-float)]">
+      <div
+        className={cn(
+          "glass mx-4 flex w-full max-w-md items-center justify-between rounded-full px-2 py-2 shadow-[var(--shadow-float)]",
+          hidden ? "pointer-events-none" : "pointer-events-auto",
+        )}
+      >
         {items.map((item) => {
           const active = item.exact
             ? pathname === item.to

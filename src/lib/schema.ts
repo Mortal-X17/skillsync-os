@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export const ChecklistItemSchema = z.object({
   id: z.string(),
@@ -122,6 +122,9 @@ export const PreferencesSchema = z.object({
   notifications: z.boolean().default(true),
   developerMode: z.boolean().default(false),
   modules: ModuleFlagsSchema.default({ attendance: false, expenses: false }),
+  background: z
+    .enum(["aurora", "gradient", "atmospheric"])
+    .default("aurora"),
 });
 
 export const StatsSchema = z.object({
@@ -171,6 +174,7 @@ export const AppDataSchema = z.object({
     notifications: true,
     developerMode: false,
     modules: { attendance: false, expenses: false },
+    background: "aurora",
   }),
   stats: StatsSchema.default({ xp: 0, level: 1, streak: 0, lastActive: "" }),
   attendance: AttendanceSchema.default({ subjects: [] }),

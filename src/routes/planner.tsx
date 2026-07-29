@@ -5,7 +5,7 @@ import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, SectionHeader } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet } from "@/components/edit/Sheet";
-import { TextField } from "@/components/edit/Fields";
+import { TextField , NO_AUTOFILL_PROPS } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { addDaysISO, todayISO, fromISO } from "@/lib/date";
@@ -171,6 +171,7 @@ function PlannerPage() {
                       aria-label="Toggle"
                     />
                     <input
+                      {...NO_AUTOFILL_PROPS}
                       value={t.title}
                       onChange={(e) => updateTask(t.id, { title: e.target.value })}
                       className={cn(

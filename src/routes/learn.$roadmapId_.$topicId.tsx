@@ -16,7 +16,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
-import { TextField, TextArea } from "@/components/edit/Fields";
+import { TextField, TextArea , NO_AUTOFILL_PROPS } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { topicPct, subtopicPct } from "@/lib/progress";
@@ -130,6 +130,7 @@ function TopicDetail() {
           {roadmap.title} · {phase.title}
         </div>
         <input
+          {...NO_AUTOFILL_PROPS}
           value={topic.title}
           onChange={(e) => {
             updateTopic(roadmapId, phaseId, topicId, { title: e.target.value });
@@ -264,6 +265,7 @@ function TopicDetail() {
                   )}
                 </button>
                 <input
+                  {...NO_AUTOFILL_PROPS}
                   className={
                     "flex-1 bg-transparent text-[13.5px] outline-none " +
                     (c.done ? "text-muted-foreground line-through" : "")
@@ -484,6 +486,7 @@ function SubtopicBlock({
           )}
         </button>
         <input
+          {...NO_AUTOFILL_PROPS}
           value={sub.title}
           onChange={(e) => onChange({ title: e.target.value })}
           className="flex-1 bg-transparent text-[13.5px] font-medium outline-none"
@@ -521,6 +524,7 @@ function SubtopicBlock({
                   )}
                 </button>
                 <input
+                  {...NO_AUTOFILL_PROPS}
                   className={
                     "flex-1 bg-transparent text-[13px] outline-none " +
                     (c.done ? "text-muted-foreground line-through" : "")

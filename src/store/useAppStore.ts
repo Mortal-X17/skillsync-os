@@ -779,7 +779,7 @@ export const useAppStore = create<State>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() =>
         typeof window !== "undefined"
           ? window.localStorage

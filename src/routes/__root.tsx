@@ -77,6 +77,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  // SkillSync is a local-first mobile app; render the app on the client so
+  // persisted device data and browser-only mobile behavior never break SSR.
+  ssr: false,
   head: () => ({
     meta: [
       { charSet: "utf-8" },

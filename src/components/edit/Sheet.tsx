@@ -1,6 +1,11 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  useKeyboardInset,
+  useRegisterOverlay,
+  useScrollFocusedIntoView,
+} from "@/hooks/use-keyboard-inset";
 
 export function BottomSheet({
   open,
@@ -8,13 +13,21 @@ export function BottomSheet({
   title,
   children,
   className,
+  footer,
 }: {
   open: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
   className?: string;
+  /** Sticky action row pinned above the keyboard. */
+  footer?: ReactNode;
 }) {
+  const kb = useKeyboardInset();
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useRegisterOverlay(open);
+  useScrollFocusedIntoView(bodyRef, open);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -37,12 +50,16 @@ export function BottomSheet({
       />
       <div
         className={cn(
-          "animate-sheet-up glass relative mx-auto flex max-h-[92dvh] w-full max-w-md flex-col overflow-hidden rounded-t-[28px] bg-surface/90 shadow-[var(--shadow-float)]",
+          "animate-sheet-up glass relative mx-auto flex w-full max-w-md flex-col overflow-hidden rounded-t-[28px] bg-surface/90 shadow-[var(--shadow-float)] transition-[max-height,margin] duration-200 ease-[var(--ease-out-soft)]",
           className,
         )}
+        style={{
+          marginBottom: kb,
+          maxHeight: `calc(92dvh - ${kb}px)`,
+        }}
       >
-        <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-white/15" />
-        <div className="flex items-center justify-between gap-3 px-6 pt-3">
+        <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-white/15" />
+        <div className="flex shrink-0 items-center justify-between gap-3 px-6 pt-3">
           <h3 className="min-w-0 truncate text-[17px] font-semibold tracking-tight">
             {title}
           </h3>
@@ -54,9 +71,26 @@ export function BottomSheet({
             <X className="h-4 w-4" strokeWidth={1.75} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 pb-[max(env(safe-area-inset-bottom),24px)] pt-4">
+        <div
+          ref={bodyRef}
+          className={cn(
+            "flex-1 overflow-y-auto overscroll-contain px-6 pt-4",
+            footer ? "pb-3" : "pb-[max(env(safe-area-inset-bottom),24px)]",
+          )}
+          style={kb > 0 ? { paddingBottom: footer ? 12 : 16 } : undefined}
+        >
           {children}
         </div>
+        {footer ? (
+          <div
+            className="shrink-0 border-t border-white/[0.06] bg-surface/80 px-6 pt-3 backdrop-blur-xl"
+            style={{
+              paddingBottom: kb > 0 ? 12 : "max(env(safe-area-inset-bottom),20px)",
+            }}
+          >
+            {footer}
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -79,6 +113,9 @@ export function ConfirmDialog({
   confirmLabel?: string;
   destructive?: boolean;
 }) {
+  const kb = useKeyboardInset();
+  useRegisterOverlay(open);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -89,7 +126,10 @@ export function ConfirmDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6">
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+      style={{ paddingBottom: kb ? kb + 24 : undefined }}
+    >
       <div
         className="absolute inset-0 bg-black/65 backdrop-blur-[6px] animate-in fade-in duration-200"
         onClick={onClose}

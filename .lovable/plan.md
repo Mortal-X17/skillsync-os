@@ -1,36 +1,36 @@
-Implement a new premium background system for SkillSync OS, replacing the current AuroraBackground component.
+## 1. Keyboard (IME) overlap fix
 
-### Direction chosen
-**Geometric Grid Beam** — dark charcoal base with a subtle geometric grid, a soft top-center beam glow, and a vignette edge. Calm, premium, and OS-like. This is a CSS-only replacement that keeps the app fully functional and dark-themed.
+**Detect the keyboard** — add `src/hooks/use-keyboard-inset.tsx` using `window.visualViewport` (resize/scroll listeners) to compute `keyboardInset = innerHeight - (visualViewport.height + offsetTop)`. Treated as open when inset > 120px. SSR-safe (starts at 0, reads only in `useEffect`). Expose the value as a CSS variable `--kb-inset` on `<html>` so plain CSS can react too.
 
-### Plan
+**Hide the bottom nav when the keyboard is open** — `BottomNav` gets `translate-y-[120%] opacity-0 pointer-events-none` while the keyboard is up, with a 200ms ease transition. Also auto-hide whenever a bottom sheet/dialog is open, so it can never sit over sheet content.
 
-1. **Rebuild the background component**
-   - Replace `src/components/layout/AuroraBackground.tsx` with a four-layer fixed background:
-     - Layer 1: deep matte black base (`#09090B` / `var(--background)`)
-     - Layer 2: soft top-center radial beam glow (indigo/purple, very low opacity, large blur)
-     - Layer 3: subtle geometric grid (`linear-gradient` lines at 32–40px spacing, low opacity)
-     - Layer 4: edge vignette (`radial-gradient` from transparent center to dark edges)
-   - Add a configurable intensity/blur prop so the user can tune it later.
-   - Respect `prefers-reduced-motion` by keeping the grid static and disabling any animated beam drift.
+**Bottom sheets sit above the keyboard** — in `src/components/edit/Sheet.tsx`:
+- `BottomSheet` container gets `paddingBottom: max(env(safe-area-inset-bottom), 24px) + keyboardInset` and `maxHeight: calc(92dvh - keyboardInset)` so it shrinks instead of sliding under the keyboard.
+- `ConfirmDialog` container gets the same bottom offset so it re-centers in the visible area.
+- Sheet body keeps its own scroll; the header/handle stay pinned.
 
-2. **Apply globally via the root layout**
-   - Ensure the background is rendered in `src/routes/__root.tsx` behind `<Outlet />` and `<Splash />` so it persists across all routes.
-   - Verify the `body` background remains transparent so the fixed background layer is visible.
+**Sticky action row** — sheets that render Save/Done buttons get a sticky footer (`sticky bottom-0` inside the scroll area with a blurred surface backdrop), so the primary action is always visible regardless of content height.
 
-3. **Design-token compliance**
-   - Use CSS variables and semantic tokens from `src/styles.css` instead of hardcoded hex colors where possible.
-   - Keep existing colors (indigo/purple) aligned with the current accent engine.
+**Auto scroll-into-view on focus** — a small `useScrollFocusedIntoView` effect inside the sheet listens to `focusin` on the sheet body and calls `scrollIntoView({ block: "center", behavior: "smooth" })` after the viewport settles (rAF + short timeout for the keyboard animation).
 
-4. **Visual QA**
-   - Verify the grid is visible but does not reduce text contrast.
-   - Check that the background stays behind all surfaces and toasts.
-   - Test on mobile viewport size.
+**Suggestion bar / credential strip** — already partly handled by `NO_AUTOFILL_PROPS`; extend it with `name="no-autofill-<random>"` fallback and audit any bare `<input>`/`<textarea>` still not using `TextField`/`TextArea` (Learn phase rename, Habit edit, Planner, Notes, Attendance, Expenses) and convert them. Gboard's own suggestion strip can't be removed by web code, but with the nav hidden and the sheet resized it no longer overlaps anything.
 
-### Implementation notes
+**Viewport meta** — `viewport-fit=cover` is already set; add `interactive-widget=resizes-content` so Android resizes rather than overlays the layout.
+
+**QA pass** — walk every sheet/dialog/form on a 433×826 mobile viewport with a simulated keyboard inset and confirm zero overlap: Learn (rename phase/topic/subtopic, create roadmap, import), Habits (edit habit, check-in note), Projects, Planner, Notes, Attendance, Expenses, Profile (dev mode, reset phrase, backup).
+
+## 2. Background system
+
+**Remove the grid.** Replace `AuroraBackground.tsx` with a modular `src/components/layout/Backgrounds/` directory:
+- `AuroraBackground.tsx` — Option 1: 3 huge blurred clouds (purple, indigo, royal blue + faint cyan), 3–8% opacity, 60–90s drift cycles, GPU transforms only.
+- `MinimalGradient.tsx` — Option 2: static matte black, soft radial gradients, edge lighting, vignette, fine grain. Zero animation.
+- `Atmospheric.tsx` — Option 3: layered corner lighting, ambient shadow falloff, deep noise texture, no visible shapes.
+- `index.tsx` — `<AppBackground />` reads the chosen style from the store and renders the right layer. All three respect `prefers-reduced-motion` (aurora freezes to a static composition).
+
+**Live in-app preview so you can compare** — a new "Appearance" tile in Profile → Preferences opens a picker sheet with three swatch cards. Tapping a card applies the background instantly to the whole app (live, full-screen), so you can back out and browse other pages while it's active; tap another to switch. The choice is persisted in `preferences.background` (default: Aurora) with a schema migration so existing data is untouched.
+
+### Technical notes
 - No new dependencies.
-- No redesign of existing UI components; only the background layer changes.
-- Implementation will be done in under 5 credits via a focused component replacement.
-
-### After implementation
-I will run a build check and a quick browser verification to confirm the background renders across routes without errors.
+- `visualViewport` listeners are passive and throttled with rAF; the CSS variable write is the only DOM mutation.
+- Backgrounds use `transform`/`opacity` only, `will-change` scoped, `contain: strict` on the fixed layer — no repaint cost on scroll, battery-safe.
+- Zustand persist version bumped with a defaulting migration for `preferences.background`.

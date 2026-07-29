@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, GraduationCap, FolderKanban, CalendarRange, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useKeyboardOpen, useOverlayOpen } from "@/hooks/use-keyboard-inset";
 
 type NavItem = {
   to: "/" | "/learn" | "/projects" | "/planner" | "/profile";

@@ -22,10 +22,7 @@ import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { roadmapPct } from "@/lib/progress";
 import { todayISO } from "@/lib/date";
 import { useMemo } from "react";
-import {
-  useNotificationRunner,
-  useUnreadCount,
-} from "@/hooks/use-notification-runner";
+import { useUnreadCount } from "@/hooks/use-notification-runner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -67,7 +64,6 @@ function todayDateLabel(): string {
 
 function Dashboard() {
   const hydrated = useHydrated();
-  useNotificationRunner();
   const unread = useUnreadCount();
   const stats = useAppStore((s) => s.stats);
   const profile = useAppStore((s) => s.profile);

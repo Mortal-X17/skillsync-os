@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { AppBackground } from "@/components/layout/backgrounds";
 import { Splash } from "@/components/layout/Splash";
+import { NotificationRunner } from "@/components/notifications/NotificationRunner";
 
 
 function NotFoundComponent() {
@@ -157,6 +158,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AppBackground />
       <Splash />
+      <NotificationRunner />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster />

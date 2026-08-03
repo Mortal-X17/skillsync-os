@@ -111,14 +111,29 @@ function Dashboard() {
         title={`${greeting()}${profile.name ? `, ${profile.name.split(" ")[0]}` : ""}.`}
         subtitle="Small steps, compounded daily."
         right={
-          <Link
-            to="/notes"
-            aria-label="Notes"
-            className="glass flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-95"
-          >
-            <StickyNote className="h-[17px] w-[17px] text-muted-foreground" strokeWidth={1.75} />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/notifications"
+              aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
+              className="glass relative flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-95"
+            >
+              <Bell className="h-[17px] w-[17px] text-muted-foreground" strokeWidth={1.75} />
+              {unread > 0 ? (
+                <span className="absolute right-1.5 top-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[9.5px] font-bold text-primary-foreground">
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              ) : null}
+            </Link>
+            <Link
+              to="/notes"
+              aria-label="Notes"
+              className="glass flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-95"
+            >
+              <StickyNote className="h-[17px] w-[17px] text-muted-foreground" strokeWidth={1.75} />
+            </Link>
+          </div>
         }
+
       />
 
       <div className="space-y-6 px-5">

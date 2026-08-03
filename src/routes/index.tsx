@@ -13,6 +13,7 @@ import {
   Activity,
   LineChart,
   GraduationCap,
+  Bell,
 } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
@@ -21,6 +22,10 @@ import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { roadmapPct } from "@/lib/progress";
 import { todayISO } from "@/lib/date";
 import { useMemo } from "react";
+import {
+  useNotificationRunner,
+  useUnreadCount,
+} from "@/hooks/use-notification-runner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,6 +67,8 @@ function todayDateLabel(): string {
 
 function Dashboard() {
   const hydrated = useHydrated();
+  useNotificationRunner();
+  const unread = useUnreadCount();
   const stats = useAppStore((s) => s.stats);
   const profile = useAppStore((s) => s.profile);
   const roadmaps = useAppStore((s) => s.roadmaps);

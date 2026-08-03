@@ -1,6 +1,7 @@
 import { CURRENT_SCHEMA_VERSION, AppDataSchema, type AppData } from "./schema";
 import { createInitialData } from "./seed";
 import { todayISO } from "./date";
+import { createDefaultNotifications } from "./notifications/types";
 
 /**
  * v1 → v2: adds habit.startDate, attendance module, expenses module,
@@ -32,6 +33,10 @@ const migrators: Record<number, (data: any) => any> = {
       expenses: data.expenses ?? { transactions: [] },
     };
   },
+  3: (data) => ({
+    ...data,
+    notifications: data.notifications ?? createDefaultNotifications(),
+  }),
   2: (data) => ({
     ...data,
     preferences: {
@@ -68,6 +73,30 @@ export function migrate(input: unknown): AppData {
   };
   data.attendance = data.attendance ?? { subjects: [] };
   data.expenses = data.expenses ?? { transactions: [] };
+  {
+    const defaults = createDefaultNotifications();
+    const n = data.notifications ?? {};
+    data.notifications = {
+      settings: {
+        ...defaults.settings,
+        ...(n.settings ?? {}),
+        categories: {
+          ...defaults.settings.categories,
+          ...((n.settings ?? {}).categories ?? {}),
+        },
+        quietHours: {
+          ...defaults.settings.quietHours,
+          ...((n.settings ?? {}).quietHours ?? {}),
+        },
+        weeklySummary: {
+          ...defaults.settings.weeklySummary,
+          ...((n.settings ?? {}).weeklySummary ?? {}),
+        },
+      },
+      items: Array.isArray(n.items) ? n.items : [],
+      scheduled: Array.isArray(n.scheduled) ? n.scheduled : [],
+    };
+  }
 
   const parsed = AppDataSchema.safeParse(data);
   if (parsed.success) return parsed.data;

@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PlannerRouteImport } from './routes/planner'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NotesRouteImport } from './routes/notes'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as HabitsRouteImport } from './routes/habits'
@@ -25,6 +26,7 @@ import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as HabitsIndexRouteImport } from './routes/habits.index'
 import { Route as ExpensesIndexRouteImport } from './routes/expenses.index'
 import { Route as AttendanceIndexRouteImport } from './routes/attendance.index'
+import { Route as ProfileNotificationsRouteImport } from './routes/profile.notifications'
 import { Route as ProfileModulesRouteImport } from './routes/profile.modules'
 import { Route as ProfileBackupRouteImport } from './routes/profile.backup'
 import { Route as LearnRoadmapIdRouteImport } from './routes/learn.$roadmapId'
@@ -50,6 +52,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PlannerRoute = PlannerRouteImport.update({
   id: '/planner',
   path: '/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotesRoute = NotesRouteImport.update({
@@ -112,6 +119,11 @@ const AttendanceIndexRoute = AttendanceIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AttendanceRoute,
 } as any)
+const ProfileNotificationsRoute = ProfileNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => ProfileRoute,
+} as any)
 const ProfileModulesRoute = ProfileModulesRouteImport.update({
   id: '/modules',
   path: '/modules',
@@ -151,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/habits': typeof HabitsRouteWithChildren
   '/learn': typeof LearnRouteWithChildren
   '/notes': typeof NotesRoute
+  '/notifications': typeof NotificationsRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRouteWithChildren
   '/projects': typeof ProjectsRoute
@@ -160,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
+  '/profile/notifications': typeof ProfileNotificationsRoute
   '/attendance/': typeof AttendanceIndexRoute
   '/expenses/': typeof ExpensesIndexRoute
   '/habits/': typeof HabitsIndexRoute
@@ -171,6 +185,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
   '/notes': typeof NotesRoute
+  '/notifications': typeof NotificationsRoute
   '/planner': typeof PlannerRoute
   '/projects': typeof ProjectsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -179,6 +194,7 @@ export interface FileRoutesByTo {
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
+  '/profile/notifications': typeof ProfileNotificationsRoute
   '/attendance': typeof AttendanceIndexRoute
   '/expenses': typeof ExpensesIndexRoute
   '/habits': typeof HabitsIndexRoute
@@ -195,6 +211,7 @@ export interface FileRoutesById {
   '/habits': typeof HabitsRouteWithChildren
   '/learn': typeof LearnRouteWithChildren
   '/notes': typeof NotesRoute
+  '/notifications': typeof NotificationsRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRouteWithChildren
   '/projects': typeof ProjectsRoute
@@ -204,6 +221,7 @@ export interface FileRoutesById {
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
+  '/profile/notifications': typeof ProfileNotificationsRoute
   '/attendance/': typeof AttendanceIndexRoute
   '/expenses/': typeof ExpensesIndexRoute
   '/habits/': typeof HabitsIndexRoute
@@ -221,6 +239,7 @@ export interface FileRouteTypes {
     | '/habits'
     | '/learn'
     | '/notes'
+    | '/notifications'
     | '/planner'
     | '/profile'
     | '/projects'
@@ -230,6 +249,7 @@ export interface FileRouteTypes {
     | '/learn/$roadmapId'
     | '/profile/backup'
     | '/profile/modules'
+    | '/profile/notifications'
     | '/attendance/'
     | '/expenses/'
     | '/habits/'
@@ -241,6 +261,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analytics'
     | '/notes'
+    | '/notifications'
     | '/planner'
     | '/projects'
     | '/sitemap.xml'
@@ -249,6 +270,7 @@ export interface FileRouteTypes {
     | '/learn/$roadmapId'
     | '/profile/backup'
     | '/profile/modules'
+    | '/profile/notifications'
     | '/attendance'
     | '/expenses'
     | '/habits'
@@ -264,6 +286,7 @@ export interface FileRouteTypes {
     | '/habits'
     | '/learn'
     | '/notes'
+    | '/notifications'
     | '/planner'
     | '/profile'
     | '/projects'
@@ -273,6 +296,7 @@ export interface FileRouteTypes {
     | '/learn/$roadmapId'
     | '/profile/backup'
     | '/profile/modules'
+    | '/profile/notifications'
     | '/attendance/'
     | '/expenses/'
     | '/habits/'
@@ -289,6 +313,7 @@ export interface RootRouteChildren {
   HabitsRoute: typeof HabitsRouteWithChildren
   LearnRoute: typeof LearnRouteWithChildren
   NotesRoute: typeof NotesRoute
+  NotificationsRoute: typeof NotificationsRoute
   PlannerRoute: typeof PlannerRoute
   ProfileRoute: typeof ProfileRouteWithChildren
   ProjectsRoute: typeof ProjectsRoute
@@ -323,6 +348,13 @@ declare module '@tanstack/react-router' {
       path: '/planner'
       fullPath: '/planner'
       preLoaderRoute: typeof PlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notes': {
@@ -408,6 +440,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/attendance/'
       preLoaderRoute: typeof AttendanceIndexRouteImport
       parentRoute: typeof AttendanceRoute
+    }
+    '/profile/notifications': {
+      id: '/profile/notifications'
+      path: '/notifications'
+      fullPath: '/profile/notifications'
+      preLoaderRoute: typeof ProfileNotificationsRouteImport
+      parentRoute: typeof ProfileRoute
     }
     '/profile/modules': {
       id: '/profile/modules'
@@ -510,12 +549,14 @@ const LearnRouteWithChildren = LearnRoute._addFileChildren(LearnRouteChildren)
 interface ProfileRouteChildren {
   ProfileBackupRoute: typeof ProfileBackupRoute
   ProfileModulesRoute: typeof ProfileModulesRoute
+  ProfileNotificationsRoute: typeof ProfileNotificationsRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 const ProfileRouteChildren: ProfileRouteChildren = {
   ProfileBackupRoute: ProfileBackupRoute,
   ProfileModulesRoute: ProfileModulesRoute,
+  ProfileNotificationsRoute: ProfileNotificationsRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }
 
@@ -530,6 +571,7 @@ const rootRouteChildren: RootRouteChildren = {
   HabitsRoute: HabitsRouteWithChildren,
   LearnRoute: LearnRouteWithChildren,
   NotesRoute: NotesRoute,
+  NotificationsRoute: NotificationsRoute,
   PlannerRoute: PlannerRoute,
   ProfileRoute: ProfileRouteWithChildren,
   ProjectsRoute: ProjectsRoute,

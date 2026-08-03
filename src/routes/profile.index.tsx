@@ -425,16 +425,15 @@ function ProfilePage() {
           <SectionHeader title="Preferences" />
           <Card className="p-2">
             <div className="divide-y divide-white/[0.05]">
-              <SettingRow
-                icon={Bell}
-                label="Notifications"
-                right={
-                  <Toggle
-                    on={preferences.notifications}
-                    onChange={(v) => updatePreferences({ notifications: v })}
-                  />
-                }
-              />
+              <Link to="/profile/notifications" className="block">
+                <SettingRow
+                  icon={Bell}
+                  label="Notifications"
+                  hint={preferences.notifications ? "On" : "Off"}
+                  right={<ChevronRight className="h-4 w-4 text-muted-foreground/60" />}
+                />
+              </Link>
+
               <SettingRow icon={Palette} label="Theme" hint="Dark" />
               <button
                 type="button"

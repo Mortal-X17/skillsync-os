@@ -1,6 +1,11 @@
 import { z } from "zod";
+import {
+  NotificationsStateSchema,
+  createDefaultNotifications,
+} from "./notifications/types";
 
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
+
 
 export const ChecklistItemSchema = z.object({
   id: z.string(),
@@ -179,6 +184,10 @@ export const AppDataSchema = z.object({
   stats: StatsSchema.default({ xp: 0, level: 1, streak: 0, lastActive: "" }),
   attendance: AttendanceSchema.default({ subjects: [] }),
   expenses: ExpensesSchema.default({ transactions: [] }),
+  notifications: NotificationsStateSchema.default(() =>
+    createDefaultNotifications(),
+  ),
+
 });
 
 export type ChecklistItem = z.infer<typeof ChecklistItemSchema>;

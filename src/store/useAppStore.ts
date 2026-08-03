@@ -22,6 +22,13 @@ import { createInitialData } from "@/lib/seed";
 import { migrate } from "@/lib/migrations";
 import { newId } from "@/lib/id";
 import { todayISO } from "@/lib/date";
+import {
+  HISTORY_LIMIT,
+  type CategoryKey,
+  type NotificationItem,
+  type NotificationSettings,
+  type ScheduledNotification,
+} from "@/lib/notifications/types";
 
 type ModuleKey = "attendance" | "expenses";
 
@@ -169,6 +176,26 @@ type State = AppData & {
   // expenses
   addTransaction: (partial: Omit<Transaction, "id" | "at"> & Partial<Transaction>) => Transaction;
   deleteTransaction: (id: string) => void;
+
+  // notifications
+  pushNotification: (
+    input: Omit<NotificationItem, "id" | "createdAt" | "read" | "delivered" | "origin"> &
+      Partial<Pick<NotificationItem, "read" | "delivered" | "origin">>,
+  ) => NotificationItem | null;
+  markNotificationRead: (id: string, read?: boolean) => void;
+  markAllNotificationsRead: () => void;
+  deleteNotification: (id: string) => void;
+  clearNotifications: () => void;
+  updateNotificationSettings: (patch: Partial<NotificationSettings>) => void;
+  setNotificationCategory: (
+    key: CategoryKey,
+    patch: Partial<{ enabled: boolean; time: string }>,
+  ) => void;
+  scheduleNotification: (
+    input: Omit<ScheduledNotification, "id" | "status" | "origin"> &
+      Partial<Pick<ScheduledNotification, "status" | "origin">>,
+  ) => ScheduledNotification;
+  cancelScheduled: (id: string) => void;
 
   // backup
   exportJSON: () => string;
@@ -746,6 +773,98 @@ export const useAppStore = create<State>()(
           },
         })),
 
+      pushNotification: (input) => {
+        const state = get();
+        const existing = state.notifications?.items ?? [];
+        if (input.sourceId && existing.some((i) => i.sourceId === input.sourceId)) {
+          return null;
+        }
+        const item: NotificationItem = {
+          id: newId(),
+          createdAt: Date.now(),
+          read: false,
+          delivered: false,
+          origin: "rule",
+          ...input,
+        };
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            items: [item, ...(s.notifications?.items ?? [])].slice(0, HISTORY_LIMIT),
+          },
+        }));
+        return item;
+      },
+      markNotificationRead: (id, read = true) =>
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            items: (s.notifications?.items ?? []).map((i) =>
+              i.id === id ? { ...i, read } : i,
+            ),
+          },
+        })),
+      markAllNotificationsRead: () =>
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            items: (s.notifications?.items ?? []).map((i) => ({ ...i, read: true })),
+          },
+        })),
+      deleteNotification: (id) =>
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            items: (s.notifications?.items ?? []).filter((i) => i.id !== id),
+          },
+        })),
+      clearNotifications: () =>
+        set((s) => ({ notifications: { ...s.notifications, items: [] } })),
+      updateNotificationSettings: (patch) =>
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            settings: { ...s.notifications.settings, ...patch },
+          },
+        })),
+      setNotificationCategory: (key, patch) =>
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            settings: {
+              ...s.notifications.settings,
+              categories: {
+                ...s.notifications.settings.categories,
+                [key]: { ...s.notifications.settings.categories?.[key], ...patch },
+              },
+            },
+          },
+        })),
+      scheduleNotification: (input) => {
+        const entry: ScheduledNotification = {
+          id: newId(),
+          status: "pending",
+          origin: "rule",
+          ...input,
+        };
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            scheduled: [...(s.notifications?.scheduled ?? []), entry],
+          },
+        }));
+        return entry;
+      },
+      cancelScheduled: (id) =>
+        set((s) => ({
+          notifications: {
+            ...s.notifications,
+            scheduled: (s.notifications?.scheduled ?? []).map((e) =>
+              e.id === id ? { ...e, status: "cancelled" as const } : e,
+            ),
+          },
+        })),
+
       exportJSON: () => {
         const rest = get() as any;
         const data: AppData = {
@@ -761,6 +880,7 @@ export const useAppStore = create<State>()(
           stats: rest.stats,
           attendance: rest.attendance,
           expenses: rest.expenses,
+          notifications: rest.notifications,
         };
         return JSON.stringify(data, null, 2);
       },
@@ -779,7 +899,7 @@ export const useAppStore = create<State>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() =>
         typeof window !== "undefined"
           ? window.localStorage
@@ -800,6 +920,7 @@ export const useAppStore = create<State>()(
           stats: state.stats,
           attendance: state.attendance,
           expenses: state.expenses,
+          notifications: state.notifications,
         };
         return data as any;
       },

@@ -1,5 +1,6 @@
 import type { AppData, Roadmap, Habit, Phase, Topic } from "./schema";
 import { CURRENT_SCHEMA_VERSION } from "./schema";
+import { createDefaultNotifications } from "./notifications/types";
 const SEED_CREATED_AT = 1_704_067_200_000;
 const SEED_START_DATE = "2024-01-01";
 
@@ -184,5 +185,6 @@ export function createInitialData(): AppData {
     stats: { xp: 0, level: 1, streak: 0, lastActive: "" },
     attendance: { subjects: [] },
     expenses: { transactions: [] },
+    notifications: createDefaultNotifications(),
   };
 }

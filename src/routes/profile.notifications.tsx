@@ -347,6 +347,56 @@ function NotificationSettingsPage() {
           </Card>
         </section>
 
+        {/* Diagnostics */}
+        <section className="space-y-3">
+          <SectionHeader title="Diagnostics" />
+          <Card className="p-4">
+            <button
+              type="button"
+              onClick={runTest}
+              className="pressable glass w-full rounded-[14px] py-2.5 text-[13px] font-semibold"
+            >
+              Send test notification
+            </button>
+            {testResult ? (
+              <p className="mt-3 text-[12.5px] leading-relaxed text-muted-foreground">
+                {testResult}
+              </p>
+            ) : null}
+            {env ? (
+              <div className="mt-3 space-y-1.5 border-t border-white/[0.05] pt-3">
+                {(
+                  [
+                    ["Installed app", env.standalone],
+                    ["Secure context", env.secureContext],
+                    ["Notification API", env.notificationApi],
+                    ["Service worker API", env.serviceWorkerApi],
+                    ["Worker registered", env.swRegistered],
+                    ["Worker active", env.swActive],
+                    ["Worker controlling page", env.swControlling],
+                    ["Permission granted", permission === "granted"],
+                  ] as const
+                ).map(([label, ok]) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between text-[12.5px]"
+                  >
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className={ok ? "text-emerald-400" : "text-amber-400"}>
+                      {ok ? "yes" : "no"}
+                    </span>
+                  </div>
+                ))}
+                {env.error ? (
+                  <p className="pt-1 text-[12px] text-amber-400">{env.error}</p>
+                ) : null}
+              </div>
+            ) : null}
+          </Card>
+        </section>
+
+
+
         {/* Honest limits */}
         <Card className="p-4">
           <div className="flex items-start gap-3">

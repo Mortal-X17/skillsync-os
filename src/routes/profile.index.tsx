@@ -50,7 +50,7 @@ export const Route = createFileRoute("/profile/")({
   component: ProfilePage,
 });
 
-const APP_VERSION = "0.3";
+const APP_VERSION = "2.0";
 
 async function fileToResizedDataUrl(
   file: File,

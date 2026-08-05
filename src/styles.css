@@ -151,7 +151,7 @@ html.light body {
   --glow: color-mix(in oklab, var(--primary) 32%, transparent);
 
   --muted: #f1f2f7;
-  --muted-foreground: #6b7280;
+  --muted-foreground: #5a6373;
   --accent: #eef0f7;
   --accent-foreground: #111827;
 
@@ -166,13 +166,13 @@ html.light body {
   --input: rgba(17, 24, 39, 0.1);
   --ring: var(--primary);
 
-  --bg-base: #f8f9fc;
+  --bg-base: #fbfbfe;
   --aurora-1: 99, 102, 241; /* indigo */
   --aurora-2: 167, 139, 250; /* soft violet */
   --aurora-3: 148, 163, 184; /* silver */
-  --aurora-op-1: 0.1;
-  --aurora-op-2: 0.085;
-  --aurora-op-3: 0.06;
+  --aurora-op-1: 0.075;
+  --aurora-op-2: 0.06;
+  --aurora-op-3: 0.045;
   --aurora-sheen: 0.7;
   --aurora-core: rgba(255, 255, 255, 0.55);
   --aurora-vignette: rgba(148, 163, 184, 0.22);

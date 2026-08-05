@@ -1,31 +1,32 @@
 import { NOISE, BASE_LAYER_CLASS } from "./shared";
 
 /**
- * Option 2 — Premium Minimal Gradient.
- * Fully static: matte black, soft radial gradients, edge lighting,
- * vignette and a tiny amount of grain. Zero animation.
+ * Minimal Gradient — fully static, theme-aware.
+ * Matte base, soft radial light, edge lighting, grain, vignette.
  */
 export function MinimalGradientBackground() {
   return (
     <div
       aria-hidden="true"
       className={BASE_LAYER_CLASS}
-      style={{ backgroundColor: "var(--background)", contain: "strict" }}
+      style={{ backgroundColor: "var(--bg-base)", contain: "strict" }}
     >
       {/* soft top light */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(90% 55% at 50% -10%, rgba(99,102,241,0.16) 0%, transparent 65%)",
+            "radial-gradient(95% 58% at 50% -12%, rgba(var(--aurora-1),0.9) 0%, transparent 66%)",
+          opacity: "var(--aurora-op-1)",
         }}
       />
-      {/* low warm-cool balance from the bottom */}
+      {/* balance from the bottom */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(70% 45% at 50% 108%, rgba(37,99,235,0.12) 0%, transparent 70%)",
+            "radial-gradient(72% 46% at 50% 108%, rgba(var(--aurora-2),0.9) 0%, transparent 70%)",
+          opacity: "var(--aurora-op-2)",
         }}
       />
       {/* edge lighting */}
@@ -33,7 +34,7 @@ export function MinimalGradientBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(90deg, rgba(255,255,255,0.035) 0%, transparent 12%, transparent 88%, rgba(255,255,255,0.035) 100%)",
+            "linear-gradient(90deg, rgba(255,255,255,var(--aurora-sheen)) 0%, transparent 12%, transparent 88%, rgba(255,255,255,var(--aurora-sheen)) 100%)",
         }}
       />
       {/* grain */}
@@ -42,7 +43,7 @@ export function MinimalGradientBackground() {
         style={{
           backgroundImage: NOISE,
           backgroundRepeat: "repeat",
-          opacity: 0.022,
+          opacity: "var(--aurora-noise)",
           mixBlendMode: "overlay",
         }}
       />
@@ -51,7 +52,7 @@ export function MinimalGradientBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 100% at 50% 45%, transparent 38%, rgba(0,0,0,0.45) 80%, rgba(0,0,0,0.68) 100%)",
+            "radial-gradient(120% 100% at 50% 45%, transparent 38%, var(--aurora-vignette) 84%, var(--aurora-vignette) 100%)",
         }}
       />
     </div>

@@ -64,6 +64,7 @@ export function migrate(input: unknown): AppData {
     notifications: true,
     developerMode: false,
     background: "aurora",
+    theme: "dark",
     ...(data.preferences ?? {}),
     modules: {
       attendance: false,

@@ -181,6 +181,8 @@ export function createInitialData(): AppData {
       developerMode: false,
       modules: { attendance: false, expenses: false },
       background: "aurora",
+      theme: "dark",
+
     },
     stats: { xp: 0, level: 1, streak: 0, lastActive: "" },
     attendance: { subjects: [] },

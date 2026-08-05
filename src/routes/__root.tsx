@@ -15,6 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AppBackground } from "@/components/layout/backgrounds";
 import { Splash } from "@/components/layout/Splash";
 import { NotificationRunner } from "@/components/notifications/NotificationRunner";
+import { ThemeManager } from "@/hooks/use-theme";
 
 
 function NotFoundComponent() {
@@ -156,6 +157,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeManager />
       <AppBackground />
       <Splash />
       <NotificationRunner />

@@ -107,12 +107,87 @@ body {
   --space-5: 32px;
   --space-6: 48px;
 
+  /* --- Background engine tokens (dark) --- */
+  --bg-base: #050507;
+  --aurora-1: 139, 92, 246; /* purple */
+  --aurora-2: 37, 99, 235; /* blue */
+  --aurora-3: 34, 211, 238; /* cyan */
+  --aurora-op-1: 0.13;
+  --aurora-op-2: 0.1;
+  --aurora-op-3: 0.075;
+  --aurora-blur-1: 150px;
+  --aurora-blur-2: 180px;
+  --aurora-blur-3: 130px;
+  --aurora-sheen: 0.045;
+  --aurora-core: rgba(0, 0, 0, 0.5);
+  --aurora-vignette: rgba(0, 0, 0, 0.55);
+  --aurora-noise: 0.03;
+  --overlay-tint: 255, 255, 255;
+
   color-scheme: dark;
+}
+
+/* ============================================================
+   LIGHT THEME — intentional, not inverted.
+   White / silver / indigo / soft lavender.
+   ============================================================ */
+html.light,
+html.light body {
+  --background: #f8f9fc;
+  --foreground: #111827;
+  --surface: #ffffff;
+  --surface-2: #f4f5f9;
+  --surface-elevated: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+
+  --primary: #4f46e5;
+  --primary-glow: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --secondary: #7c3aed;
+  --secondary-foreground: #ffffff;
+  --glow: color-mix(in oklab, var(--primary) 32%, transparent);
+
+  --muted: #f1f2f7;
+  --muted-foreground: #6b7280;
+  --accent: #eef0f7;
+  --accent-foreground: #111827;
+
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+
+  --border: rgba(17, 24, 39, 0.08);
+  --border-strong: rgba(17, 24, 39, 0.12);
+  --divider: rgba(17, 24, 39, 0.06);
+  --input: rgba(17, 24, 39, 0.1);
+  --ring: var(--primary);
+
+  --bg-base: #f8f9fc;
+  --aurora-1: 99, 102, 241; /* indigo */
+  --aurora-2: 167, 139, 250; /* soft violet */
+  --aurora-3: 148, 163, 184; /* silver */
+  --aurora-op-1: 0.16;
+  --aurora-op-2: 0.14;
+  --aurora-op-3: 0.12;
+  --aurora-sheen: 0.7;
+  --aurora-core: rgba(255, 255, 255, 0.55);
+  --aurora-vignette: rgba(148, 163, 184, 0.22);
+  --aurora-noise: 0.018;
+  --overlay-tint: 17, 24, 39;
+
+  color-scheme: light;
 }
 
 html {
   background: var(--background);
   scroll-behavior: smooth;
+  transition:
+    background-color 300ms var(--ease-out-soft),
+    color 300ms var(--ease-out-soft);
 }
 
 body {
@@ -123,7 +198,40 @@ body {
   text-rendering: optimizeLegibility;
   font-feature-settings: "cv11", "ss01", "ss03";
   overscroll-behavior-y: contain;
+  transition: color 300ms var(--ease-out-soft);
 }
+
+/* Theme-change choreography: cards, borders, icons and gradients ease. */
+html.theme-transition * {
+  transition:
+    background-color 280ms var(--ease-out-soft),
+    border-color 280ms var(--ease-out-soft),
+    color 280ms var(--ease-out-soft),
+    fill 280ms var(--ease-out-soft),
+    stroke 280ms var(--ease-out-soft),
+    box-shadow 280ms var(--ease-out-soft) !important;
+}
+
+/* Light-theme compatibility: white translucent overlays used across the app
+   are re-tinted to ink so surfaces keep their intended hierarchy. */
+html.light [class*="bg-white/"] {
+  background-color: color-mix(in oklab, #111827 var(--overlay-strength, 4%), transparent);
+}
+html.light [class*="border-white/"] {
+  border-color: rgba(17, 24, 39, 0.1);
+}
+html.light [class*="divide-white/"] > * + * {
+  border-color: rgba(17, 24, 39, 0.07);
+}
+html.light .gradient-primary [class*="text-white"],
+html.light [class*="text-white"] {
+  color: inherit;
+}
+html.light .gradient-primary,
+html.light .icon-tile-accent {
+  color: #ffffff;
+}
+
 
 @layer base {
   * {
@@ -366,4 +474,48 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ============================================================
+   LIGHT THEME surface refinements — ambient shadows & reflections
+   so cards still feel lifted off the animated background.
+   ============================================================ */
+html.light .card-surface {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.72)),
+    var(--card);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+    0 1px 2px 0 rgba(17, 24, 39, 0.04),
+    0 18px 40px -28px rgba(49, 46, 129, 0.28);
+}
+html.light .card-elevated {
+  background:
+    linear-gradient(180deg, #ffffff, rgba(255, 255, 255, 0.86)),
+    var(--surface-elevated);
+  border: 1px solid var(--border-strong);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 1) inset,
+    0 24px 56px -28px rgba(49, 46, 129, 0.3);
+}
+html.light .glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.6));
+  border: 1px solid var(--border-strong);
+}
+html.light .icon-tile {
+  background: linear-gradient(180deg, #ffffff, rgba(244, 245, 249, 0.9));
+  box-shadow: 0 8px 20px -16px rgba(49, 46, 129, 0.4);
+}
+html.light .skeleton {
+  background: rgba(17, 24, 39, 0.05);
+}
+html.light .gradient-text {
+  background-image: linear-gradient(120deg, var(--foreground), color-mix(in oklab, var(--primary) 85%, black));
+}
+html.light .gradient-mesh {
+  background:
+    radial-gradient(600px 300px at 0% 0%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 60%),
+    radial-gradient(600px 300px at 100% 100%, color-mix(in oklab, var(--secondary) 14%, transparent), transparent 60%),
+    linear-gradient(180deg, #ffffff, #f4f5f9);
 }

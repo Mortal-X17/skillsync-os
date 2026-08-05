@@ -130,7 +130,9 @@ export const PreferencesSchema = z.object({
   background: z
     .enum(["aurora", "gradient", "atmospheric"])
     .default("aurora"),
+  theme: z.enum(["light", "dark", "system"]).default("dark"),
 });
+
 
 export const StatsSchema = z.object({
   xp: z.number().default(0),
@@ -180,6 +182,8 @@ export const AppDataSchema = z.object({
     developerMode: false,
     modules: { attendance: false, expenses: false },
     background: "aurora",
+    theme: "dark",
+
   }),
   stats: StatsSchema.default({ xp: 0, level: 1, streak: 0, lastActive: "" }),
   attendance: AttendanceSchema.default({ subjects: [] }),

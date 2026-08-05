@@ -83,6 +83,8 @@ function NotificationSettingsPage() {
   const update = useAppStore((s) => s.updateNotificationSettings);
   const setCategory = useAppStore((s) => s.setNotificationCategory);
   const [permission, setPermission] = useState<PermissionState>("default");
+  const [env, setEnv] = useState<NotificationEnvironment | null>(null);
+  const [testResult, setTestResult] = useState<string | null>(null);
 
   useEffect(() => {
     const current = getPermission();
@@ -90,8 +92,52 @@ function NotificationSettingsPage() {
     if (current !== settings.permission) update({ permission: current });
   }, [settings.permission, update]);
 
+  useEffect(() => {
+    let alive = true;
+    void ensureNotificationWorker().then(() =>
+      inspectEnvironment().then((e) => {
+        if (alive) setEnv(e);
+      }),
+    );
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  /** Bypasses all app logic: straight to the delivery layer. */
+  const runTest = async () => {
+    setTestResult("Sending…");
+    const perm =
+      getPermission() === "default" ? await requestPermission() : getPermission();
+    setPermission(perm);
+    if (perm !== "granted") {
+      setTestResult(`Blocked: permission is "${perm}".`);
+      setEnv(await inspectEnvironment());
+      return;
+    }
+    await ensureNotificationWorker();
+    const result = await deliver({
+      id: `test-${Date.now()}`,
+      createdAt: Date.now(),
+      category: "achievements",
+      title: "SkillSync test notification",
+      body: "If you can see this, delivery works on this device.",
+      read: false,
+      priority: "normal",
+      origin: "manual",
+      action: { kind: "route", to: "/notifications" },
+    });
+    setEnv(await inspectEnvironment());
+    setTestResult(
+      result.ok
+        ? `Delivered via ${result.via === "serviceWorker" ? "the service worker" : "the browser notification API"}.`
+        : `Failed: ${result.error ?? "unknown error"}`,
+    );
+  };
+
   const copy = PERMISSION_COPY[permission];
   const canAsk = permission === "default";
+
 
   const visibleCategories = NOTIFICATION_CATEGORIES.filter((key) => {
     const meta = CATEGORY_META[key];

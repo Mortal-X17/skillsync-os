@@ -3,6 +3,7 @@ import type {
   ScheduledNotification,
 } from "./types";
 import { getPermission } from "./permission";
+import { getRegistration } from "./sw";
 
 /**
  * Delivery adapter interface. The web adapter shows notifications while the
@@ -18,23 +19,66 @@ export type NotificationAdapter = {
   cancel(entry: ScheduledNotification): Promise<void>;
 };
 
+/** Delivery result with the exact path taken — used by diagnostics/logs. */
+export type DeliveryResult = {
+  ok: boolean;
+  via: "serviceWorker" | "constructor" | "none";
+  error: string | null;
+};
+
+/**
+ * Displays a notification, preferring the service-worker path.
+ *
+ * On Android Chrome `new Notification()` throws an "Illegal constructor"
+ * TypeError, so registration.showNotification() is the only path that works
+ * there. Desktop keeps the constructor as a fallback.
+ */
+export async function deliver(item: NotificationItem): Promise<DeliveryResult> {
+  if (typeof window === "undefined") {
+    return { ok: false, via: "none", error: "no window" };
+  }
+  if (getPermission() !== "granted") {
+    return { ok: false, via: "none", error: "permission not granted" };
+  }
+
+  const options: NotificationOptions & { renotify?: boolean } = {
+    body: item.body,
+    icon: "/icon-512.png",
+    badge: "/icon-512.png",
+    tag: item.sourceId ?? item.id,
+    silent: item.priority === "low",
+    data: { url: item.action?.kind === "route" ? item.action.to : "/notifications" },
+  };
+
+  let swError: string | null = null;
+  try {
+    const reg = await getRegistration();
+    if (reg) {
+      await reg.showNotification(item.title, options);
+      console.info("[notifications] displayed via service worker", item.sourceId ?? item.id);
+      return { ok: true, via: "serviceWorker", error: null };
+    }
+    swError = "no service worker registration";
+  } catch (e) {
+    swError = e instanceof Error ? e.message : String(e);
+  }
+
+  try {
+    new window.Notification(item.title, options);
+    console.info("[notifications] displayed via constructor", item.sourceId ?? item.id);
+    return { ok: true, via: "constructor", error: swError };
+  } catch (e) {
+    const err = e instanceof Error ? e.message : String(e);
+    console.warn("[notifications] delivery failed", { swError, constructorError: err });
+    return { ok: false, via: "none", error: swError ? `${swError}; ${err}` : err };
+  }
+}
+
 const webAdapter: NotificationAdapter = {
   kind: "web",
   canSchedule: false,
   async show(item) {
-    if (getPermission() !== "granted") return false;
-    try {
-      new window.Notification(item.title, {
-        body: item.body,
-        icon: "/icon-512.png",
-        badge: "/icon-512.png",
-        tag: item.sourceId ?? item.id,
-        silent: item.priority === "low",
-      });
-      return true;
-    } catch {
-      return false;
-    }
+    return (await deliver(item)).ok;
   },
   // The web platform has no reliable "fire later" API — scheduling is handled
   // in-app by the runner while SkillSync is open.
@@ -43,6 +87,7 @@ const webAdapter: NotificationAdapter = {
   },
   async cancel() {},
 };
+
 
 const noopAdapter: NotificationAdapter = {
   kind: "noop",

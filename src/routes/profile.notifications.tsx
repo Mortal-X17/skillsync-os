@@ -23,6 +23,12 @@ import {
   requestPermission,
   type PermissionState,
 } from "@/lib/notifications/permission";
+import { deliver } from "@/lib/notifications/adapter";
+import {
+  ensureNotificationWorker,
+  inspectEnvironment,
+  type NotificationEnvironment,
+} from "@/lib/notifications/sw";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
 
@@ -83,6 +89,8 @@ function NotificationSettingsPage() {
   const update = useAppStore((s) => s.updateNotificationSettings);
   const setCategory = useAppStore((s) => s.setNotificationCategory);
   const [permission, setPermission] = useState<PermissionState>("default");
+  const [env, setEnv] = useState<NotificationEnvironment | null>(null);
+  const [testResult, setTestResult] = useState<string | null>(null);
 
   useEffect(() => {
     const current = getPermission();
@@ -90,8 +98,53 @@ function NotificationSettingsPage() {
     if (current !== settings.permission) update({ permission: current });
   }, [settings.permission, update]);
 
+  useEffect(() => {
+    let alive = true;
+    void ensureNotificationWorker().then(() =>
+      inspectEnvironment().then((e) => {
+        if (alive) setEnv(e);
+      }),
+    );
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  /** Bypasses all app logic: straight to the delivery layer. */
+  const runTest = async () => {
+    setTestResult("Sending…");
+    const perm =
+      getPermission() === "default" ? await requestPermission() : getPermission();
+    setPermission(perm);
+    if (perm !== "granted") {
+      setTestResult(`Blocked: permission is "${perm}".`);
+      setEnv(await inspectEnvironment());
+      return;
+    }
+    await ensureNotificationWorker();
+    const result = await deliver({
+      id: `test-${Date.now()}`,
+      createdAt: Date.now(),
+      category: "achievements",
+      title: "SkillSync test notification",
+      body: "If you can see this, delivery works on this device.",
+      read: false,
+      priority: "normal",
+      origin: "manual",
+      delivered: false,
+      action: { kind: "route", to: "/notifications" },
+    });
+    setEnv(await inspectEnvironment());
+    setTestResult(
+      result.ok
+        ? `Delivered via ${result.via === "serviceWorker" ? "the service worker" : "the browser notification API"}.`
+        : `Failed: ${result.error ?? "unknown error"}`,
+    );
+  };
+
   const copy = PERMISSION_COPY[permission];
   const canAsk = permission === "default";
+
 
   const visibleCategories = NOTIFICATION_CATEGORIES.filter((key) => {
     const meta = CATEGORY_META[key];
@@ -346,6 +399,56 @@ function NotificationSettingsPage() {
             ) : null}
           </Card>
         </section>
+
+        {/* Diagnostics */}
+        <section className="space-y-3">
+          <SectionHeader title="Diagnostics" />
+          <Card className="p-4">
+            <button
+              type="button"
+              onClick={runTest}
+              className="pressable glass w-full rounded-[14px] py-2.5 text-[13px] font-semibold"
+            >
+              Send test notification
+            </button>
+            {testResult ? (
+              <p className="mt-3 text-[12.5px] leading-relaxed text-muted-foreground">
+                {testResult}
+              </p>
+            ) : null}
+            {env ? (
+              <div className="mt-3 space-y-1.5 border-t border-white/[0.05] pt-3">
+                {(
+                  [
+                    ["Installed app", env.standalone],
+                    ["Secure context", env.secureContext],
+                    ["Notification API", env.notificationApi],
+                    ["Service worker API", env.serviceWorkerApi],
+                    ["Worker registered", env.swRegistered],
+                    ["Worker active", env.swActive],
+                    ["Worker controlling page", env.swControlling],
+                    ["Permission granted", permission === "granted"],
+                  ] as const
+                ).map(([label, ok]) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between text-[12.5px]"
+                  >
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className={ok ? "text-emerald-400" : "text-amber-400"}>
+                      {ok ? "yes" : "no"}
+                    </span>
+                  </div>
+                ))}
+                {env.error ? (
+                  <p className="pt-1 text-[12px] text-amber-400">{env.error}</p>
+                ) : null}
+              </div>
+            ) : null}
+          </Card>
+        </section>
+
+
 
         {/* Honest limits */}
         <Card className="p-4">

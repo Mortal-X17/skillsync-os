@@ -23,6 +23,12 @@ import {
   requestPermission,
   type PermissionState,
 } from "@/lib/notifications/permission";
+import { deliver } from "@/lib/notifications/adapter";
+import {
+  ensureNotificationWorker,
+  inspectEnvironment,
+  type NotificationEnvironment,
+} from "@/lib/notifications/sw";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/lib/utils";
 

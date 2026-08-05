@@ -23,7 +23,11 @@ export function useNotificationRunner() {
   useEffect(() => {
     if (!hydrated || typeof window === "undefined") return;
 
+    // Android needs an active service worker to display notifications at all.
+    void ensureNotificationWorker();
+
     let disposed = false;
+
 
     const run = () => {
       if (disposed) return;

@@ -131,6 +131,7 @@ function NotificationSettingsPage() {
       read: false,
       priority: "normal",
       origin: "manual",
+      delivered: false,
       action: { kind: "route", to: "/notifications" },
     });
     setEnv(await inspectEnvironment());

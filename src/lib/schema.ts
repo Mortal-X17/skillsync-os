@@ -159,9 +159,15 @@ export const AttendanceSchema = z.object({
 export const TransactionSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string().default(""),
   amount: z.number(),
   type: z.enum(["credit", "debit"]),
+  tags: z.array(z.string()).default([]),
+  /** Timestamp of the expense date. */
   at: z.number(),
+  /** Manual ordering: ascending, lower shows first. */
+  position: z.number().default(0),
+  updatedAt: z.number().default(0),
 });
 
 export const ExpensesSchema = z.object({

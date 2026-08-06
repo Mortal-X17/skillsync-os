@@ -74,6 +74,16 @@ export function migrate(input: unknown): AppData {
   };
   data.attendance = data.attendance ?? { subjects: [] };
   data.expenses = data.expenses ?? { transactions: [] };
+  // Expense Manager V2: description / tags / position / updatedAt
+  data.expenses.transactions = (data.expenses.transactions ?? []).map(
+    (t: any, i: number) => ({
+      ...t,
+      description: t.description ?? "",
+      tags: Array.isArray(t.tags) ? t.tags : [],
+      position: typeof t.position === "number" ? t.position : i,
+      updatedAt: typeof t.updatedAt === "number" ? t.updatedAt : (t.at ?? 0),
+    }),
+  );
   {
     const defaults = createDefaultNotifications();
     const n = data.notifications ?? {};

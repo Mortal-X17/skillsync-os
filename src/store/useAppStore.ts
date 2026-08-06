@@ -174,8 +174,13 @@ type State = AppData & {
   deleteSubject: (id: string) => void;
 
   // expenses
-  addTransaction: (partial: Omit<Transaction, "id" | "at"> & Partial<Transaction>) => Transaction;
+  addTransaction: (
+    partial: Pick<Transaction, "title" | "amount" | "type"> & Partial<Transaction>,
+  ) => Transaction;
+  updateTransaction: (id: string, patch: Partial<Omit<Transaction, "id">>) => void;
   deleteTransaction: (id: string) => void;
+  /** Persist a manual order for the given transaction ids (ascending). */
+  setTransactionOrder: (ids: string[]) => void;
 
   // notifications
   pushNotification: (
@@ -750,12 +755,22 @@ export const useAppStore = create<State>()(
         })),
 
       addTransaction: (partial) => {
+        const existing = get().expenses.transactions;
+        const minPos = existing.reduce(
+          (m, t) => Math.min(m, t.position ?? 0),
+          0,
+        );
+        const now = Date.now();
         const tx: Transaction = {
           id: newId(),
           title: partial.title,
+          description: partial.description ?? "",
           amount: partial.amount,
           type: partial.type,
-          at: partial.at ?? Date.now(),
+          tags: partial.tags ?? [],
+          at: partial.at ?? now,
+          position: partial.position ?? minPos - 1,
+          updatedAt: now,
         };
         set((s) => ({
           expenses: {
@@ -765,6 +780,33 @@ export const useAppStore = create<State>()(
         }));
         return tx;
       },
+      updateTransaction: (id, patch) =>
+        set((s) => ({
+          expenses: {
+            ...s.expenses,
+            transactions: s.expenses.transactions.map((t) =>
+              t.id === id ? { ...t, ...patch, updatedAt: Date.now() } : t,
+            ),
+          },
+        })),
+      setTransactionOrder: (ids) =>
+        set((s) => {
+          const order = new Map(ids.map((id, i) => [id, i]));
+          const base = s.expenses.transactions.reduce(
+            (m, t) => Math.min(m, t.position ?? 0),
+            0,
+          );
+          return {
+            expenses: {
+              ...s.expenses,
+              transactions: s.expenses.transactions.map((t) =>
+                order.has(t.id)
+                  ? { ...t, position: base + (order.get(t.id) as number) }
+                  : t,
+              ),
+            },
+          };
+        }),
       deleteTransaction: (id) =>
         set((s) => ({
           expenses: {
@@ -772,6 +814,7 @@ export const useAppStore = create<State>()(
             transactions: s.expenses.transactions.filter((t) => t.id !== id),
           },
         })),
+
 
       pushNotification: (input) => {
         const state = get();

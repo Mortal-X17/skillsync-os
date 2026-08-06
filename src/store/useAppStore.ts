@@ -174,8 +174,13 @@ type State = AppData & {
   deleteSubject: (id: string) => void;
 
   // expenses
-  addTransaction: (partial: Omit<Transaction, "id" | "at"> & Partial<Transaction>) => Transaction;
+  addTransaction: (
+    partial: Pick<Transaction, "title" | "amount" | "type"> & Partial<Transaction>,
+  ) => Transaction;
+  updateTransaction: (id: string, patch: Partial<Omit<Transaction, "id">>) => void;
   deleteTransaction: (id: string) => void;
+  /** Persist a manual order for the given transaction ids (ascending). */
+  setTransactionOrder: (ids: string[]) => void;
 
   // notifications
   pushNotification: (

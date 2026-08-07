@@ -57,13 +57,24 @@ function start() {
   measure();
 }
 
-/** Raw keyboard inset in px (0 when closed / unsupported). */
+/**
+ * Raw keyboard inset in px (0 when closed / unsupported).
+ * Always 0 on desktop-class viewports: keyboard insets, viewport shifts and
+ * sheet repositioning are mobile-only behaviour.
+ */
 export function useKeyboardInset() {
   useEffect(() => {
     start();
   }, []);
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const isDesktop = useIsDesktop();
+  return isDesktop ? 0 : raw;
 }
+
+export function useKeyboardOpen() {
+  return useKeyboardInset() > 120;
+}
+
 
 export function useKeyboardOpen() {
   return useKeyboardInset() > 120;

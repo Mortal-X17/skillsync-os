@@ -94,7 +94,7 @@ function ModulesPage() {
       </header>
 
       <div className="auto-grid px-5 pb-24 lg:px-2">
-        <p className="px-1 text-[12.5px] text-muted-foreground">
+        <p className="col-span-full px-1 text-[12.5px] text-muted-foreground">
           Optional workspaces. Turn on only what you need.
         </p>
         <ModuleRow

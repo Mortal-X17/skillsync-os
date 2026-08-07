@@ -21,6 +21,8 @@ export function Card({
         "p-5 transition-all duration-200 ease-[var(--ease-out-soft)]",
         interactive &&
           "pressable cursor-pointer active:shadow-[0_10px_24px_-20px_oklch(0_0_0_/_0.9)]",
+        // Desktop-only hover affordance (hover-capable pointers only)
+        "[@media(hover:hover)_and_(pointer:fine)]:hover:border-border-strong [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5",
         className,
       )}
       {...props}

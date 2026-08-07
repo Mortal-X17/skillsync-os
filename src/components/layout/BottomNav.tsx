@@ -29,9 +29,10 @@ export function BottomNav() {
       aria-label="Primary"
       aria-hidden={hidden}
       className={cn(
-        "pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[max(env(safe-area-inset-bottom),16px)] transition-all duration-200 ease-[var(--ease-out-soft)]",
+        "pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-[max(env(safe-area-inset-bottom),16px)] transition-all duration-200 ease-[var(--ease-out-soft)] lg:hidden",
         hidden && "pointer-events-none translate-y-[140%] opacity-0",
       )}
+
     >
       <div
         className={cn(

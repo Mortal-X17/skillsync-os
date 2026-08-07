@@ -181,10 +181,10 @@ function LearnPage() {
                   params: { roadmapId: r.id },
                 })
               }
-              className="block w-full cursor-pointer text-left"
+              className="block h-full w-full cursor-pointer text-left"
               aria-label={`Open ${r.title} roadmap`}
             >
-              <Card className="relative overflow-hidden border-white/[0.08] p-5">
+              <Card className="relative h-full overflow-hidden border-white/[0.08] p-5">
                 <div
                   className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full opacity-30 blur-3xl"
                   style={{

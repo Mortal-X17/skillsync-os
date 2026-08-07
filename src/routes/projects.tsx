@@ -115,9 +115,9 @@ function ProjectsPage() {
           <button
             key={p.id}
             onClick={() => setEditing(p)}
-            className="block w-full text-left"
+            className="block h-full w-full text-left"
           >
-            <Card className="p-5">
+            <Card className="h-full p-5">
               <div className="flex items-start justify-between">
                 <div className="flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">

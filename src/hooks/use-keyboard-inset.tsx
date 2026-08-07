@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { useIsDesktop } from "@/hooks/use-breakpoint";
 
 /**
  * Tracks the on-screen keyboard (IME) inset using visualViewport.
@@ -70,11 +71,6 @@ export function useKeyboardInset() {
   const isDesktop = useIsDesktop();
   return isDesktop ? 0 : raw;
 }
-
-export function useKeyboardOpen() {
-  return useKeyboardInset() > 120;
-}
-
 
 export function useKeyboardOpen() {
   return useKeyboardInset() > 120;

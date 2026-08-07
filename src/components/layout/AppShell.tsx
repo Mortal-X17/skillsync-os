@@ -1,14 +1,25 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "./BottomNav";
+import { SideNav } from "./SideNav";
 
+/**
+ * Responsive application shell.
+ * - `< lg` — mobile layout with the floating bottom navigation.
+ * - `>= lg` — permanent collapsible sidebar, content in a centered container.
+ */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div className="relative mx-auto flex min-h-[100dvh] w-full max-w-md flex-col">
-      <main className="animate-float-in flex-1 pb-32 pt-[max(env(safe-area-inset-top),24px)]">
-        {children}
-      </main>
-      <BottomNav />
+    <div className="relative flex min-h-[100dvh] w-full">
+      <SideNav />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <main className="animate-float-in flex-1 pb-32 pt-[max(env(safe-area-inset-top),24px)] lg:pb-16 lg:pt-8">
+          <div className="mx-auto w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg lg:px-4 xl:max-w-screen-xl xl:px-8 2xl:max-w-screen-2xl">
+            {children}
+          </div>
+        </main>
+        <BottomNav />
+      </div>
     </div>
   );
 }
@@ -51,9 +62,9 @@ export function PageHeader({
   return (
     <header
       className={cn(
-        "mb-6 px-6",
+        "mb-6 px-6 lg:mb-8 lg:px-2",
         sticky &&
-          "sticky top-0 z-50 bg-background/80 py-5 backdrop-blur-xl transition-colors",
+          "sticky top-0 z-50 bg-background/80 py-5 backdrop-blur-xl transition-colors lg:bg-transparent lg:backdrop-blur-none",
       )}
     >
       <div className="flex items-start justify-between gap-4">
@@ -63,11 +74,11 @@ export function PageHeader({
               {eyebrow}
             </div>
           ) : null}
-          <h1 className="text-balance text-[30px] font-semibold leading-[1.1] tracking-[-0.025em] text-foreground">
+          <h1 className="text-balance text-fluid-title font-semibold leading-[1.1] tracking-[-0.025em] text-foreground">
             {title}
           </h1>
           {subtitle ? (
-            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+            <p className="mt-2 text-fluid-body leading-relaxed text-muted-foreground">
               {subtitle}
             </p>
           ) : null}

@@ -316,6 +316,64 @@ html.light .icon-tile-accent {
   text-wrap: balance;
 }
 
+/* --- Fluid typography (scales phone → ultrawide) --- */
+@utility text-fluid-display {
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  line-height: 1.05;
+}
+@utility text-fluid-title {
+  font-size: clamp(1.75rem, 1.5rem + 1.1vw, 2.5rem);
+  line-height: 1.1;
+}
+@utility text-fluid-heading {
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.375rem);
+  line-height: 1.25;
+}
+@utility text-fluid-body {
+  font-size: clamp(0.875rem, 0.84rem + 0.16vw, 1rem);
+  line-height: 1.6;
+}
+@utility text-fluid-sm {
+  font-size: clamp(0.8125rem, 0.79rem + 0.12vw, 0.9375rem);
+  line-height: 1.5;
+}
+
+/* Responsive card grid: 1 → 2 → 3 → 4 columns */
+@utility auto-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  @media (min-width: 768px) {
+    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Wider items (statistics, editors) — max 2 up on desktop */
+@utility auto-grid-wide {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  @media (min-width: 1024px) {
+    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Charts / canvases must always fill their responsive container */
+@utility chart-responsive {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+
 @utility gradient-primary {
   background-image: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
 }

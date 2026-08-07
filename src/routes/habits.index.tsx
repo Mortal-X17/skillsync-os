@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Plus, Flame, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet } from "@/components/edit/Sheet";
@@ -64,14 +65,7 @@ function HabitsPage() {
         >
           <ArrowLeft className="h-[17px] w-[17px] text-muted-foreground" strokeWidth={1.75} />
         </Link>
-        <IconButton
-          variant="primary"
-          size="lg"
-          aria-label="New habit"
-          onClick={() => setOpen(true)}
-        >
-          <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-        </IconButton>
+        <PrimaryAction label="Add Habit" onClick={() => setOpen(true)} />
       </header>
 
       <div className="mb-6 px-5 lg:px-2">

@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card, Chip } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
@@ -559,14 +560,7 @@ function ExpensesPage() {
             Expenses.
           </h1>
         </div>
-        <IconButton
-          variant="primary"
-          size="lg"
-          aria-label="New transaction"
-          onClick={() => setAddOpen(true)}
-        >
-          <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-        </IconButton>
+        <PrimaryAction label="Add Expense" onClick={() => setAddOpen(true)} />
       </header>
 
       <div className="space-y-4 px-5 lg:px-2 pb-24">

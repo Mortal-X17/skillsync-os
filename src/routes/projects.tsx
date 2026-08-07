@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, FolderKanban, Trash2, ExternalLink } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
@@ -60,17 +61,13 @@ function ProjectsPage() {
             : `${projects.filter((p) => p.status === "active").length} active · ${projects.filter((p) => p.status === "done").length} shipped`
         }
         right={
-          <IconButton
-            variant="primary"
-            size="lg"
-            aria-label="New project"
+          <PrimaryAction
+            label="Add Project"
             onClick={() => {
               const p = addProject({ title: "Untitled project" });
               setEditing(p);
             }}
-          >
-            <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-          </IconButton>
+          />
         }
       />
 

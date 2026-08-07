@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { roadmapCounts, roadmapPct } from "@/lib/progress";
@@ -157,14 +158,10 @@ function LearnPage() {
         title="Learn."
         subtitle="Curated paths built for depth, not noise."
         right={
-          <IconButton
-            variant="primary"
-            size="lg"
-            aria-label="Create or import roadmap"
+          <PrimaryAction
+            label="New Roadmap"
             onClick={() => setFabOpen(true)}
-          >
-            <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-          </IconButton>
+          />
         }
       />
       <div className="auto-grid px-5 pb-28 lg:px-2">

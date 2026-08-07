@@ -56,7 +56,7 @@ function HabitsPage() {
 
   return (
     <AppShell>
-      <header className="mb-5 flex items-center justify-between px-5">
+      <header className="mb-5 flex items-center justify-between px-5 lg:px-2">
         <Link
           to="/"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -74,7 +74,7 @@ function HabitsPage() {
         </IconButton>
       </header>
 
-      <div className="mb-6 px-5">
+      <div className="mb-6 px-5 lg:px-2">
         <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           Operation Rebirth
         </div>
@@ -86,7 +86,7 @@ function HabitsPage() {
         </p>
       </div>
 
-      <div className="space-y-3 px-5">
+      <div className="auto-grid px-5 lg:px-2">
         {hydrated && habits.length === 0 ? (
           <EmptyState
             title="No habits yet"

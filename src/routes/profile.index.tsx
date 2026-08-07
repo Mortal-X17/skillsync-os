@@ -201,7 +201,7 @@ function ProfilePage() {
     <AppShell>
       <PageHeader eyebrow="You" title="Profile." />
 
-      <div className="space-y-6 px-5">
+      <div className="space-y-6 px-5 lg:px-2">
         {/* Identity */}
         <Card className="relative overflow-hidden p-5">
           <div className="relative flex items-center gap-4">

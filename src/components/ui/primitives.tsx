@@ -300,7 +300,13 @@ export function Sparkline({
     .join(" ");
 
   return (
-    <svg width={width} height={height} className={className} aria-hidden="true">
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
+      height={height}
+      className={cn("chart-responsive block", className)}
+      aria-hidden="true"
+    >
       <defs>
         <linearGradient id="spark" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="var(--primary)" />

@@ -139,9 +139,9 @@ function Dashboard() {
 
       />
 
-      <div className="space-y-6 px-5">
+      <div className="space-y-6 px-5 lg:px-2">
         {/* Stat row */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Card className="p-4">
             <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
               <Flame className="h-3.5 w-3.5" strokeWidth={2} />

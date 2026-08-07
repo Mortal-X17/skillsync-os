@@ -91,7 +91,7 @@ function RoadmapDetail() {
   if (!hydrated) {
     return (
       <AppShell>
-        <div className="px-5 pt-4 text-muted-foreground">Loading…</div>
+        <div className="px-5 lg:px-2 pt-4 text-muted-foreground">Loading…</div>
       </AppShell>
     );
   }
@@ -99,7 +99,7 @@ function RoadmapDetail() {
   if (!roadmap) {
     return (
       <AppShell>
-        <div className="px-5 pt-4">
+        <div className="px-5 lg:px-2 pt-4">
           <Link to="/learn" className="text-muted-foreground">
             ← Back
           </Link>
@@ -113,7 +113,7 @@ function RoadmapDetail() {
 
   return (
     <AppShell>
-      <header className="mb-5 px-5">
+      <header className="mb-5 px-5 lg:px-2">
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate({ to: "/learn" })}
@@ -156,7 +156,7 @@ function RoadmapDetail() {
         </div>
       </header>
 
-      <div className="space-y-4 px-5">
+      <div className="space-y-4 px-5 lg:px-2">
         {roadmap.phases.length === 0 ? (
           <EmptyState
             title="No phases yet"

@@ -45,7 +45,7 @@ function BackupPage() {
 
   return (
     <AppShell>
-      <header className="mb-4 flex items-center gap-3 px-5 pt-1">
+      <header className="mb-4 flex items-center gap-3 px-5 lg:px-2 pt-1">
         <Link
           to="/profile"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -63,7 +63,7 @@ function BackupPage() {
         </div>
       </header>
 
-      <div className="space-y-6 px-5 pb-24">
+      <div className="space-y-6 px-5 lg:px-2 pb-24">
         <BackupSection onRequestReset={() => setStep(1)} />
       </div>
 

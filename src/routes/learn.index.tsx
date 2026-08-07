@@ -167,7 +167,7 @@ function LearnPage() {
           </IconButton>
         }
       />
-      <div className="space-y-4 px-5 pb-28">
+      <div className="auto-grid px-5 pb-28 lg:px-2">
         {!hydrated ? (
           <div className="text-muted-foreground">Loading…</div>
         ) : null}

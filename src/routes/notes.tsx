@@ -55,7 +55,7 @@ function NotesPage() {
 
   return (
     <AppShell>
-      <header className="mb-5 flex items-center justify-between px-5">
+      <header className="mb-5 flex items-center justify-between px-5 lg:px-2">
         <Link
           to="/"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -75,7 +75,7 @@ function NotesPage() {
           <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
         </IconButton>
       </header>
-      <div className="mb-4 px-5">
+      <div className="mb-4 px-5 lg:px-2">
         <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em]">
           Notes.
         </h1>
@@ -84,7 +84,7 @@ function NotesPage() {
         </p>
       </div>
 
-      <div className="mb-4 px-5">
+      <div className="mb-4 px-5 lg:px-2">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
           <TextField
@@ -96,7 +96,7 @@ function NotesPage() {
         </div>
       </div>
 
-      <div className="space-y-3 px-5">
+      <div className="auto-grid px-5 lg:px-2">
         {hydrated && filtered.length === 0 ? (
           <EmptyState
             icon={StickyNote}

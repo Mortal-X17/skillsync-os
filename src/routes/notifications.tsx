@@ -96,7 +96,7 @@ function NotificationsPage() {
         }
       />
 
-      <div className="space-y-6 px-5">
+      <div className="space-y-6 px-5 lg:px-2 lg:auto-grid-wide lg:space-y-0 lg:items-start">
         {items.length === 0 ? (
           <EmptyState
             icon={BellOff}

@@ -61,7 +61,7 @@ function AnalyticsPage() {
 
   return (
     <AppShell>
-      <header className="mb-5 flex items-center justify-between px-5">
+      <header className="mb-5 flex items-center justify-between px-5 lg:px-2">
         <Link
           to="/profile"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -71,7 +71,7 @@ function AnalyticsPage() {
         </Link>
       </header>
 
-      <div className="mb-6 px-5">
+      <div className="mb-6 px-5 lg:px-2">
         <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           Insights
         </div>
@@ -83,8 +83,8 @@ function AnalyticsPage() {
         </p>
       </div>
 
-      <div className="space-y-6 px-5">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-6 px-5 lg:px-2 lg:auto-grid-wide lg:space-y-0 lg:items-start">
+        <div className="grid grid-cols-2 gap-3 lg:col-span-full lg:grid-cols-4">
           <Card className="p-4">
             <div className="text-[12px] text-muted-foreground">Learning</div>
             <div className="mt-2 text-[28px] font-semibold tracking-tight">

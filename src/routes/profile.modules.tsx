@@ -75,7 +75,7 @@ function ModulesPage() {
 
   return (
     <AppShell>
-      <header className="mb-4 flex items-center gap-3 px-5 pt-1">
+      <header className="mb-4 flex items-center gap-3 px-5 lg:px-2 pt-1">
         <Link
           to="/profile"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -93,7 +93,7 @@ function ModulesPage() {
         </div>
       </header>
 
-      <div className="space-y-3 px-5 pb-24">
+      <div className="auto-grid px-5 pb-24 lg:px-2">
         <p className="px-1 text-[12.5px] text-muted-foreground">
           Optional workspaces. Turn on only what you need.
         </p>

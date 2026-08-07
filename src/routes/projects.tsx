@@ -75,7 +75,7 @@ function ProjectsPage() {
       />
 
 
-      <div className="mb-5 flex gap-2 px-5">
+      <div className="mb-5 flex gap-2 px-5 lg:px-2">
         {(["all", "planning", "active", "done"] as Filter[]).map((f) => {
           const active = filter === f;
           return (
@@ -95,7 +95,7 @@ function ProjectsPage() {
         })}
       </div>
 
-      <div className="space-y-4 px-5">
+      <div className="auto-grid px-5 lg:px-2">
         {hydrated && filtered.length === 0 ? (
           <EmptyState
             icon={FolderKanban}

@@ -97,7 +97,7 @@ function PlannerPage() {
         }
       />
 
-      <div className="space-y-6 px-5">
+      <div className="space-y-6 px-5 lg:px-2">
         <Card className="p-4">
           <div className="mb-3 flex items-center justify-between px-1">
             <span className="text-[13px] font-medium">

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, FolderKanban, Trash2, ExternalLink } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
@@ -60,22 +61,18 @@ function ProjectsPage() {
             : `${projects.filter((p) => p.status === "active").length} active · ${projects.filter((p) => p.status === "done").length} shipped`
         }
         right={
-          <IconButton
-            variant="primary"
-            size="lg"
-            aria-label="New project"
+          <PrimaryAction
+            label="Add Project"
             onClick={() => {
               const p = addProject({ title: "Untitled project" });
               setEditing(p);
             }}
-          >
-            <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-          </IconButton>
+          />
         }
       />
 
 
-      <div className="mb-5 flex gap-2 px-5">
+      <div className="mb-5 flex gap-2 px-5 lg:px-2">
         {(["all", "planning", "active", "done"] as Filter[]).map((f) => {
           const active = filter === f;
           return (
@@ -95,7 +92,7 @@ function ProjectsPage() {
         })}
       </div>
 
-      <div className="space-y-4 px-5">
+      <div className="auto-grid px-5 lg:px-2">
         {hydrated && filtered.length === 0 ? (
           <EmptyState
             icon={FolderKanban}
@@ -118,9 +115,9 @@ function ProjectsPage() {
           <button
             key={p.id}
             onClick={() => setEditing(p)}
-            className="block w-full text-left"
+            className="block h-full w-full text-left"
           >
-            <Card className="p-5">
+            <Card className="h-full p-5">
               <div className="flex items-start justify-between">
                 <div className="flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">

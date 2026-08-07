@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card, Chip, ProgressBar } from "@/components/ui/primitives";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { roadmapCounts, roadmapPct } from "@/lib/progress";
@@ -157,17 +158,13 @@ function LearnPage() {
         title="Learn."
         subtitle="Curated paths built for depth, not noise."
         right={
-          <IconButton
-            variant="primary"
-            size="lg"
-            aria-label="Create or import roadmap"
+          <PrimaryAction
+            label="New Roadmap"
             onClick={() => setFabOpen(true)}
-          >
-            <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-          </IconButton>
+          />
         }
       />
-      <div className="space-y-4 px-5 pb-28">
+      <div className="auto-grid px-5 pb-28 lg:px-2">
         {!hydrated ? (
           <div className="text-muted-foreground">Loading…</div>
         ) : null}
@@ -184,10 +181,10 @@ function LearnPage() {
                   params: { roadmapId: r.id },
                 })
               }
-              className="block w-full cursor-pointer text-left"
+              className="block h-full w-full cursor-pointer text-left"
               aria-label={`Open ${r.title} roadmap`}
             >
-              <Card className="relative overflow-hidden border-white/[0.08] p-5">
+              <Card className="relative h-full overflow-hidden border-white/[0.08] p-5">
                 <div
                   className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full opacity-30 blur-3xl"
                   style={{

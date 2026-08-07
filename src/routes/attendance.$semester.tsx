@@ -83,7 +83,7 @@ function SemesterPage() {
 
   return (
     <AppShell>
-      <header className="mb-4 flex items-center gap-3 px-5 pt-1">
+      <header className="mb-4 flex items-center gap-3 px-5 lg:px-2 pt-1">
         <Link
           to="/attendance"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -104,7 +104,7 @@ function SemesterPage() {
         </IconButton>
       </header>
 
-      <div className="space-y-4 px-5 pb-24">
+      <div className="space-y-4 px-5 lg:px-2 pb-24">
         <Card className="p-4">
           <div className="mb-2 flex items-center justify-between text-[12px] text-muted-foreground">
             <span>Semester attendance</span>

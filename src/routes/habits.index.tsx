@@ -2,11 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Plus, Flame, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet } from "@/components/edit/Sheet";
 import { TextField } from "@/components/edit/Fields";
-import { ActionButton, IconButton } from "@/components/edit/Buttons";
+import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { todayISO, addDaysISO } from "@/lib/date";
 import { cn } from "@/lib/utils";
@@ -56,7 +57,7 @@ function HabitsPage() {
 
   return (
     <AppShell>
-      <header className="mb-5 flex items-center justify-between px-5">
+      <header className="mb-5 flex items-center justify-between px-5 lg:px-2">
         <Link
           to="/"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -64,17 +65,10 @@ function HabitsPage() {
         >
           <ArrowLeft className="h-[17px] w-[17px] text-muted-foreground" strokeWidth={1.75} />
         </Link>
-        <IconButton
-          variant="primary"
-          size="lg"
-          aria-label="New habit"
-          onClick={() => setOpen(true)}
-        >
-          <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-        </IconButton>
+        <PrimaryAction label="Add Habit" onClick={() => setOpen(true)} />
       </header>
 
-      <div className="mb-6 px-5">
+      <div className="mb-6 px-5 lg:px-2">
         <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           Operation Rebirth
         </div>
@@ -86,7 +80,7 @@ function HabitsPage() {
         </p>
       </div>
 
-      <div className="space-y-3 px-5">
+      <div className="auto-grid px-5 lg:px-2">
         {hydrated && habits.length === 0 ? (
           <EmptyState
             title="No habits yet"

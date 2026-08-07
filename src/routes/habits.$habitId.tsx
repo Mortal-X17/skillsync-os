@@ -134,14 +134,14 @@ function HabitDetail() {
   if (!hydrated) {
     return (
       <AppShell>
-        <div className="px-5 pt-4 text-muted-foreground">Loading…</div>
+        <div className="px-5 lg:px-2 pt-4 text-muted-foreground">Loading…</div>
       </AppShell>
     );
   }
   if (!habit) {
     return (
       <AppShell>
-        <div className="px-5 pt-4">
+        <div className="px-5 lg:px-2 pt-4">
           <Link to="/habits" className="text-muted-foreground">
             ← Back
           </Link>
@@ -157,7 +157,7 @@ function HabitDetail() {
 
   return (
     <AppShell>
-      <header className="mb-5 flex items-center justify-between px-5">
+      <header className="mb-5 flex items-center justify-between px-5 lg:px-2">
         <Link
           to="/habits"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -187,7 +187,7 @@ function HabitDetail() {
         </div>
       </header>
 
-      <div className="mb-6 px-5">
+      <div className="mb-6 px-5 lg:px-2">
         <div className="flex items-center gap-3">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04] text-[26px]">
             {habit.emoji}
@@ -216,13 +216,13 @@ function HabitDetail() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 px-5">
+      <div className="grid grid-cols-3 gap-3 px-5 lg:px-2">
         <StatCard icon={Flame} label="Current" value={String(currentStreak)} />
         <StatCard icon={Trophy} label="Best" value={String(bestStreak)} />
         <StatCard icon={Percent} label="30-day" value={`${Math.round((last30 / 30) * 100)}%`} />
       </div>
 
-      <section className="mt-6 space-y-3 px-5">
+      <section className="mt-6 space-y-3 px-5 lg:px-2">
         <SectionHeader title="This week" />
         <Card>
           <div className="mb-2 flex items-center justify-between text-[12px] text-muted-foreground">
@@ -233,7 +233,7 @@ function HabitDetail() {
         </Card>
       </section>
 
-      <section className="mt-6 space-y-3 px-5">
+      <section className="mt-6 space-y-3 px-5 lg:px-2">
         <SectionHeader title="This month" />
         <Card>
           <div className="mb-2 flex items-center justify-between text-[12px] text-muted-foreground">
@@ -244,7 +244,7 @@ function HabitDetail() {
         </Card>
       </section>
 
-      <section className="mt-6 space-y-3 px-5">
+      <section className="mt-6 space-y-3 px-5 lg:px-2">
         <SectionHeader title="Overall" />
         <Card>
           <div className="mb-2 flex items-center justify-between text-[12px] text-muted-foreground">
@@ -259,7 +259,7 @@ function HabitDetail() {
         </Card>
       </section>
 
-      <section className="mt-6 space-y-3 px-5">
+      <section className="mt-6 space-y-3 px-5 lg:px-2">
         <SectionHeader
           title="Calendar"
           action={

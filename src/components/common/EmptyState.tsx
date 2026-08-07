@@ -13,7 +13,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="animate-float-in flex flex-col items-center justify-center gap-4 rounded-[20px] border border-dashed border-white/[0.09] bg-white/[0.012] px-6 py-12 text-center">
+    <div className="animate-float-in col-span-full flex flex-col items-center justify-center gap-4 rounded-[20px] border border-dashed border-white/[0.09] bg-white/[0.012] px-6 py-12 text-center">
       <div className="relative">
         <div
           aria-hidden

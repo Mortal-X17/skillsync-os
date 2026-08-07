@@ -77,7 +77,7 @@ function TopicDetail() {
   if (!hydrated) {
     return (
       <AppShell>
-        <div className="px-5 pt-4 text-muted-foreground">Loading…</div>
+        <div className="px-5 lg:px-2 pt-4 text-muted-foreground">Loading…</div>
       </AppShell>
     );
   }
@@ -85,7 +85,7 @@ function TopicDetail() {
   if (!roadmap || !phase || !topic) {
     return (
       <AppShell>
-        <div className="px-5 pt-4">
+        <div className="px-5 lg:px-2 pt-4">
           <Link to="/learn" className="text-muted-foreground">
             ← Back
           </Link>
@@ -107,7 +107,7 @@ function TopicDetail() {
 
   return (
     <AppShell>
-      <header className="mb-5 flex items-center justify-between px-5">
+      <header className="mb-5 flex items-center justify-between px-5 lg:px-2">
         <Link
           to="/learn/$roadmapId"
           params={{ roadmapId }}
@@ -125,7 +125,7 @@ function TopicDetail() {
         </IconButton>
       </header>
 
-      <div className="mb-6 px-5">
+      <div className="mb-6 px-5 lg:px-2">
         <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           {roadmap.title} · {phase.title}
         </div>
@@ -154,7 +154,7 @@ function TopicDetail() {
       </div>
 
       {/* Notes */}
-      <section className="space-y-3 px-5">
+      <section className="space-y-3 px-5 lg:px-2">
         <SectionHeader title="Notes" />
         <Card className="p-3">
           <TextArea
@@ -170,7 +170,7 @@ function TopicDetail() {
       </section>
 
       {/* Resources */}
-      <section className="mt-6 space-y-3 px-5">
+      <section className="mt-6 space-y-3 px-5 lg:px-2">
         <SectionHeader
           title="Resources"
           action={
@@ -234,7 +234,7 @@ function TopicDetail() {
       </section>
 
       {/* Checklist */}
-      <section className="mt-6 space-y-3 px-5">
+      <section className="mt-6 space-y-3 px-5 lg:px-2">
         <SectionHeader
           title="Checklist"
           action={
@@ -325,7 +325,7 @@ function TopicDetail() {
       </section>
 
       {/* Subtopics */}
-      <section className="mt-6 space-y-3 px-5">
+      <section className="mt-6 space-y-3 px-5 lg:px-2">
         <SectionHeader title="Subtopics" />
         <div className="space-y-2">
           {topic.subtopics.map((sub) => (

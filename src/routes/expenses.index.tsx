@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
+import { PrimaryAction } from "@/components/layout/PrimaryAction";
 import { Card, Chip } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/common/EmptyState";
 import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
@@ -543,7 +544,7 @@ function ExpensesPage() {
 
   return (
     <AppShell>
-      <header className="mb-4 flex items-center gap-3 px-5 pt-1">
+      <header className="mb-4 flex items-center gap-3 px-5 lg:px-2 pt-1">
         <Link
           to="/profile"
           className="glass flex h-10 w-10 items-center justify-center rounded-full active:scale-95"
@@ -559,17 +560,10 @@ function ExpensesPage() {
             Expenses.
           </h1>
         </div>
-        <IconButton
-          variant="primary"
-          size="lg"
-          aria-label="New transaction"
-          onClick={() => setAddOpen(true)}
-        >
-          <Plus className="h-[17px] w-[17px]" strokeWidth={2} />
-        </IconButton>
+        <PrimaryAction label="Add Expense" onClick={() => setAddOpen(true)} />
       </header>
 
-      <div className="space-y-4 px-5 pb-24">
+      <div className="space-y-4 px-5 lg:px-2 pb-24">
         <div className="relative">
           <Search
             className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70"

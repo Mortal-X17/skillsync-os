@@ -43,7 +43,7 @@ export function BottomSheet({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-8">
       <div
         className="absolute inset-0 bg-black/65 backdrop-blur-[6px] animate-in fade-in duration-200"
         onClick={onClose}
@@ -51,6 +51,8 @@ export function BottomSheet({
       <div
         className={cn(
           "animate-sheet-up glass relative mx-auto flex w-full max-w-md flex-col overflow-hidden rounded-t-[28px] bg-surface/90 shadow-[var(--shadow-float)] transition-[max-height,margin] duration-200 ease-[var(--ease-out-soft)]",
+          // Tablet & desktop: centered dialog / modal instead of a bottom sheet.
+          "md:animate-dialog-pop md:max-w-lg md:rounded-[24px] lg:max-w-xl",
           className,
         )}
         style={{
@@ -58,15 +60,15 @@ export function BottomSheet({
           maxHeight: `calc(92dvh - ${kb}px)`,
         }}
       >
-        <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-white/15" />
-        <div className="flex shrink-0 items-center justify-between gap-3 px-6 pt-3">
-          <h3 className="min-w-0 truncate text-[17px] font-semibold tracking-tight">
+        <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-white/15 md:hidden" />
+        <div className="flex shrink-0 items-center justify-between gap-3 px-6 pt-3 md:pt-5">
+          <h3 className="min-w-0 truncate text-[17px] font-semibold tracking-tight md:text-[19px]">
             {title}
           </h3>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="pressable flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.05] text-muted-foreground"
+            className="pressable flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.05] text-muted-foreground transition-colors hover:bg-white/[0.09] hover:text-foreground"
           >
             <X className="h-4 w-4" strokeWidth={1.75} />
           </button>
@@ -75,7 +77,7 @@ export function BottomSheet({
           ref={bodyRef}
           className={cn(
             "flex-1 overflow-y-auto overscroll-contain px-6 pt-4",
-            footer ? "pb-3" : "pb-[max(env(safe-area-inset-bottom),24px)]",
+            footer ? "pb-3" : "pb-[max(env(safe-area-inset-bottom),24px)] md:pb-6",
           )}
           style={kb > 0 ? { paddingBottom: footer ? 12 : 16 } : undefined}
         >
@@ -83,7 +85,7 @@ export function BottomSheet({
         </div>
         {footer ? (
           <div
-            className="shrink-0 border-t border-white/[0.06] bg-surface/80 px-6 pt-3 backdrop-blur-xl"
+            className="shrink-0 border-t border-white/[0.06] bg-surface/80 px-6 pt-3 backdrop-blur-xl md:pb-5"
             style={{
               paddingBottom: kb > 0 ? 12 : "max(env(safe-area-inset-bottom),20px)",
             }}
@@ -95,6 +97,7 @@ export function BottomSheet({
     </div>
   );
 }
+
 
 export function ConfirmDialog({
   open,

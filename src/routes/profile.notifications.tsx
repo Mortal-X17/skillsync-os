@@ -170,7 +170,7 @@ function NotificationSettingsPage() {
         }
       />
 
-      <div className="space-y-7 px-5">
+      <div className="space-y-7 px-5 lg:px-2">
         {/* Permission */}
         <Card className="p-4">
           <div className="flex items-start gap-3">

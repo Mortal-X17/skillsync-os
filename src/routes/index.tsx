@@ -139,9 +139,9 @@ function Dashboard() {
 
       />
 
-      <div className="space-y-6 px-5">
+      <div className="space-y-6 px-5 lg:px-2">
         {/* Stat row */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Card className="p-4">
             <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
               <Flame className="h-3.5 w-3.5" strokeWidth={2} />
@@ -335,12 +335,12 @@ function Dashboard() {
               hint="Ship something. Add a project to start tracking."
             />
           ) : (
-            <div className="no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5">
+            <div className="no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 xl:grid-cols-4">
               {activeProjects.map((p) => (
                 <Link
                   key={p.id}
                   to="/projects"
-                  className="card-surface min-w-[220px] max-w-[240px] flex-1 space-y-3 p-5"
+                  className="card-surface min-w-[220px] max-w-[240px] flex-1 space-y-3 p-5 transition-transform lg:min-w-0 lg:max-w-none [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-0.5"
                 >
                   <Chip tone={p.status === "active" ? "primary" : "success"}>
                     {p.status === "active" ? "In progress" : "Planning"}
@@ -466,9 +466,10 @@ function Dashboard() {
         <Link
           to="/planner"
           aria-label="Add task"
-          className="fixed bottom-28 right-6 z-30 flex h-12 w-12 items-center justify-center rounded-full gradient-primary shadow-[0_10px_40px_-10px_rgba(124,58,237,0.6)] transition-transform active:scale-95"
+          className="fixed bottom-28 right-6 z-30 flex h-12 w-12 items-center justify-center gap-2 rounded-full gradient-primary shadow-[0_10px_40px_-10px_rgba(124,58,237,0.6)] transition-transform hover:brightness-110 active:scale-95 lg:bottom-10 lg:right-10 lg:h-12 lg:w-auto lg:rounded-[16px] lg:px-5"
         >
           <Plus className="h-5 w-5 text-white" strokeWidth={2.25} />
+          <span className="hidden text-[14px] font-medium text-white lg:inline">Add Task</span>
         </Link>
       </div>
     </AppShell>

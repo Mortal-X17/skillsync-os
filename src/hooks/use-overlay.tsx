@@ -50,7 +50,7 @@ export function useScrollLock(active: boolean) {
 
 /* ------------------------------ layer stack ------------------------------ */
 
-const BASE_Z = 100;
+const BASE_Z = 200;
 const STEP_Z = 10;
 
 let stack: symbol[] = [];

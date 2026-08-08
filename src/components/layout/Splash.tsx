@@ -46,7 +46,7 @@ export function Splash() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-3 bg-background/70 backdrop-blur-xl transition-opacity duration-300"
+      className="pointer-events-none fixed inset-0 z-[90] flex flex-col items-center justify-center gap-3 bg-background/70 backdrop-blur-xl transition-opacity duration-300"
       style={{ opacity: leaving ? 0 : 1 }}
     >
       <div className="animate-float-in text-center">

@@ -19,7 +19,7 @@ function OverlayPortal({ children }: { children: ReactNode }) {
 }
 
 const BACKDROP =
-  "absolute inset-0 bg-[color-mix(in_oklab,var(--background)_62%,black)]/70 backdrop-blur-[3px] animate-in fade-in duration-200 motion-reduce:animate-none";
+  "absolute inset-0 bg-black/45 backdrop-blur-[2px] animate-in fade-in duration-200 motion-reduce:animate-none";
 
 /**
  * Responsive edit surface:

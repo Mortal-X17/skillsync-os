@@ -90,6 +90,21 @@ export function useOverlayLayer(open: boolean) {
   };
 }
 
+/** True while any overlay (sheet / dialog) is open. */
+export function useAnyOverlayOpen() {
+  const [openCount, setOpenCount] = useState(() => stack.length);
+  useEffect(() => {
+    const onChange = () => setOpenCount(stack.length);
+    stackListeners.add(onChange);
+    onChange();
+    return () => {
+      stackListeners.delete(onChange);
+    };
+  }, []);
+  return openCount > 0;
+}
+
+
 /** Escape / Android-back dismissal for the topmost overlay only. */
 export function useDismissOnEscape(open: boolean, isTop: boolean, onClose: () => void) {
   useEffect(() => {

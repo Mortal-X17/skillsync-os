@@ -8,7 +8,7 @@ import { useIsDesktop } from "@/hooks/use-breakpoint";
  */
 
 let inset = 0;
-let overlayCount = 0;
+
 const listeners = new Set<() => void>();
 
 function emit() {

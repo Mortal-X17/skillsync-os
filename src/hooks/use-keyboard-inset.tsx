@@ -78,34 +78,17 @@ export function useKeyboardOpen() {
 
 /* ---------------- overlay (sheet / dialog) tracking ---------------- */
 
-const overlayListeners = new Set<() => void>();
-function emitOverlay() {
-  for (const l of overlayListeners) l();
+/**
+ * Overlay tracking now lives in `use-overlay` (single stack shared by every
+ * sheet / dialog). These re-exports keep existing call sites working.
+ */
+export { useAnyOverlayOpen as useOverlayOpen } from "@/hooks/use-overlay";
+
+/** @deprecated overlays register themselves through `useOverlayLayer`. */
+export function useRegisterOverlay(_open: boolean) {
+  /* no-op — kept for backwards compatibility */
 }
 
-/** Registers an open sheet/dialog for the lifetime of the component. */
-export function useRegisterOverlay(open: boolean) {
-  useEffect(() => {
-    if (!open) return;
-    overlayCount += 1;
-    emitOverlay();
-    return () => {
-      overlayCount = Math.max(0, overlayCount - 1);
-      emitOverlay();
-    };
-  }, [open]);
-}
-
-export function useOverlayOpen() {
-  return useSyncExternalStore(
-    (cb) => {
-      overlayListeners.add(cb);
-      return () => overlayListeners.delete(cb);
-    },
-    () => overlayCount > 0,
-    () => false,
-  );
-}
 
 /**
  * Keeps the focused field visible inside a scroll container when the

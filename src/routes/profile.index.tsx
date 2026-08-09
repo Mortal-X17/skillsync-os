@@ -22,6 +22,7 @@ import {
   SlidersHorizontal,
   GraduationCap,
   Wallet,
+  Vibrate,
 } from "lucide-react";
 import { AppShell, AppFooter, PageHeader } from "@/components/layout/AppShell";
 import { Card, Chip, ProgressBar, SectionHeader } from "@/components/ui/primitives";
@@ -34,6 +35,7 @@ import {
   type BackgroundStyle,
 } from "@/components/layout/backgrounds";
 import { THEME_OPTIONS } from "@/hooks/use-theme";
+import { haptics, hapticsSupported, type HapticIntensity } from "@/lib/haptics";
 
 
 
@@ -94,6 +96,7 @@ function ProfilePage() {
   const [openJson, setOpenJson] = useState(false);
   const [openAppearance, setOpenAppearance] = useState(false);
   const [openTheme, setOpenTheme] = useState(false);
+  const [openHaptics, setOpenHaptics] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -458,6 +461,24 @@ function ProfilePage() {
               </button>
               <button
                 type="button"
+                onClick={() => setOpenHaptics(true)}
+                className="w-full text-left transition-transform active:scale-[0.99]"
+              >
+                <SettingRow
+                  icon={Vibrate}
+                  label="Haptic feedback"
+                  right={
+                    <span className="flex items-center gap-2">
+                      <span className="text-[13px] text-muted-foreground">
+                        {(preferences.haptics ?? true) ? "On" : "Off"}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+                    </span>
+                  }
+                />
+              </button>
+              <button
+                type="button"
                 onClick={() => setOpenAppearance(true)}
                 className="w-full text-left transition-transform active:scale-[0.99]"
               >
@@ -599,6 +620,69 @@ function ProfilePage() {
       </div>
 
       <BottomSheet
+        open={openHaptics}
+        onClose={() => setOpenHaptics(false)}
+        title="Haptic feedback"
+      >
+        <p className="mb-4 text-[13px] leading-relaxed text-muted-foreground">
+          Subtle vibrations on taps, toggles and completions. Mobile only —
+          desktop simply ignores it.
+        </p>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3 rounded-[18px] border border-border bg-white/[0.03] px-4 py-3.5">
+            <div className="min-w-0">
+              <div className="text-[14px] font-semibold tracking-tight">
+                Haptics
+              </div>
+              <div className="text-[12px] text-muted-foreground">
+                {hapticsSupported()
+                  ? "Supported on this device"
+                  : "Not supported on this device"}
+              </div>
+            </div>
+            <Toggle
+              on={preferences.haptics ?? true}
+              onChange={(v) => updatePreferences({ haptics: v })}
+            />
+          </div>
+
+          <div
+            className={
+              "rounded-[18px] border border-border bg-white/[0.03] p-4 transition-opacity " +
+              ((preferences.haptics ?? true) ? "" : "pointer-events-none opacity-40")
+            }
+          >
+            <div className="text-[13px] font-semibold tracking-tight">
+              Intensity
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {(["light", "standard", "strong"] as HapticIntensity[]).map((lvl) => {
+                const active = (preferences.hapticIntensity ?? "standard") === lvl;
+                return (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => {
+                      updatePreferences({ hapticIntensity: lvl });
+                      haptics.selection();
+                    }}
+                    className={
+                      "rounded-[12px] py-2.5 text-[12.5px] font-medium capitalize transition-all active:scale-[0.97] " +
+                      (active
+                        ? "gradient-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+                        : "bg-white/[0.05] text-muted-foreground")
+                    }
+                  >
+                    {lvl}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet
         open={openTheme}
         onClose={() => setOpenTheme(false)}
         title="Theme"
@@ -613,7 +697,10 @@ function ProfilePage() {
               <button
                 key={opt.id}
                 type="button"
-                onClick={() => updatePreferences({ theme: opt.id })}
+                onClick={() => {
+                  haptics.selection();
+                  updatePreferences({ theme: opt.id });
+                }}
                 className={
                   "w-full overflow-hidden rounded-[18px] border text-left transition-all active:scale-[0.98] " +
                   (active
@@ -662,9 +749,10 @@ function ProfilePage() {
               <button
                 key={opt.id}
                 type="button"
-                onClick={() =>
-                  updatePreferences({ background: opt.id as BackgroundStyle })
-                }
+                onClick={() => {
+                  haptics.selection();
+                  updatePreferences({ background: opt.id as BackgroundStyle });
+                }}
                 className={
                   "w-full overflow-hidden rounded-[18px] border text-left transition-all active:scale-[0.98] " +
                   (active
@@ -967,7 +1055,10 @@ function Toggle({
 }) {
   return (
     <button
-      onClick={() => onChange(!on)}
+      onClick={() => {
+        haptics.toggle(!on);
+        onChange(!on);
+      }}
       aria-pressed={on}
       className={
         "relative h-6 w-11 rounded-full transition-colors " +

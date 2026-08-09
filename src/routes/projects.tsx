@@ -10,6 +10,7 @@ import { TextField, TextArea , NO_AUTOFILL_PROPS } from "@/components/edit/Field
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import type { Project } from "@/lib/schema";
+import { haptics } from "@/lib/haptics";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({

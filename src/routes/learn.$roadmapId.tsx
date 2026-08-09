@@ -22,6 +22,7 @@ import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
 import { TextField, TextArea , NO_AUTOFILL_PROPS } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import type { Topic, Subtopic } from "@/lib/schema";
+import { haptics } from "@/lib/haptics";
 
 export const Route = createFileRoute("/learn/$roadmapId")({
   head: ({ params }) => ({

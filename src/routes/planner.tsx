@@ -10,6 +10,7 @@ import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { addDaysISO, todayISO, fromISO } from "@/lib/date";
 import { cn } from "@/lib/utils";
+import { haptics } from "@/lib/haptics";
 
 export const Route = createFileRoute("/planner")({
   head: () => ({
@@ -115,7 +116,10 @@ function PlannerPage() {
               return (
                 <button
                   key={iso}
-                  onClick={() => setSelected(iso)}
+                  onClick={() => {
+                    haptics.selection();
+                    setSelected(iso);
+                  }}
                   className={cn(
                     "flex flex-col items-center gap-1.5 rounded-2xl border py-2.5 transition-all active:scale-[0.96]",
                     isSel
@@ -161,7 +165,11 @@ function PlannerPage() {
                 {tasksForSelected.map((t) => (
                   <div key={t.id} className="flex items-center gap-3">
                     <button
-                      onClick={() => updateTask(t.id, { done: !t.done })}
+                      onClick={() => {
+                        if (t.done) haptics.tap();
+                        else haptics.success();
+                        updateTask(t.id, { done: !t.done });
+                      }}
                       className={cn(
                         "h-4 w-4 rounded-full border transition-colors",
                         t.done
@@ -282,6 +290,7 @@ function PlannerPage() {
             onClick={() => {
               if (!title.trim()) return;
               addTask({ title: title.trim(), date: selected, time });
+              haptics.success();
               setTitle("");
               setTime("");
               setOpen(false);

@@ -1,3 +1,4 @@
+import { haptics } from "@/lib/haptics";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, GraduationCap, Wallet } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
@@ -21,7 +22,10 @@ export const Route = createFileRoute("/profile/modules")({
 function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
-      onClick={() => onChange(!on)}
+      onClick={() => {
+        haptics.toggle(!on);
+        onChange(!on);
+      }}
       aria-pressed={on}
       className={
         "relative h-6 w-11 shrink-0 rounded-full transition-colors " +

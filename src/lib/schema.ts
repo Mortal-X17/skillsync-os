@@ -131,6 +131,9 @@ export const PreferencesSchema = z.object({
     .enum(["aurora", "gradient", "atmospheric"])
     .default("aurora"),
   theme: z.enum(["light", "dark", "system"]).default("dark"),
+  /** Tactile feedback on supported devices. */
+  haptics: z.boolean().default(true),
+  hapticIntensity: z.enum(["light", "standard", "strong"]).default("standard"),
 });
 
 
@@ -189,6 +192,8 @@ export const AppDataSchema = z.object({
     modules: { attendance: false, expenses: false },
     background: "aurora",
     theme: "dark",
+    haptics: true,
+    hapticIntensity: "standard",
 
   }),
   stats: StatsSchema.default({ xp: 0, level: 1, streak: 0, lastActive: "" }),

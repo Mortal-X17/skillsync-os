@@ -254,11 +254,14 @@ function ProjectsPage() {
                 min={0}
                 max={100}
                 value={current.progress}
-                onChange={(e) =>
-                  updateProject(current.id, {
-                    progress: Number(e.target.value),
-                  })
-                }
+                onChange={(e) => {
+                  const next = Number(e.target.value);
+                  // Only pulse when crossing a 10% milestone — never per pixel.
+                  if (Math.floor(next / 10) !== Math.floor(current.progress / 10)) {
+                    haptics.selection();
+                  }
+                  updateProject(current.id, { progress: next });
+                }}
                 className="w-full accent-[var(--primary)]"
               />
             </div>

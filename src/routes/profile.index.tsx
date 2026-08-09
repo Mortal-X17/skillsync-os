@@ -149,6 +149,7 @@ function ProfilePage() {
       updatePreferences({ developerMode: true });
       toast.success("Developer mode enabled");
     } else {
+      haptics.error();
       toast.error("Entered name doesn't match. Developer mode was not enabled.");
     }
     setDevNameInput("");
@@ -178,6 +179,7 @@ function ProfilePage() {
         mode === "all" ? "All data wiped. Fresh start." : "Reset to starter demo data.",
       );
     } else {
+      haptics.error();
       toast.error("The entered text was wrong. No data was wiped.");
     }
   };

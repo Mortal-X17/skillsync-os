@@ -280,6 +280,8 @@ function RoadmapDetail() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
+                                if (tPct === 100) haptics.selection();
+                                else haptics.success();
                                 setTopicComplete(
                                   roadmap.id,
                                   phase.id,
@@ -365,6 +367,7 @@ function RoadmapDetail() {
                                         <button
                                           onClick={(e) => {
                                             e.stopPropagation();
+                                            haptics.selection();
                                             setSubtopicComplete(
                                               roadmap.id,
                                               phase.id,

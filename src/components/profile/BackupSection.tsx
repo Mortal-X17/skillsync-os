@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { haptics } from "@/lib/haptics";
 import {
   Download,
   Upload,
@@ -99,6 +100,7 @@ export function BackupSection({
       setCreateOpen(false);
       toast.success("Backup created");
     } catch (e: any) {
+      haptics.error();
       toast.error(e?.message ?? "Could not create backup");
     } finally {
       setCreating(false);
@@ -148,12 +150,14 @@ export function BackupSection({
       const text = await file.text();
       const result = validateBackup(text);
       if (!result.ok) {
+        haptics.error();
         toast.error(result.error);
         return;
       }
       setPendingRestore(result.backup);
       setRestoreStep(1);
     } catch (e: any) {
+      haptics.error();
       toast.error(e?.message ?? "Could not read file");
     }
   };
@@ -165,6 +169,7 @@ export function BackupSection({
       await new Promise((r) => setTimeout(r, 200));
       const result = importJSON(JSON.stringify(pendingRestore.data));
       if (!result.ok) {
+        haptics.error();
         toast.error(`Restore failed: ${result.error}`);
         return;
       }

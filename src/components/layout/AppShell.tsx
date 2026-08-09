@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "./BottomNav";
 import { SideNav } from "./SideNav";
+import { useHapticPreferences } from "@/hooks/use-haptics";
 
 /**
  * Responsive application shell.
@@ -9,6 +10,7 @@ import { SideNav } from "./SideNav";
  * - `>= lg` — permanent collapsible sidebar, content in a centered container.
  */
 export function AppShell({ children }: { children: ReactNode }) {
+  useHapticPreferences();
   return (
     <div className="relative flex min-h-[100dvh] w-full">
       <SideNav />

@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, GraduationCap, FolderKanban, CalendarRange, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { haptics } from "@/lib/haptics";
 import { useKeyboardOpen, useOverlayOpen } from "@/hooks/use-keyboard-inset";
 
 type NavItem = {
@@ -56,6 +57,9 @@ export function BottomNav() {
                   : "text-muted-foreground hover:text-foreground/80",
               )}
               aria-label={item.label}
+              onClick={() => {
+                if (!active) haptics.selection();
+              }}
             >
               <span
                 className={cn(

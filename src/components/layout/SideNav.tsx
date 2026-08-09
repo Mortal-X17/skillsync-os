@@ -13,6 +13,7 @@ import {
   PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { haptics } from "@/lib/haptics";
 
 type Item = {
   to:
@@ -92,7 +93,10 @@ export function SideNav() {
           </div>
         )}
         <button
-          onClick={toggle}
+          onClick={() => {
+            haptics.tap();
+            toggle();
+          }}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className="pressable flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
         >
@@ -115,6 +119,9 @@ export function SideNav() {
               key={item.to}
               to={item.to}
               title={collapsed ? item.label : undefined}
+              onClick={() => {
+                if (!active) haptics.selection();
+              }}
               className={cn(
                 "group relative flex items-center gap-3 rounded-[14px] px-3 py-2.5 transition-all duration-200 ease-[var(--ease-out-soft)]",
                 collapsed && "justify-center px-0",

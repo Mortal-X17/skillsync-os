@@ -182,6 +182,8 @@ export function createInitialData(): AppData {
       modules: { attendance: false, expenses: false },
       background: "aurora",
       theme: "dark",
+      haptics: true,
+      hapticIntensity: "standard",
 
     },
     stats: { xp: 0, level: 1, streak: 0, lastActive: "" },

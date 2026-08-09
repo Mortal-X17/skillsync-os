@@ -1,3 +1,4 @@
+import { haptics } from "@/lib/haptics";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -65,7 +66,10 @@ function Toggle({
   return (
     <button
       type="button"
-      onClick={() => onChange(!on)}
+      onClick={() => {
+        haptics.toggle(!on);
+        onChange(!on);
+      }}
       aria-pressed={on}
       aria-label={label}
       className={cn(

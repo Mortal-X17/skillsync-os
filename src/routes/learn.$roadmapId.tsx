@@ -22,6 +22,7 @@ import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
 import { TextField, TextArea , NO_AUTOFILL_PROPS } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import type { Topic, Subtopic } from "@/lib/schema";
+import { haptics } from "@/lib/haptics";
 
 export const Route = createFileRoute("/learn/$roadmapId")({
   head: ({ params }) => ({
@@ -280,6 +281,8 @@ function RoadmapDetail() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
+                                if (tPct === 100) haptics.selection();
+                                else haptics.success();
                                 setTopicComplete(
                                   roadmap.id,
                                   phase.id,
@@ -365,6 +368,7 @@ function RoadmapDetail() {
                                         <button
                                           onClick={(e) => {
                                             e.stopPropagation();
+                                            haptics.selection();
                                             setSubtopicComplete(
                                               roadmap.id,
                                               phase.id,

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { haptics } from "@/lib/haptics";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { BottomSheet } from "@/components/edit/Sheet";
@@ -39,6 +40,7 @@ function BackupPage() {
       toast.success("All data wiped. Fresh start.");
       navigate({ to: "/profile" });
     } else {
+      haptics.error();
       toast.error("The entered text was wrong. No data was wiped.");
     }
   };

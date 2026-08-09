@@ -11,6 +11,7 @@ import { ActionButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import { todayISO, addDaysISO } from "@/lib/date";
 import { cn } from "@/lib/utils";
+import { haptics } from "@/lib/haptics";
 
 export const Route = createFileRoute("/habits/")({
   head: () => ({
@@ -124,6 +125,14 @@ function HabitsPage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    if (doneToday) {
+                      haptics.tap();
+                    } else if ((streak + 1) % 7 === 0) {
+                      // Weekly streak milestone earns a richer confirmation.
+                      haptics.milestone();
+                    } else {
+                      haptics.success();
+                    }
                     toggleHabitToday(h.id);
                   }}
                   aria-label="Toggle today"
@@ -198,6 +207,7 @@ function HabitsPage() {
             onClick={() => {
               if (!title.trim()) return;
               addHabit(title.trim(), emoji || "✨");
+              haptics.success();
               setTitle("");
               setEmoji("✨");
               setOpen(false);

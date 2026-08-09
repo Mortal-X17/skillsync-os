@@ -10,6 +10,7 @@ import { TextField, TextArea , NO_AUTOFILL_PROPS } from "@/components/edit/Field
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 import type { Project } from "@/lib/schema";
+import { haptics } from "@/lib/haptics";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -254,11 +255,14 @@ function ProjectsPage() {
                 min={0}
                 max={100}
                 value={current.progress}
-                onChange={(e) =>
-                  updateProject(current.id, {
-                    progress: Number(e.target.value),
-                  })
-                }
+                onChange={(e) => {
+                  const next = Number(e.target.value);
+                  // Only pulse when crossing a 10% milestone — never per pixel.
+                  if (Math.floor(next / 10) !== Math.floor(current.progress / 10)) {
+                    haptics.selection();
+                  }
+                  updateProject(current.id, { progress: next });
+                }}
                 className="w-full accent-[var(--primary)]"
               />
             </div>

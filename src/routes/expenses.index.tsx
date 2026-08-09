@@ -26,7 +26,7 @@ import { BottomSheet, ConfirmDialog } from "@/components/edit/Sheet";
 import { TextField, TextArea, NO_AUTOFILL_PROPS } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
-import { haptic } from "@/lib/haptics";
+import { haptics } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 import type { Transaction } from "@/lib/schema";
 
@@ -262,7 +262,7 @@ function DragList({
 
   const finish = useCallback(() => {
     if (state.current.active) {
-      haptic(14);
+      haptics.tap();
       onReorder(state.current.ids);
     }
     cleanup();
@@ -315,7 +315,7 @@ function DragList({
           state.current.fromIndex = target;
           state.current.startY = ev.clientY;
           setDy(0);
-          haptic(8);
+          haptics.selection();
         }
 
         // Edge auto-scroll
@@ -342,7 +342,7 @@ function DragList({
         state.current.active = true;
         setActiveId(id);
         setOrder(ids);
-        haptic(18);
+        haptics.longPress();
       }, 380);
     },
     [finish, list],

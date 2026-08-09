@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { haptics } from "@/lib/haptics";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Variant = "primary" | "ghost" | "outline" | "danger";
@@ -31,6 +32,10 @@ export function IconButton({
   };
   return (
     <button
+      onClick={(e) => {
+        if (!props.disabled) variant === "danger" ? haptics.impact() : haptics.tap();
+        props.onClick?.(e);
+      }}
       className={cn(
         "pressable inline-flex items-center justify-center",
         variant === "ghost" && "text-muted-foreground hover:text-foreground",
@@ -63,6 +68,10 @@ export function ActionButton({
   };
   return (
     <button
+      onClick={(e) => {
+        if (!props.disabled) variant === "danger" ? haptics.impact() : haptics.tap();
+        props.onClick?.(e);
+      }}
       className={cn(
         "pressable inline-flex items-center justify-center gap-2 font-medium tracking-tight",
         sizes[size],
@@ -84,6 +93,10 @@ export function Fab({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }) {
   return (
     <button
+      onClick={(e) => {
+        if (!props.disabled) haptics.tap();
+        props.onClick?.(e);
+      }}
       className={cn(
         "pressable inline-flex h-12 w-12 items-center justify-center rounded-full gradient-primary text-primary-foreground shadow-[var(--shadow-glow)] ring-1 ring-white/15 active:scale-95",
         className,

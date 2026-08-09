@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { haptics } from "@/lib/haptics";
 import {
   Plus,
   ChevronRight,
@@ -123,6 +124,7 @@ function LearnPage() {
       const raw = String(reader.result ?? "");
       const result = parseImportJSON(raw);
       if (!result.ok) {
+        haptics.error();
         toast.error("Import failed", { description: result.error });
         return;
       }
@@ -131,7 +133,10 @@ function LearnPage() {
       const first = result.file.roadmaps[0];
       checkDuplicate(first);
     };
-    reader.onerror = () => toast.error("Could not read file");
+    reader.onerror = () => {
+      haptics.error();
+      toast.error("Could not read file");
+    };
     reader.readAsText(file);
   }
 

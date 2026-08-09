@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { haptics } from "@/lib/haptics";
 import { useKeyboardInset, useScrollFocusedIntoView } from "@/hooks/use-keyboard-inset";
 import {
   useDismissOnEscape,
@@ -151,6 +152,11 @@ export function ConfirmDialog({
   useDismissOnEscape(open, isTop, onClose);
   useFocusTrap(surfaceRef, open);
 
+  // Destructive confirmations announce themselves tactilely, exactly once.
+  useEffect(() => {
+    if (open && destructive) haptics.warning();
+  }, [open, destructive]);
+
   if (!open) return null;
 
   return (
@@ -188,6 +194,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={() => {
+                haptics.impact();
                 onConfirm();
                 onClose();
               }}

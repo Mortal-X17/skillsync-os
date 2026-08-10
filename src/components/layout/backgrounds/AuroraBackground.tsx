@@ -27,10 +27,10 @@ export type AuroraLayer = {
 
 /** purple → blue → teal → green, blended by overlap. */
 export const AURORA_LAYERS: AuroraLayer[] = [
-  { speed: 0.08, opacity: 0.35, blur: 80, scale: 1.4, direction: "left", color: "var(--aurora-1)", amp: 12, phase: 0 },
-  { speed: 0.12, opacity: 0.25, blur: 120, scale: 1.6, direction: "right", color: "var(--aurora-2)", amp: 15, phase: 1.7 },
-  { speed: 0.06, opacity: 0.2, blur: 160, scale: 1.8, direction: "left", color: "var(--aurora-3)", amp: 10, phase: 3.1 },
-  { speed: 0.15, opacity: 0.18, blur: 200, scale: 2, direction: "right", color: "var(--aurora-4)", amp: 18, phase: 4.6 },
+  { speed: 0.08, opacity: 0.6, blur: 80, scale: 1.4, direction: "left", color: "var(--aurora-1)", amp: 12, phase: 0 },
+  { speed: 0.12, opacity: 0.5, blur: 120, scale: 1.6, direction: "right", color: "var(--aurora-2)", amp: 15, phase: 1.7 },
+  { speed: 0.06, opacity: 0.42, blur: 160, scale: 1.8, direction: "left", color: "var(--aurora-3)", amp: 10, phase: 3.1 },
+  { speed: 0.15, opacity: 0.38, blur: 200, scale: 2, direction: "right", color: "var(--aurora-4)", amp: 18, phase: 4.6 },
 ];
 
 function lightGradient(rgb: string) {

@@ -120,8 +120,8 @@ body {
   --aurora-blur-2: 180px;
   --aurora-blur-3: 130px;
   --aurora-sheen: 0.045;
-  --aurora-core: rgba(0, 0, 0, 0.5);
-  --aurora-vignette: rgba(0, 0, 0, 0.55);
+  --aurora-core: rgba(0, 0, 0, 0.28);
+  --aurora-vignette: rgba(0, 0, 0, 0.42);
   --aurora-noise: 0.03;
   --aurora-strength: 1;
   --overlay-tint: 255, 255, 255;

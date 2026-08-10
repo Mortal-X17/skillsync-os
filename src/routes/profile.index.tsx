@@ -35,6 +35,7 @@ import {
   type BackgroundStyle,
 } from "@/components/layout/backgrounds";
 import { THEME_OPTIONS } from "@/hooks/use-theme";
+import { AuroraSpeedControl } from "@/components/layout/backgrounds/AuroraSpeedControl";
 import { haptics, hapticsSupported, type HapticIntensity } from "@/lib/haptics";
 
 
@@ -733,6 +734,10 @@ function ProfilePage() {
               </button>
             );
           })}
+        </div>
+
+        <div className="mt-5 rounded-[18px] border border-border bg-white/[0.03] p-4">
+          <AuroraSpeedControl />
         </div>
       </BottomSheet>
 

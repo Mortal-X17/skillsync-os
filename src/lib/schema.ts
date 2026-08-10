@@ -134,8 +134,6 @@ export const PreferencesSchema = z.object({
   /** Tactile feedback on supported devices. */
   haptics: z.boolean().default(true),
   hapticIntensity: z.enum(["light", "standard", "strong"]).default("standard"),
-  /** Aurora animation speed multiplier (0.02 – 0.35). Normal = 0.12. */
-  auroraSpeed: z.number().min(0.02).max(0.35).default(0.12),
 });
 
 
@@ -196,7 +194,7 @@ export const AppDataSchema = z.object({
     theme: "dark",
     haptics: true,
     hapticIntensity: "standard",
-    auroraSpeed: 0.12,
+
   }),
   stats: StatsSchema.default({ xp: 0, level: 1, streak: 0, lastActive: "" }),
   attendance: AttendanceSchema.default({ subjects: [] }),

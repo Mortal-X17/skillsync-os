@@ -66,10 +66,6 @@ export function migrate(input: unknown): AppData {
     background: "aurora",
     theme: "dark",
     ...(data.preferences ?? {}),
-    auroraSpeed:
-      typeof (data.preferences ?? {}).auroraSpeed === "number"
-        ? (data.preferences ?? {}).auroraSpeed
-        : 0.12,
     modules: {
       attendance: false,
       expenses: false,

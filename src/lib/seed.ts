@@ -184,6 +184,7 @@ export function createInitialData(): AppData {
       theme: "dark",
       haptics: true,
       hapticIntensity: "standard",
+      auroraSpeed: 0.12,
 
     },
     stats: { xp: 0, level: 1, streak: 0, lastActive: "" },

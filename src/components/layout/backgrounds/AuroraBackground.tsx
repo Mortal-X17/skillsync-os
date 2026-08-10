@@ -1,89 +1,149 @@
+import { useEffect, useRef } from "react";
+import { useAppStore } from "@/store/useAppStore";
 import { NOISE, BASE_LAYER_CLASS } from "./shared";
 
 /**
- * Animated Aurora — 5 layers of quiet energy.
- * 1) matte base  2) three drifting light sources  3) noise
- * 4) radial glow 5) vignette
+ * Animated Aurora — a requestAnimationFrame driven, multi-layered light field.
  *
- * Only transform/opacity animate, so the compositor does all the work.
+ * Four large blurred light sources drift in different directions at different
+ * speeds to create depth. Only transform / opacity are animated, so the
+ * compositor does all the work. Speed is user controlled (Theme → Aurora
+ * Speed) and applied instantly through a ref, without remounting layers.
  */
-const CSS = `
-@keyframes ss-aurora-a {
-  0%,100% { transform: translate3d(-8%, -6%, 0) scale(1) rotate(0deg); }
-  33%     { transform: translate3d(6%, 4%, 0) scale(1.14) rotate(6deg); }
-  66%     { transform: translate3d(-3%, 9%, 0) scale(1.06) rotate(-4deg); }
-}
-@keyframes ss-aurora-b {
-  0%,100% { transform: translate3d(10%, 8%, 0) scale(1.08) rotate(0deg); }
-  50%     { transform: translate3d(-8%, -6%, 0) scale(1) rotate(-8deg); }
-}
-@keyframes ss-aurora-c {
-  0%,100% { transform: translate3d(-4%, 4%, 0) scale(0.96) rotate(0deg); }
-  40%     { transform: translate3d(8%, -8%, 0) scale(1.2) rotate(10deg); }
-  75%     { transform: translate3d(-6%, -2%, 0) scale(1.05) rotate(4deg); }
-}
-@keyframes ss-aurora-breathe {
-  0%,100% { opacity: 0.85; }
-  50%     { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ss-aurora-blob { animation: none !important; }
-}
-`;
 
-/** Soft centre, slightly brighter mid-edge → readable focal points. */
-function lightGradient(rgb: string, mid = 0.55) {
-  return `radial-gradient(circle at 50% 50%, rgba(${rgb},0.42) 0%, rgba(${rgb},0.72) ${mid * 100}%, rgba(${rgb},0.28) ${mid * 100 + 18}%, transparent 76%)`;
+export type AuroraLayer = {
+  /** Base radians per second (multiplied by the user speed multiplier). */
+  speed: number;
+  opacity: number;
+  blur: number;
+  scale: number;
+  direction: "left" | "right";
+  /** `rgb` triplet token for the layer colour. */
+  color: string;
+  /** Drift amplitude in % of the viewport. */
+  amp: number;
+  phase: number;
+};
+
+/** purple → blue → teal → green, blended by overlap. */
+export const AURORA_LAYERS: AuroraLayer[] = [
+  { speed: 0.08, opacity: 0.6, blur: 80, scale: 1.4, direction: "left", color: "var(--aurora-1)", amp: 12, phase: 0 },
+  { speed: 0.12, opacity: 0.5, blur: 120, scale: 1.6, direction: "right", color: "var(--aurora-2)", amp: 15, phase: 1.7 },
+  { speed: 0.06, opacity: 0.42, blur: 160, scale: 1.8, direction: "left", color: "var(--aurora-3)", amp: 10, phase: 3.1 },
+  { speed: 0.15, opacity: 0.38, blur: 200, scale: 2, direction: "right", color: "var(--aurora-4)", amp: 18, phase: 4.6 },
+];
+
+function lightGradient(rgb: string) {
+  return `radial-gradient(circle at 50% 50%, rgba(${rgb},0.55) 0%, rgba(${rgb},0.78) 42%, rgba(${rgb},0.34) 62%, transparent 78%)`;
+}
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    !!window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/**
+ * The animated light layers. Used full-screen as the app background and, at a
+ * smaller size, as the live preview inside the Aurora Speed control.
+ */
+export function AuroraField({
+  speed,
+  scale = 1,
+  className,
+}: {
+  /** User speed multiplier, e.g. 0.12 for Normal. */
+  speed: number;
+  /** Shrinks blur / size for small previews. */
+  scale?: number;
+  className?: string;
+}) {
+  const nodes = useRef<(HTMLDivElement | null)[]>([]);
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
+
+  useEffect(() => {
+    const reduced = prefersReducedMotion();
+    let raf = 0;
+    let last = performance.now();
+    const t = AURORA_LAYERS.map((l) => l.phase);
+
+    const paint = () => {
+      for (let i = 0; i < AURORA_LAYERS.length; i++) {
+        const l = AURORA_LAYERS[i]!;
+        const el = nodes.current[i];
+        if (!el) continue;
+        const p = t[i]!;
+        const dir = l.direction === "left" ? -1 : 1;
+        const x = Math.sin(p) * l.amp * dir;
+        const y = Math.cos(p * 0.72) * l.amp * 0.55;
+        const s = l.scale * (1 + Math.sin(p * 0.5) * 0.06);
+        const o = l.opacity * (0.82 + 0.18 * (0.5 + 0.5 * Math.sin(p * 0.83)));
+        el.style.transform = `translate3d(${x}%, ${y}%, 0) scale(${s}) rotate(${Math.sin(p * 0.4) * 8 * dir}deg)`;
+        el.style.opacity = String(o);
+      }
+    };
+
+    const tick = (now: number) => {
+      const dt = Math.min(now - last, 50) / 1000;
+      last = now;
+      // Slow to a crawl when the tab is hidden, and honour reduced motion.
+      const mult = document.hidden ? 0 : reduced ? 0.15 : 1;
+      if (mult > 0) {
+        for (let i = 0; i < t.length; i++) {
+          t[i] = (t[i]! + dt * AURORA_LAYERS[i]!.speed * speedRef.current * 12) % (Math.PI * 200);
+        }
+        paint();
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    paint();
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div
+      className={"absolute inset-0 overflow-hidden " + (className ?? "")}
+      style={{ opacity: "var(--aurora-strength, 1)" }}
+    >
+      {AURORA_LAYERS.map((l, i) => (
+        <div
+          key={i}
+          ref={(el) => {
+            nodes.current[i] = el;
+          }}
+          className="absolute rounded-full"
+          style={{
+            left: i % 2 === 0 ? "-24%" : "22%",
+            top: i < 2 ? "-26%" : "18%",
+            height: `${70 + i * 8}%`,
+            width: `${80 + i * 6}%`,
+            background: lightGradient(l.color),
+            filter: `blur(${Math.max(24, l.blur * scale)}px)`,
+            opacity: l.opacity,
+            mixBlendMode: "screen",
+            willChange: "transform, opacity",
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export function AuroraBackground() {
+  const speed = useAppStore((s) => s.preferences.auroraSpeed) ?? 0.12;
+
   return (
     <div
       aria-hidden="true"
       className={BASE_LAYER_CLASS}
       style={{ backgroundColor: "var(--bg-base)", contain: "strict" }}
     >
-      <style>{CSS}</style>
-
-      {/* Light source 1 — upper left */}
-      <div
-        className="ss-aurora-blob absolute left-[-28%] top-[-22%] h-[78vh] w-[78vh] rounded-full"
-        style={{
-          background: lightGradient("var(--aurora-1)", 0.5),
-          filter: "blur(var(--aurora-blur-1, 150px))",
-          opacity: "var(--aurora-op-1)",
-          animation:
-            "ss-aurora-a 58s cubic-bezier(0.45,0,0.55,1) infinite, ss-aurora-breathe 21s ease-in-out infinite",
-          willChange: "transform, opacity",
-          transform: "translateZ(0)",
-        }}
-      />
-      {/* Light source 2 — lower right */}
-      <div
-        className="ss-aurora-blob absolute bottom-[-32%] right-[-30%] h-[92vh] w-[92vh] rounded-full"
-        style={{
-          background: lightGradient("var(--aurora-2)", 0.52),
-          filter: "blur(var(--aurora-blur-2, 180px))",
-          opacity: "var(--aurora-op-2)",
-          animation:
-            "ss-aurora-b 82s cubic-bezier(0.45,0,0.55,1) infinite, ss-aurora-breathe 27s ease-in-out infinite",
-          willChange: "transform, opacity",
-          transform: "translateZ(0)",
-        }}
-      />
-      {/* Light source 3 — centre */}
-      <div
-        className="ss-aurora-blob absolute left-1/2 top-1/2 h-[62vh] w-[62vh] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{
-          background: lightGradient("var(--aurora-3)", 0.46),
-          filter: "blur(var(--aurora-blur-3, 130px))",
-          opacity: "var(--aurora-op-3)",
-          animation:
-            "ss-aurora-c 47s cubic-bezier(0.45,0,0.55,1) infinite, ss-aurora-breathe 17s ease-in-out infinite",
-          willChange: "transform, opacity",
-          transform: "translateZ(0)",
-        }}
-      />
+      <AuroraField speed={speed} />
 
       {/* grain */}
       <div
@@ -95,7 +155,7 @@ export function AuroraBackground() {
           mixBlendMode: "overlay",
         }}
       />
-      {/* radial glow / ambient core for contrast under content */}
+      {/* ambient core for contrast under content */}
       <div
         className="absolute inset-0"
         style={{

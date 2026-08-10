@@ -111,7 +111,8 @@ body {
   --bg-base: #050507;
   --aurora-1: 139, 92, 246; /* purple */
   --aurora-2: 37, 99, 235; /* blue */
-  --aurora-3: 34, 211, 238; /* cyan */
+  --aurora-3: 45, 212, 191; /* teal */
+  --aurora-4: 34, 197, 94; /* green */
   --aurora-op-1: 0.13;
   --aurora-op-2: 0.1;
   --aurora-op-3: 0.075;
@@ -119,9 +120,10 @@ body {
   --aurora-blur-2: 180px;
   --aurora-blur-3: 130px;
   --aurora-sheen: 0.045;
-  --aurora-core: rgba(0, 0, 0, 0.5);
-  --aurora-vignette: rgba(0, 0, 0, 0.55);
+  --aurora-core: rgba(0, 0, 0, 0.28);
+  --aurora-vignette: rgba(0, 0, 0, 0.42);
   --aurora-noise: 0.03;
+  --aurora-strength: 1;
   --overlay-tint: 255, 255, 255;
 
   color-scheme: dark;
@@ -169,7 +171,8 @@ html.light body {
   --bg-base: #fbfbfe;
   --aurora-1: 99, 102, 241; /* indigo */
   --aurora-2: 167, 139, 250; /* soft violet */
-  --aurora-3: 148, 163, 184; /* silver */
+  --aurora-3: 45, 212, 191; /* teal */
+  --aurora-4: 129, 199, 132; /* soft green */
   --aurora-op-1: 0.075;
   --aurora-op-2: 0.06;
   --aurora-op-3: 0.045;
@@ -177,6 +180,7 @@ html.light body {
   --aurora-core: rgba(255, 255, 255, 0.55);
   --aurora-vignette: rgba(148, 163, 184, 0.22);
   --aurora-noise: 0.018;
+  --aurora-strength: 0.55;
   --overlay-tint: 17, 24, 39;
 
   color-scheme: light;

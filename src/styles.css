@@ -123,6 +123,7 @@ body {
   --aurora-core: rgba(0, 0, 0, 0.5);
   --aurora-vignette: rgba(0, 0, 0, 0.55);
   --aurora-noise: 0.03;
+  --aurora-strength: 1;
   --overlay-tint: 255, 255, 255;
 
   color-scheme: dark;
@@ -179,6 +180,7 @@ html.light body {
   --aurora-core: rgba(255, 255, 255, 0.55);
   --aurora-vignette: rgba(148, 163, 184, 0.22);
   --aurora-noise: 0.018;
+  --aurora-strength: 0.55;
   --overlay-tint: 17, 24, 39;
 
   color-scheme: light;

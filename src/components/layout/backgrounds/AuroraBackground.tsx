@@ -106,7 +106,10 @@ export function AuroraField({
   }, []);
 
   return (
-    <div className={"absolute inset-0 overflow-hidden " + (className ?? "")}>
+    <div
+      className={"absolute inset-0 overflow-hidden " + (className ?? "")}
+      style={{ opacity: "var(--aurora-strength, 1)" }}
+    >
       {AURORA_LAYERS.map((l, i) => (
         <div
           key={i}

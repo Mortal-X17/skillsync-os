@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { AppBackground } from "@/components/layout/backgrounds";
-import { Splash } from "@/components/layout/Splash";
+import { AppLaunchScreen } from "@/components/layout/AppLaunchScreen";
 import { NotificationRunner } from "@/components/notifications/NotificationRunner";
 import { ThemeManager } from "@/hooks/use-theme";
 
@@ -159,7 +159,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeManager />
       <AppBackground />
-      <Splash />
+      <AppLaunchScreen />
       <NotificationRunner />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />

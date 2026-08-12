@@ -179,15 +179,28 @@ export function AuroraBackground() {
     >
       <style>{CSS}</style>
 
-      {/* deep sky gradient — keeps the lower half dark and empty */}
+      {/* deep sky gradient — dark but never flat black at the bottom */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, #060a16 0%, #04060f 45%, #020308 100%)",
+            "linear-gradient(to bottom, #070c1a 0%, #05081360 42%, #060a18 78%, #070b19 100%)",
           opacity: "var(--aurora-sky, 1)",
         }}
       />
+      {/* horizon glow — removes the dead black patch near the bottom */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[46vh]"
+        style={{
+          background:
+            "radial-gradient(90% 100% at 50% 100%, rgba(59,74,180,0.22) 0%, rgba(30,41,120,0.12) 45%, transparent 80%)",
+          filter: "blur(40px)",
+          opacity: "var(--aurora-haze, 0.85)",
+          animation: "ss-glow-breathe 28s ease-in-out infinite",
+          willChange: "opacity",
+        }}
+      />
+
 
       {/* stars */}
       <div

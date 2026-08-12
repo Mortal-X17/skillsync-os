@@ -122,6 +122,10 @@ body {
   --aurora-core: rgba(0, 0, 0, 0.5);
   --aurora-vignette: rgba(0, 0, 0, 0.55);
   --aurora-noise: 0.03;
+  --aurora-sky: 1;
+  --aurora-stars: 0.6;
+  --aurora-stars-2: 0.3;
+  --aurora-haze: 0.9;
   --overlay-tint: 255, 255, 255;
 
   color-scheme: dark;
@@ -177,6 +181,10 @@ html.light body {
   --aurora-core: rgba(255, 255, 255, 0.55);
   --aurora-vignette: rgba(148, 163, 184, 0.22);
   --aurora-noise: 0.018;
+  --aurora-sky: 0;
+  --aurora-stars: 0;
+  --aurora-stars-2: 0;
+  --aurora-haze: 0.3;
   --overlay-tint: 17, 24, 39;
 
   color-scheme: light;

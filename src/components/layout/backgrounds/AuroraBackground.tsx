@@ -166,7 +166,7 @@ const STAR_FIELD = [
 ]
   .map(
     (p) =>
-      `radial-gradient(1.4px 1.4px at ${p}, rgba(226,240,255,0.9) 0%, transparent 100%)`,
+      `radial-gradient(1.1px 1.1px at ${p}, rgba(226,240,255,0.9) 0%, transparent 100%)`,
   )
   .join(",");
 

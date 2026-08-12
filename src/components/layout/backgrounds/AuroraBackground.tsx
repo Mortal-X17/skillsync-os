@@ -179,15 +179,28 @@ export function AuroraBackground() {
     >
       <style>{CSS}</style>
 
-      {/* deep sky gradient — keeps the lower half dark and empty */}
+      {/* deep sky gradient — dark but never flat black at the bottom */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, #060a16 0%, #04060f 45%, #020308 100%)",
+            "linear-gradient(to bottom, #070c1a 0%, #050813 42%, #060a18 78%, #070b19 100%)",
           opacity: "var(--aurora-sky, 1)",
         }}
       />
+      {/* horizon glow — removes the dead black patch near the bottom */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[46vh]"
+        style={{
+          background:
+            "radial-gradient(90% 100% at 50% 100%, rgba(59,74,180,0.22) 0%, rgba(30,41,120,0.12) 45%, transparent 80%)",
+          filter: "blur(40px)",
+          opacity: "var(--aurora-haze, 0.85)",
+          animation: "ss-glow-breathe 28s ease-in-out infinite",
+          willChange: "opacity",
+        }}
+      />
+
 
       {/* stars */}
       <div
@@ -289,14 +302,6 @@ export function AuroraBackground() {
         size={230}
         animation="ss-rays-drift-2 67s ease-in-out infinite"
       />
-      <Rays
-        className="left-[-8%] top-[12%] h-[52vh] w-[116%]"
-        hue="180,140,255"
-        opacity={0.14}
-        blur={3}
-        size={90}
-        animation="ss-rays-drift-2 33s ease-in-out infinite"
-      />
 
       {/* grain */}
       <div
@@ -314,7 +319,7 @@ export function AuroraBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 90% at 50% 65%, transparent 30%, var(--aurora-vignette) 88%, var(--aurora-vignette) 100%)",
+            "radial-gradient(130% 100% at 50% 45%, transparent 42%, var(--aurora-vignette) 95%, var(--aurora-vignette) 100%)",
         }}
       />
     </div>

@@ -191,7 +191,8 @@ html.light body {
 }
 
 html {
-  background: var(--background);
+  background: var(--bg-base);
+  -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
   transition:
     background-color 300ms var(--ease-out-soft),
@@ -200,6 +201,7 @@ html {
 
 body {
   background: transparent;
+  text-size-adjust: 100%;
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

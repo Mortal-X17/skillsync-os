@@ -16,9 +16,9 @@ export const BACKGROUND_OPTIONS: {
   {
     id: "aurora",
     label: "Animated Aurora",
-    description: "Slow drifting purple, indigo and royal blue light clouds.",
+    description: "Flowing northern-lights ribbons and rays over a starlit night sky.",
     swatch:
-      "radial-gradient(60% 60% at 25% 25%, rgba(139,92,246,0.28), transparent 70%), radial-gradient(60% 60% at 80% 70%, rgba(37,99,235,0.26), transparent 70%), #09090b",
+      "linear-gradient(105deg, transparent 12%, rgba(167,110,255,0.55) 30%, rgba(96,165,250,0.5) 50%, transparent 72%), linear-gradient(95deg, transparent 20%, rgba(103,232,249,0.4) 48%, transparent 78%), radial-gradient(90% 100% at 50% 100%, rgba(59,74,180,0.35), transparent 75%), linear-gradient(to bottom, #070c1a, #060a18)",
   },
   {
     id: "gradient",

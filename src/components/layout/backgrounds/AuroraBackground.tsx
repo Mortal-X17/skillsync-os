@@ -184,7 +184,7 @@ export function AuroraBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, #070c1a 0%, #05081360 42%, #060a18 78%, #070b19 100%)",
+            "linear-gradient(to bottom, #070c1a 0%, #050813 42%, #060a18 78%, #070b19 100%)",
           opacity: "var(--aurora-sky, 1)",
         }}
       />
@@ -302,14 +302,6 @@ export function AuroraBackground() {
         size={230}
         animation="ss-rays-drift-2 67s ease-in-out infinite"
       />
-      <Rays
-        className="left-[-8%] top-[12%] h-[52vh] w-[116%]"
-        hue="180,140,255"
-        opacity={0.14}
-        blur={3}
-        size={90}
-        animation="ss-rays-drift-2 33s ease-in-out infinite"
-      />
 
       {/* grain */}
       <div
@@ -327,7 +319,7 @@ export function AuroraBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 90% at 50% 65%, transparent 30%, var(--aurora-vignette) 88%, var(--aurora-vignette) 100%)",
+            "radial-gradient(130% 100% at 50% 45%, transparent 42%, var(--aurora-vignette) 95%, var(--aurora-vignette) 100%)",
         }}
       />
     </div>

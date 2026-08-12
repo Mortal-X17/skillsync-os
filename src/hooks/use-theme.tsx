@@ -34,7 +34,7 @@ export const THEME_OPTIONS: {
 ];
 
 const THEME_COLOR: Record<ResolvedTheme, string> = {
-  dark: "#050507",
+  dark: "#070b19",
   light: "#f8f9fc",
 };
 

@@ -323,7 +323,7 @@ export function AuroraBackground() {
           background:
             "linear-gradient(to right, transparent 0%, rgba(147,89,255,0.26) 20%, rgba(96,165,250,0.30) 48%, rgba(103,232,249,0.24) 74%, transparent 100%)",
           filter: "blur(70px)",
-          opacity: 0.85,
+          opacity: 0.62,
           animation:
             "ss-core-drift 14s ease-in-out infinite, ss-glow-breathe 9s ease-in-out infinite",
           willChange: "transform, opacity",
@@ -337,8 +337,8 @@ export function AuroraBackground() {
       <CurtainFolds
         className="left-[-22%] top-[-4%] h-[48vh] w-[145%]"
         hue="167,110,255"
-        opacity={0.42}
-        blur={13}
+        opacity={0.5}
+        blur={11}
         size={116}
         animation="ss-curtain-sway 11s ease-in-out infinite, ss-glow-breathe 8s ease-in-out infinite"
       />
@@ -346,8 +346,8 @@ export function AuroraBackground() {
       <CurtainFolds
         className="left-[-18%] top-[0%] h-[44vh] w-[140%]"
         hue="96,165,250"
-        opacity={0.4}
-        blur={10}
+        opacity={0.46}
+        blur={8}
         size={74}
         animation="ss-curtain-sway-2 9s ease-in-out infinite, ss-glow-breathe 6.5s ease-in-out infinite"
       />
@@ -355,8 +355,8 @@ export function AuroraBackground() {
       <CurtainFolds
         className="left-[-14%] top-[4%] h-[38vh] w-[130%]"
         hue="130,240,255"
-        opacity={0.3}
-        blur={7}
+        opacity={0.36}
+        blur={5}
         size={48}
         animation="ss-curtain-sway 8s ease-in-out 1s infinite"
       />
@@ -366,7 +366,7 @@ export function AuroraBackground() {
         core="rgba(214,238,255,0.9)"
         glow="rgba(96,165,250,0.3)"
         blur={9}
-        opacity={0.62}
+        opacity={0.5}
         animation="ss-core-drift 10s ease-in-out infinite, ss-glow-breathe 7s ease-in-out infinite"
       />
       {/* thin high-energy highlight */}

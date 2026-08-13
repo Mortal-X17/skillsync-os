@@ -16,10 +16,12 @@ export const BACKGROUND_OPTIONS: {
   {
     id: "aurora",
     label: "Animated Aurora",
-    description: "Flowing northern-lights ribbons and rays over a starlit night sky.",
+    description:
+      "A flowing northern-lights curtain with light glares over a starlit sky.",
     swatch:
-      "linear-gradient(105deg, transparent 12%, rgba(167,110,255,0.55) 30%, rgba(96,165,250,0.5) 50%, transparent 72%), linear-gradient(95deg, transparent 20%, rgba(103,232,249,0.4) 48%, transparent 78%), radial-gradient(90% 100% at 50% 100%, rgba(59,74,180,0.35), transparent 75%), linear-gradient(to bottom, #070c1a, #060a18)",
+      "repeating-linear-gradient(96deg, transparent 0 10px, rgba(167,110,255,0.35) 13px, transparent 17px 26px), repeating-linear-gradient(88deg, transparent 0 7px, rgba(130,240,255,0.28) 9px, transparent 12px 19px), linear-gradient(100deg, transparent 8%, rgba(147,89,255,0.5) 28%, rgba(96,165,250,0.55) 52%, rgba(103,232,249,0.4) 72%, transparent 92%), radial-gradient(90% 100% at 50% 100%, rgba(59,74,180,0.35), transparent 75%), linear-gradient(to bottom, #070c1a, #060a18)",
   },
+
   {
     id: "gradient",
     label: "Minimal Gradient",

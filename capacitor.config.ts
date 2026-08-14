@@ -3,7 +3,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 const config: CapacitorConfig = {
   appId: "com.skillsync.os",
   appName: "SkillSync",
-  webDir: ".output/public",
+  webDir: "dist/client",
   server: {
     androidScheme: "https",
   },

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SkillSync</string>
+    <string name="title_activity_main">SkillSync</string>
+    <string name="package_name">com.skillsync.os</string>
+    <string name="custom_url_scheme">com.skillsync.os</string>
+</resources>

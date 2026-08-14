@@ -1,73 +1,147 @@
-# SkillSync — Build the Android APK
+# SkillSync → Android APK
 
-This project is packaged with **Capacitor**. You build the web app once, then
-wrap it in a native Android shell to get an installable `.apk`.
+SkillSync ships as a **fully offline** Android app. The web app is built into a
+static bundle, the bundle is packaged inside a native shell (Capacitor), and the
+result is an installable `.apk`. No server, no network, no cloud.
 
-## One-time setup on your machine
+Everything below is already wired up in this repo:
 
-You need:
+```
+scripts/build-mobile.mjs        builds the offline bundle (dist/client)
+capacitor.config.ts             native app id / name / webDir
+android/                        the native Android project (committed)
+android/app/build.gradle        version + release signing (reads secrets)
+.github/workflows/android.yml   cloud build pipeline → downloadable APK
+```
 
-1. **Node.js 20+** and **bun** (or npm).
-2. **Android Studio** (bundles the Android SDK + Java + Gradle).
-   Download → <https://developer.android.com/studio>
-3. During Android Studio setup, accept the SDK licenses when prompted.
+---
 
-## Build steps
+## Option A — Build in the cloud (recommended, nothing to install)
 
-From the project root:
+### 1. Push this project to GitHub
+
+In Lovable: **Plus (+) menu → GitHub → Connect**, then push.
+
+### 2. Create your signing key (once, on your own machine)
+
+The key identifies you as the publisher. **Keep it forever** — every future
+update must be signed with the same key or Android refuses to install it.
 
 ```bash
-# 1) Install deps (already done in Lovable)
+keytool -genkey -v -keystore skillsync-release.jks \
+  -alias skillsync -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Store the file and the two passwords in a password manager. Then encode it:
+
+```bash
+# macOS
+base64 -i skillsync-release.jks | pbcopy
+# Linux
+base64 -w0 skillsync-release.jks
+```
+
+### 3. Add four GitHub secrets
+
+Repo → **Settings → Secrets and variables → Actions → New repository secret**:
+
+| Secret | Value |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | the base64 string from step 2 |
+| `ANDROID_KEYSTORE_PASSWORD` | keystore password |
+| `ANDROID_KEY_ALIAS` | `skillsync` |
+| `ANDROID_KEY_PASSWORD` | key password |
+
+If you skip this, builds still work — you just get an **unsigned** release APK
+(fine for testing, not for sharing).
+
+### 4. Build
+
+- **Actions → Android APK → Run workflow** (optionally set version name/code), or
+- push a tag to also create a GitHub Release with the APK attached:
+
+  ```bash
+  git tag v1.0.0 && git push origin v1.0.0
+  ```
+
+When it finishes, download `skillsync-apk-<version>` from the run's
+**Artifacts** section. It contains:
+
+- `SkillSync-<version>-release.apk` → install this one
+- `SkillSync-<version>-debug.apk` → for debugging
+
+### 5. Install on your phone
+
+Copy the APK to the device, tap it, and allow *"Install unknown apps"* for
+your file manager / browser when prompted.
+
+---
+
+## Option B — Build locally
+
+Requires **Node 20+**, **JDK 21**, and the **Android SDK**
+(easiest via [Android Studio](https://developer.android.com/studio)).
+
+```bash
 bun install
 
-# 2) Build the web app (outputs static files to .output/public)
-bun run build
+# Debug APK (unsigned, installable, quickest)
+bun run android:apk
+# → android/app/build/outputs/apk/debug/app-debug.apk
 
-# 3) Add the Android platform (first time only)
-bunx cap add android
-
-# 4) Copy the built web app into the Android project
-bunx cap sync android
-
-# 5) Build a debug APK
-cd android
-./gradlew assembleDebug
+# Signed release APK
+#   create android/keystore.properties first (git-ignored):
+#     storeFile=/absolute/path/skillsync-release.jks
+#     storePassword=...
+#     keyAlias=skillsync
+#     keyPassword=...
+bun run android:release
+# → android/app/build/outputs/apk/release/app-release.apk
 ```
 
-Your APK is here:
+Prefer Android Studio? `bun run android:sync && bun run android:open`.
 
-```
-android/app/build/outputs/apk/debug/app-debug.apk
-```
+---
 
-Copy it to your phone and install it (enable "Install unknown apps" for your
-file manager first).
+## Shipping an update
 
-## Updating the app later
+1. Change the code as usual in Lovable and push.
+2. Bump the version — `versionCode` **must increase every time**:
+   - cloud: pass `versionName` / `versionCode` when running the workflow, or push
+     a new `vX.Y.Z` tag (the run number becomes the version code);
+   - local: `ORG_GRADLE_PROJECT_skillsyncVersionName=1.1.0
+     ORG_GRADLE_PROJECT_skillsyncVersionCode=2 bun run android:release`.
+3. Install the new APK over the old one.
 
-Every time you change the code:
+**Your data survives updates.** SkillSync stores everything locally under the
+app id `com.skillsync.os`. Installing a newer, same-signed APK keeps it.
+Uninstalling deletes it — so before anything risky, use
+**Profile → Backup & Restore → Create Backup** and keep the `.json` file.
 
-```bash
-bun run build
-bunx cap sync android
-cd android && ./gradlew assembleDebug
-```
+---
 
-Your data is stored in the app's local storage and **survives updates** as
-long as you keep the same `appId` (`com.skillsync.os`) and don't uninstall.
+## Native shell details
 
-## Release APK (signed)
+| Setting | Value |
+| --- | --- |
+| App id | `com.skillsync.os` |
+| App name | SkillSync |
+| Min / target SDK | 24 / 36 (Android 7 → 16) |
+| Orientation | Portrait |
+| Keyboard | `adjustResize` (pairs with the in-app keyboard-inset handling) |
+| System bars | Transparent, dark content, edge-to-edge |
+| Launch screen | Deep matte `#09090b` + SkillSync mark |
+| Permissions | `INTERNET` (local WebView bridge), `VIBRATE` (haptics), `POST_NOTIFICATIONS` (reminders) |
 
-For a signed release build later:
+Icons and the splash mark are generated from `public/icon-512.png` into
+`android/app/src/main/res/mipmap-*` and `drawable-*`. Replace that file and
+re-generate if the brand mark changes.
 
-1. In Android Studio: `Build → Generate Signed Bundle / APK`
-2. Create a keystore (save it — you need it for every future update).
-3. Choose APK, release variant, sign, and build.
+## Troubleshooting
 
-## Notes
-
-- SkillSync is 100% offline. No cloud dependencies, no network required.
-- All data lives in the WebView's `localStorage`, backed up via the
-  Profile → Backup → **Export** button (produces a `.json` file).
-- To restore on a new device: install the APK, open Profile → Backup →
-  **Import**, and pick the file.
+| Symptom | Fix |
+| --- | --- |
+| White screen after launch | Re-run `bun run android:sync`; `dist/client/index.html` must exist |
+| "App not installed" | A different signing key than the installed build — uninstall first, or reuse the original keystore |
+| Gradle: SDK not found | Open the `android/` folder once in Android Studio and let it install the SDK |
+| Workflow warns "unsigned" | The four GitHub secrets aren't set (see step 3) |

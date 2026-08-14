@@ -11,7 +11,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:mobile": "node scripts/build-mobile.mjs",
-    "android:sync": "node scripts/build-mobile.mjs && bunx cap sync android"
+    "android:sync": "node scripts/build-mobile.mjs && bunx cap sync android",
+    "android:apk": "node scripts/build-mobile.mjs && bunx cap sync android && cd android && ./gradlew assembleDebug",
+    "android:release": "node scripts/build-mobile.mjs && bunx cap sync android && cd android && ./gradlew assembleRelease",
+    "android:open": "bunx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",

@@ -6,26 +6,10 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-/**
- * MOBILE_BUILD=1 switches on TanStack Start's SPA shell output, which emits a
- * static `dist/client/index.html`. That file is what Capacitor packages into
- * the Android APK, so the app boots completely offline from the WebView.
- * The normal web build is untouched.
- */
-const mobileBuild = process.env["MOBILE_BUILD"] === "1";
-
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
-    ...(mobileBuild
-      ? {
-          spa: {
-            enabled: true,
-            prerender: { enabled: true, outputPath: "/index.html", crawlLinks: false },
-          },
-        }
-      : {}),
   },
 });

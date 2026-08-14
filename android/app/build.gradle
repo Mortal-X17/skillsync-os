@@ -1,5 +1,47 @@
 apply plugin: 'com.android.application'
 
+/**
+ * Version source of truth.
+ *
+ * Local builds use the defaults below. CI overrides them per release:
+ *   ORG_GRADLE_PROJECT_skillsyncVersionName=1.2.0
+ *   ORG_GRADLE_PROJECT_skillsyncVersionCode=7
+ * versionCode must strictly increase for every update you install/publish.
+ */
+def skillsyncVersionName = project.findProperty('skillsyncVersionName') ?: '1.0.0'
+def skillsyncVersionCode = (project.findProperty('skillsyncVersionCode') ?: '1') as Integer
+
+/**
+ * Release signing.
+ *
+ * Secrets never live in the repository. Values are read from (in order):
+ *   1. android/keystore.properties  (git-ignored, for local release builds)
+ *   2. environment variables        (GitHub Actions secrets)
+ * When nothing is configured, the release variant simply builds unsigned
+ * instead of failing, so debug workflows keep working.
+ */
+def keystorePropsFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+
+def signingValue = { String propKey, String envKey ->
+    def value = keystoreProps.getProperty(propKey) ?: System.getenv(envKey)
+    return (value == null || value.trim().isEmpty()) ? null : value.trim()
+}
+
+def storeFilePath = signingValue('storeFile', 'ANDROID_KEYSTORE_PATH')
+def storePasswordValue = signingValue('storePassword', 'ANDROID_KEYSTORE_PASSWORD')
+def keyAliasValue = signingValue('keyAlias', 'ANDROID_KEY_ALIAS')
+def keyPasswordValue = signingValue('keyPassword', 'ANDROID_KEY_PASSWORD')
+
+def releaseSigningReady = storeFilePath != null &&
+        storePasswordValue != null &&
+        keyAliasValue != null &&
+        keyPasswordValue != null &&
+        file(storeFilePath).exists()
+
 android {
     namespace = "com.skillsync.os"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +49,8 @@ android {
         applicationId "com.skillsync.os"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode skillsyncVersionCode
+        versionName skillsyncVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +58,27 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (releaseSigningReady) {
+            release {
+                storeFile file(storeFilePath)
+                storePassword storePasswordValue
+                keyAlias keyAliasValue
+                keyPassword keyPasswordValue
+                enableV1Signing true
+                enableV2Signing true
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (releaseSigningReady) {
+                signingConfig signingConfigs.release
+            } else {
+                println "SkillSync: no release keystore configured — building an UNSIGNED release APK."
+            }
         }
     }
 }

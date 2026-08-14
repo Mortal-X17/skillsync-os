@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build:mobile": "node scripts/build-mobile.mjs",
+    "android:sync": "node scripts/build-mobile.mjs && bunx cap sync android"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",

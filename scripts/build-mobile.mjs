@@ -90,7 +90,7 @@ if (!html.includes("<html")) {
 
 // The APK has no server: drop the remote font stylesheet so the first paint
 // never waits on the network. System fallbacks are already declared in CSS.
-html = html.replace(/<link[^>]+fonts\.googleapis\.com[^>]*>/g, "");
+html = html.replace(/<link[^>]+fonts\.(?:googleapis|gstatic)\.com[^>]*>/g, "");
 
 /* ------------------ 3. normalise everything into dist/client -------------- */
 

@@ -20,7 +20,6 @@ import {
 } from "@/lib/notifications/types";
 import {
   PERMISSION_COPY,
-  getPermission,
   refreshPermission,
   requestPermission,
   type PermissionState,
@@ -466,6 +465,13 @@ function NotificationSettingsPage() {
                     </span>
                   </div>
                 ))}
+                {env.native ? (
+                  <p className="pt-1 text-[12px] text-muted-foreground">
+                    {env.scheduledCount ?? 0} reminder
+                    {env.scheduledCount === 1 ? "" : "s"} armed at the OS level
+                    {env.androidSdk ? ` · Android API ${env.androidSdk}` : ""}
+                  </p>
+                ) : null}
                 {env.error ? (
                   <p className="pt-1 text-[12px] text-amber-400">{env.error}</p>
                 ) : null}

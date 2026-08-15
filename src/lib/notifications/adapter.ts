@@ -4,6 +4,7 @@ import type {
 } from "./types";
 import { getPermission } from "./permission";
 import { getRegistration } from "./sw";
+import { hasNativeBridge, nativeBridge, type NativeRepeat } from "@/lib/native/bridge";
 
 /**
  * Delivery adapter interface. The web adapter shows notifications while the
@@ -22,7 +23,7 @@ export type NotificationAdapter = {
 /** Delivery result with the exact path taken — used by diagnostics/logs. */
 export type DeliveryResult = {
   ok: boolean;
-  via: "serviceWorker" | "constructor" | "none";
+  via: "native" | "serviceWorker" | "constructor" | "none";
   error: string | null;
 };
 
@@ -37,6 +38,29 @@ export async function deliver(item: NotificationItem): Promise<DeliveryResult> {
   if (typeof window === "undefined") {
     return { ok: false, via: "none", error: "no window" };
   }
+
+  // Android APK: post through the native NotificationManager.
+  const bridge = nativeBridge();
+  if (bridge) {
+    try {
+      const result = await bridge.notify({
+        id: item.sourceId ?? item.id,
+        title: item.title,
+        body: item.body,
+        url: item.action?.kind === "route" ? item.action.to : "/notifications",
+        priority: item.priority,
+      });
+      if (result?.ok) return { ok: true, via: "native", error: null };
+      return { ok: false, via: "none", error: "native notification rejected" };
+    } catch (e) {
+      return {
+        ok: false,
+        via: "none",
+        error: e instanceof Error ? e.message : String(e),
+      };
+    }
+  }
+
   if (getPermission() !== "granted") {
     return { ok: false, via: "none", error: "permission not granted" };
   }
@@ -101,19 +125,61 @@ const noopAdapter: NotificationAdapter = {
   async cancel() {},
 };
 
+function repeatOf(entry: ScheduledNotification): NativeRepeat {
+  const kind = entry.recurrence?.kind;
+  if (kind === "daily" || kind === "weekdays" || kind === "weekly" || kind === "monthly") {
+    return kind;
+  }
+  return "none";
+}
+
 /**
- * Phase 3 seam: when running inside the Capacitor shell, swap in a native
- * adapter here. Detection stays runtime-only so the web build never imports
- * native plugins.
+ * Android APK adapter: real OS-level scheduling through AlarmManager, so
+ * reminders fire while SkillSync is closed.
+ */
+const nativeAdapter: NotificationAdapter = {
+  kind: "capacitor",
+  canSchedule: true,
+  async show(item) {
+    return (await deliver(item)).ok;
+  },
+  async schedule(entry) {
+    const bridge = nativeBridge();
+    if (!bridge) return null;
+    try {
+      const result = await bridge.schedule({
+        id: entry.sourceId ?? entry.id,
+        title: entry.title,
+        body: entry.body,
+        at: entry.dueAt,
+        repeat: repeatOf(entry),
+        url: entry.action?.kind === "route" ? entry.action.to : "/notifications",
+        priority: entry.priority,
+      });
+      return result?.ok ? result.at : null;
+    } catch (e) {
+      console.warn("[notifications] native schedule failed", e);
+      return null;
+    }
+  },
+  async cancel(entry) {
+    const bridge = nativeBridge();
+    if (!bridge) return;
+    try {
+      await bridge.cancel({ id: entry.sourceId ?? entry.id });
+    } catch {
+      /* best effort */
+    }
+  },
+};
+
+/**
+ * Runtime-only platform detection, so the web build never imports native code.
  */
 export function getAdapter(): NotificationAdapter {
   if (typeof window === "undefined") return noopAdapter;
+  if (hasNativeBridge()) return nativeAdapter;
   return webAdapter;
 }
 
-export function isNativeShell(): boolean {
-  if (typeof window === "undefined") return false;
-  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } })
-    .Capacitor;
-  return Boolean(cap?.isNativePlatform?.());
-}
+export { isNativeShell } from "@/lib/native/bridge";

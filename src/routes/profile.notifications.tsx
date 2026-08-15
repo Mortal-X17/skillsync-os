@@ -21,6 +21,7 @@ import {
 import {
   PERMISSION_COPY,
   getPermission,
+  refreshPermission,
   requestPermission,
   type PermissionState,
 } from "@/lib/notifications/permission";
@@ -97,9 +98,15 @@ function NotificationSettingsPage() {
   const [testResult, setTestResult] = useState<string | null>(null);
 
   useEffect(() => {
-    const current = getPermission();
-    setPermission(current);
-    if (current !== settings.permission) update({ permission: current });
+    let alive = true;
+    void refreshPermission().then((current) => {
+      if (!alive) return;
+      setPermission(current);
+      if (current !== settings.permission) update({ permission: current });
+    });
+    return () => {
+      alive = false;
+    };
   }, [settings.permission, update]);
 
   useEffect(() => {
@@ -117,8 +124,8 @@ function NotificationSettingsPage() {
   /** Bypasses all app logic: straight to the delivery layer. */
   const runTest = async () => {
     setTestResult("Sending…");
-    const perm =
-      getPermission() === "default" ? await requestPermission() : getPermission();
+    const current = await refreshPermission();
+    const perm = current === "default" ? await requestPermission() : current;
     setPermission(perm);
     if (perm !== "granted") {
       setTestResult(`Blocked: permission is "${perm}".`);
@@ -141,7 +148,13 @@ function NotificationSettingsPage() {
     setEnv(await inspectEnvironment());
     setTestResult(
       result.ok
-        ? `Delivered via ${result.via === "serviceWorker" ? "the service worker" : "the browser notification API"}.`
+        ? `Delivered via ${
+            result.via === "native"
+              ? "Android's notification manager"
+              : result.via === "serviceWorker"
+                ? "the service worker"
+                : "the browser notification API"
+          }.`
         : `Failed: ${result.error ?? "unknown error"}`,
     );
   };
@@ -423,16 +436,25 @@ function NotificationSettingsPage() {
             {env ? (
               <div className="mt-3 space-y-1.5 border-t border-white/[0.05] pt-3">
                 {(
-                  [
-                    ["Installed app", env.standalone],
-                    ["Secure context", env.secureContext],
-                    ["Notification API", env.notificationApi],
-                    ["Service worker API", env.serviceWorkerApi],
-                    ["Worker registered", env.swRegistered],
-                    ["Worker active", env.swActive],
-                    ["Worker controlling page", env.swControlling],
-                    ["Permission granted", permission === "granted"],
-                  ] as const
+                  env.native
+                    ? ([
+                        ["Android app (native bridge)", true],
+                        ["Native notifications", env.nativeNotificationsEnabled],
+                        ["Native haptics", env.nativeHaptics],
+                        ["Background scheduling", env.nativeScheduling],
+                        ["Exact alarms allowed", env.exactAlarms],
+                        ["Permission granted", permission === "granted"],
+                      ] as const)
+                    : ([
+                        ["Installed app", env.standalone],
+                        ["Secure context", env.secureContext],
+                        ["Notification API", env.notificationApi],
+                        ["Service worker API", env.serviceWorkerApi],
+                        ["Worker registered", env.swRegistered],
+                        ["Worker active", env.swActive],
+                        ["Worker controlling page", env.swControlling],
+                        ["Permission granted", permission === "granted"],
+                      ] as const)
                 ).map(([label, ok]) => (
                   <div
                     key={label}

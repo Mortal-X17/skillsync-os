@@ -31,6 +31,8 @@
  * Major milestone       → milestone (rich success)
  */
 
+import { nativeBridge } from "@/lib/native/bridge";
+
 export type HapticIntensity = "light" | "standard" | "strong";
 
 type Level =
@@ -109,7 +111,7 @@ function canVibrate() {
 
 /** True when *some* tactile channel exists (used by settings UI copy). */
 export function hapticsSupported() {
-  return isNative() || canVibrate();
+  return nativeBridge() !== null || isNative() || canVibrate();
 }
 
 /* -------------------------------- patterns ------------------------------- */
@@ -198,6 +200,22 @@ function fire(level: Level) {
   // Never block the caller / UI thread.
   void (async () => {
     try {
+      // 1. SkillSync's own Android bridge (real Vibrator / VibrationEffect).
+      const bridge = nativeBridge();
+      if (bridge) {
+        try {
+          const pattern = scaled(WEB_PATTERNS[level]);
+          const result =
+            intensity === "standard"
+              ? await bridge.haptic({ level })
+              : await bridge.vibratePattern({
+                  pattern: Array.isArray(pattern) ? pattern : [pattern],
+                });
+          if (result?.ok) return;
+        } catch {
+          /* fall through to the Capacitor plugin / web API */
+        }
+      }
       if (await loadNative()) {
         if (level === "selection") {
           await native!.selectionChanged();

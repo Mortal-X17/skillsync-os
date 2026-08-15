@@ -63,4 +63,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Local reminders/notifications on Android 13+. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Reliable OS-level reminder scheduling (offline, app closed). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>
+

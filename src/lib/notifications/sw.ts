@@ -11,9 +11,20 @@
  * Lovable preview or a deploy serve stale content.
  */
 
+import { nativeCapabilities, hasNativeBridge, nativePlatform } from "@/lib/native/bridge";
+
 const SW_URL = "/notifications-sw.js";
 
 export type NotificationEnvironment = {
+  /** True inside the Android APK (native bridge present). */
+  native: boolean;
+  platform: string;
+  nativeHaptics: boolean;
+  nativeScheduling: boolean;
+  exactAlarms: boolean;
+  nativeNotificationsEnabled: boolean;
+  androidSdk: number | null;
+  scheduledCount: number | null;
   secureContext: boolean;
   standalone: boolean;
   notificationApi: boolean;
@@ -82,10 +93,24 @@ export async function getRegistration(): Promise<ServiceWorkerRegistration | nul
   return registration ?? (await ensureNotificationWorker());
 }
 
+function emptyNative() {
+  return {
+    native: false,
+    platform: "web",
+    nativeHaptics: false,
+    nativeScheduling: false,
+    exactAlarms: false,
+    nativeNotificationsEnabled: false,
+    androidSdk: null,
+    scheduledCount: null,
+  } as const;
+}
+
 /** Full environment snapshot used by the settings diagnostics card. */
 export async function inspectEnvironment(): Promise<NotificationEnvironment> {
   if (typeof window === "undefined") {
     return {
+      ...emptyNative(),
       secureContext: false,
       standalone: false,
       notificationApi: false,
@@ -99,6 +124,35 @@ export async function inspectEnvironment(): Promise<NotificationEnvironment> {
       constructorUsable: false,
       visibility: null,
       error: null,
+    };
+  }
+
+  // Android APK: the native bridge replaces the browser Notification API
+  // entirely, so report native capabilities instead of "unsupported".
+  if (hasNativeBridge()) {
+    const caps = await nativeCapabilities(true);
+    return {
+      native: true,
+      platform: nativePlatform(),
+      nativeHaptics: Boolean(caps?.haptics),
+      nativeScheduling: Boolean(caps?.canSchedule),
+      exactAlarms: Boolean(caps?.exactAlarms),
+      nativeNotificationsEnabled: Boolean(caps?.notificationsEnabled),
+      androidSdk: caps?.sdk ?? null,
+      scheduledCount: caps?.scheduledCount ?? null,
+      secureContext: window.isSecureContext,
+      standalone: true,
+      notificationApi: true,
+      serviceWorkerApi: "serviceWorker" in navigator,
+      swRegistered: false,
+      swActive: false,
+      swInstalling: false,
+      swWaiting: false,
+      swControlling: false,
+      scope: null,
+      constructorUsable: false,
+      visibility: document.visibilityState,
+      error: caps ? null : "native bridge did not report capabilities",
     };
   }
 
@@ -125,6 +179,7 @@ export async function inspectEnvironment(): Promise<NotificationEnvironment> {
   }
 
   return {
+    ...emptyNative(),
     secureContext: window.isSecureContext,
     standalone: isStandalone(),
     notificationApi: "Notification" in window,

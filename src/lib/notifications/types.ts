@@ -171,9 +171,7 @@ export const CategorySettingSchema = z.object({
 
 export const NotificationSettingsSchema = z.object({
   enabled: z.boolean().default(false),
-  permission: z
-    .enum(["default", "granted", "denied", "unsupported"])
-    .default("default"),
+  permission: z.enum(["default", "granted", "denied", "unsupported"]).default("default"),
   categories: z
     .record(z.enum(NOTIFICATION_CATEGORIES), CategorySettingSchema)
     .default(() => createDefaultCategories()),
@@ -210,16 +208,11 @@ export type NotificationAction = z.infer<typeof NotificationActionSchema>;
 /** Newest-first history cap; keeps localStorage small and the list fast. */
 export const HISTORY_LIMIT = 200;
 
-export function createDefaultCategories(): Record<
-  CategoryKey,
-  NotificationCategorySetting
-> {
+export function createDefaultCategories(): Record<CategoryKey, NotificationCategorySetting> {
   const out = {} as Record<CategoryKey, NotificationCategorySetting>;
   for (const key of NOTIFICATION_CATEGORIES) {
     const meta = CATEGORY_META[key];
-    out[key] = meta.defaultTime
-      ? { enabled: true, time: meta.defaultTime }
-      : { enabled: true };
+    out[key] = meta.defaultTime ? { enabled: true, time: meta.defaultTime } : { enabled: true };
   }
   return out;
 }

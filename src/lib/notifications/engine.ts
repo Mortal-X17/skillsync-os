@@ -73,22 +73,14 @@ export type Candidate = Omit<
   "id" | "createdAt" | "read" | "delivered" | "origin"
 > & { sourceId: string };
 
-function categoryActive(
-  key: CategoryKey,
-  settings: NotificationSettings,
-  data: AppData,
-): boolean {
+function categoryActive(key: CategoryKey, settings: NotificationSettings, data: AppData): boolean {
   const meta = CATEGORY_META[key];
   if (meta.module && !data.preferences?.modules?.[meta.module]) return false;
   return settings.categories?.[key]?.enabled !== false;
 }
 
 /** True when the category's daily reminder time has already passed today. */
-function timeReached(
-  key: CategoryKey,
-  settings: NotificationSettings,
-  now: Date,
-): boolean {
+function timeReached(key: CategoryKey, settings: NotificationSettings, now: Date): boolean {
   const meta = CATEGORY_META[key];
   if (!meta.timed) return true;
   const time = settings.categories?.[key]?.time ?? meta.defaultTime ?? "09:00";
@@ -120,11 +112,17 @@ export function buildDueCandidates(
     if (pending.length > 0) {
       out.push({
         category: "habits",
-        title: pending.length === 1 ? `${pending[0].title} still pending` : `${pending.length} habits pending`,
+        title:
+          pending.length === 1
+            ? `${pending[0].title} still pending`
+            : `${pending.length} habits pending`,
         body:
           pending.length === 1
             ? "One check-in away from keeping the streak alive."
-            : `Not checked in yet: ${pending.slice(0, 3).map((h) => h.title).join(", ")}${pending.length > 3 ? "…" : ""}`,
+            : `Not checked in yet: ${pending
+                .slice(0, 3)
+                .map((h) => h.title)
+                .join(", ")}${pending.length > 3 ? "…" : ""}`,
         priority: "high",
         action: { kind: "route", to: "/habits" },
         sourceId: `habits:pending:${today}`,
@@ -139,7 +137,10 @@ export function buildDueCandidates(
       out.push({
         category: "planner",
         title: `${due.length} task${due.length === 1 ? "" : "s"} on today's plan`,
-        body: due.slice(0, 3).map((t) => t.title).join(" · "),
+        body: due
+          .slice(0, 3)
+          .map((t) => t.title)
+          .join(" · "),
         priority: "normal",
         action: { kind: "route", to: "/planner" },
         sourceId: `planner:due:${today}`,
@@ -156,7 +157,10 @@ export function buildDueCandidates(
       out.push({
         category: "projects",
         title: `${late.length} project deadline${late.length === 1 ? "" : "s"} need attention`,
-        body: late.slice(0, 3).map((p) => p.title).join(" · "),
+        body: late
+          .slice(0, 3)
+          .map((p) => p.title)
+          .join(" · "),
         priority: "high",
         action: { kind: "route", to: "/projects" },
         sourceId: `projects:deadline:${today}`,
@@ -190,7 +194,10 @@ export function buildDueCandidates(
       out.push({
         category: "attendance",
         title: `${risky.length} subject${risky.length === 1 ? "" : "s"} below minimum`,
-        body: risky.slice(0, 3).map((s) => s.name).join(" · "),
+        body: risky
+          .slice(0, 3)
+          .map((s) => s.name)
+          .join(" · "),
         priority: "high",
         action: { kind: "route", to: "/attendance" },
         sourceId: `attendance:risk:${today}`,
@@ -202,9 +209,7 @@ export function buildDueCandidates(
   if (eligible("expenses")) {
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);
-    const loggedToday = (data.expenses?.transactions ?? []).some(
-      (t) => t.at >= start.getTime(),
-    );
+    const loggedToday = (data.expenses?.transactions ?? []).some((t) => t.at >= start.getTime());
     if (!loggedToday) {
       out.push({
         category: "expenses",
@@ -274,10 +279,7 @@ export function buildDueCandidates(
 }
 
 /** Removes candidates whose sourceId already exists in history. */
-export function dedupe(
-  candidates: Candidate[],
-  existing: NotificationItem[],
-): Candidate[] {
+export function dedupe(candidates: Candidate[], existing: NotificationItem[]): Candidate[] {
   const seen = new Set(existing.map((i) => i.sourceId).filter(Boolean) as string[]);
   return candidates.filter((c) => {
     if (seen.has(c.sourceId)) return false;

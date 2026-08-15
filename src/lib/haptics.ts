@@ -31,6 +31,8 @@
  * Major milestone       → milestone (rich success)
  */
 
+import { nativeBridge } from "@/lib/native/bridge";
+
 export type HapticIntensity = "light" | "standard" | "strong";
 
 type Level =
@@ -49,10 +51,7 @@ let enabled = true;
 let intensity: HapticIntensity = "standard";
 
 /** Called once from the app shell whenever user preferences change. */
-export function configureHaptics(next: {
-  enabled?: boolean;
-  intensity?: HapticIntensity;
-}) {
+export function configureHaptics(next: { enabled?: boolean; intensity?: HapticIntensity }) {
   if (typeof next.enabled === "boolean") enabled = next.enabled;
   if (next.intensity) intensity = next.intensity;
 }
@@ -69,13 +68,14 @@ type NativeHaptics = {
 
 let nativeReady: boolean | null = null;
 let native: NativeHaptics | null = null;
-let nativeEnums: { ImpactStyle: Record<string, string>; NotificationType: Record<string, string> } | null =
-  null;
+let nativeEnums: {
+  ImpactStyle: Record<string, string>;
+  NotificationType: Record<string, string>;
+} | null = null;
 
 function isNative() {
   if (typeof window === "undefined") return false;
-  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } })
-    .Capacitor;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
   return Boolean(cap?.isNativePlatform?.());
 }
 
@@ -109,7 +109,7 @@ function canVibrate() {
 
 /** True when *some* tactile channel exists (used by settings UI copy). */
 export function hapticsSupported() {
-  return isNative() || canVibrate();
+  return nativeBridge() !== null || isNative() || canVibrate();
 }
 
 /* -------------------------------- patterns ------------------------------- */
@@ -198,6 +198,22 @@ function fire(level: Level) {
   // Never block the caller / UI thread.
   void (async () => {
     try {
+      // 1. SkillSync's own Android bridge (real Vibrator / VibrationEffect).
+      const bridge = nativeBridge();
+      if (bridge) {
+        try {
+          const pattern = scaled(WEB_PATTERNS[level]);
+          const result =
+            intensity === "standard"
+              ? await bridge.haptic({ level })
+              : await bridge.vibratePattern({
+                  pattern: Array.isArray(pattern) ? pattern : [pattern],
+                });
+          if (result?.ok) return;
+        } catch {
+          /* fall through to the Capacitor plugin / web API */
+        }
+      }
       if (await loadNative()) {
         if (level === "selection") {
           await native!.selectionChanged();
@@ -208,9 +224,9 @@ function fire(level: Level) {
           await native!.notification({ type: notif });
           if (level === "milestone") {
             setTimeout(() => {
-              void native!.impact({ style: nativeImpactStyle("medium") ?? "MEDIUM" }).catch(
-                () => {},
-              );
+              void native!
+                .impact({ style: nativeImpactStyle("medium") ?? "MEDIUM" })
+                .catch(() => {});
             }, 90);
           }
           return;

@@ -26,6 +26,22 @@
 
         </activity>
 
+        <!-- Local reminder alarms: fire even when the app is closed. -->
+        <receiver
+            android:name=".ReminderReceiver"
+            android:exported="false" />
+
+        <!-- Re-arms stored reminders after reboot / app update. -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -37,6 +53,7 @@
         </provider>
     </application>
 
+
     <!-- Permissions -->
 
     <!-- The app itself is fully offline; INTERNET is required by the Capacitor
@@ -46,4 +63,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Local reminders/notifications on Android 13+. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Reliable OS-level reminder scheduling (offline, app closed). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>
+

@@ -1,14 +1,16 @@
 import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useAppStore } from "@/store/useAppStore";
 import { getLastBackupMeta } from "@/lib/backup";
 import { buildDueCandidates, isQuietHours } from "@/lib/notifications/engine";
 import { getAdapter } from "@/lib/notifications/adapter";
-import { getPermission } from "@/lib/notifications/permission";
+import { getPermission, refreshPermission } from "@/lib/notifications/permission";
+import { hasNativeBridge, nativeBridge } from "@/lib/native/bridge";
+import { syncNativeSchedules } from "@/lib/notifications/native-sync";
 import { ensureNotificationWorker } from "@/lib/notifications/sw";
 import type { AppData } from "@/lib/schema";
 
 const TICK_MS = 60_000;
-
 
 /**
  * Client-only notification runner.
@@ -19,24 +21,50 @@ const TICK_MS = 60_000;
  */
 export function useNotificationRunner() {
   const hydrated = useAppStore((s) => s._hydrated);
+  const navigate = useNavigate();
+
+  // Notification taps inside the APK ask the web app to open a route.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const open = (path: string) => {
+      if (!path) return;
+      void navigate({ to: path }).catch(() => {});
+    };
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail;
+      if (typeof detail === "string") open(detail);
+    };
+    window.addEventListener("skillsync:open", onOpen as EventListener);
+    const bridge = nativeBridge();
+    if (bridge) {
+      void bridge
+        .takePendingRoute()
+        .then((r) => {
+          if (r?.route) open(r.route);
+        })
+        .catch(() => {});
+    }
+    return () => window.removeEventListener("skillsync:open", onOpen as EventListener);
+  }, [navigate]);
 
   useEffect(() => {
     if (!hydrated || typeof window === "undefined") return;
 
-    // Android needs an active service worker to display notifications at all.
-    void ensureNotificationWorker();
+    // Browsers need an active service worker to display notifications at all;
+    // the APK uses the native bridge instead.
+    if (!hasNativeBridge()) void ensureNotificationWorker();
 
     let disposed = false;
 
-
-    const run = () => {
+    const run = async () => {
       if (disposed) return;
       const state = useAppStore.getState();
       const settings = state.notifications?.settings;
       if (!settings) return;
 
-      // Keep the mirrored permission value honest.
-      const permission = getPermission();
+      // Keep the mirrored permission value honest (native read on Android).
+      const permission = await refreshPermission().catch(() => getPermission());
+      if (disposed) return;
       if (permission !== settings.permission) {
         state.updateNotificationSettings({ permission });
       }
@@ -52,8 +80,7 @@ export function useNotificationRunner() {
 
       const quiet = isQuietHours(settings, now);
       const adapter = getAdapter();
-      const canDeliver =
-        settings.enabled && permission === "granted" && !quiet;
+      const canDeliver = settings.enabled && permission === "granted" && !quiet;
 
       for (const candidate of candidates) {
         const item = state.pushNotification(candidate);
@@ -75,11 +102,14 @@ export function useNotificationRunner() {
       }
 
       state.updateNotificationSettings({ lastRunAt: Date.now() });
+
+      // Mirror settings into real Android alarms so reminders fire when closed.
+      void syncNativeSchedules(settings, state.preferences?.modules);
     };
 
-    run();
-    const interval = window.setInterval(run, TICK_MS);
-    const onFocus = () => run();
+    void run();
+    const interval = window.setInterval(() => void run(), TICK_MS);
+    const onFocus = () => void run();
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onFocus);
 

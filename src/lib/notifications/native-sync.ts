@@ -89,9 +89,7 @@ export async function syncNativeSchedules(
   const bridge = nativeBridge();
   if (!bridge) return { synced: false, count: 0 };
 
-  const reminders = desiredReminders(settings);
-  const withModules = desiredReminders(settings, modules);
-  const target = modules ? withModules : reminders;
+  const target = desiredReminders(settings, modules);
   const signature = signatureOf(target);
 
   let previous: string | null = null;

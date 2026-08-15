@@ -86,9 +86,7 @@ export function hasNativeBridge(): boolean {
 let cached: NativeCapabilities | null = null;
 
 /** Cached capability probe; returns null on the web. */
-export async function nativeCapabilities(
-  refresh = false,
-): Promise<NativeCapabilities | null> {
+export async function nativeCapabilities(refresh = false): Promise<NativeCapabilities | null> {
   const bridge = nativeBridge();
   if (!bridge) return null;
   if (cached && !refresh) return cached;

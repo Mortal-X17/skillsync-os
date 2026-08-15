@@ -1,14 +1,7 @@
 import { haptics } from "@/lib/haptics";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  Bell,
-  BellRing,
-  Info,
-  Moon,
-  ShieldAlert,
-} from "lucide-react";
+import { ArrowLeft, Bell, BellRing, Info, Moon, ShieldAlert } from "lucide-react";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card, SectionHeader } from "@/components/ui/primitives";
 import { CategoryIcon } from "@/components/notifications/CategoryIcon";
@@ -39,8 +32,7 @@ export const Route = createFileRoute("/profile/notifications")({
       { title: "Notification settings — SkillSync" },
       {
         name: "description",
-        content:
-          "Choose which SkillSync reminders you get, when they arrive, and set quiet hours.",
+        content: "Choose which SkillSync reminders you get, when they arrive, and set quiet hours.",
       },
       { property: "og:title", content: "Notification settings — SkillSync" },
       {
@@ -161,7 +153,6 @@ function NotificationSettingsPage() {
   const copy = PERMISSION_COPY[permission];
   const canAsk = permission === "default";
 
-
   const visibleCategories = NOTIFICATION_CATEGORIES.filter((key) => {
     const meta = CATEGORY_META[key];
     if (key === "weeklySummary") return false;
@@ -240,9 +231,7 @@ function NotificationSettingsPage() {
                   <Bell className="h-[16px] w-[16px] text-muted-foreground" strokeWidth={1.75} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[14px] font-medium tracking-tight">
-                    System notifications
-                  </div>
+                  <div className="text-[14px] font-medium tracking-tight">System notifications</div>
                   <div className="text-[12px] text-muted-foreground">
                     Show reminders outside the app
                   </div>
@@ -266,9 +255,7 @@ function NotificationSettingsPage() {
                 <Toggle
                   label="Quiet hours"
                   on={settings.quietHours.enabled}
-                  onChange={(v) =>
-                    update({ quietHours: { ...settings.quietHours, enabled: v } })
-                  }
+                  onChange={(v) => update({ quietHours: { ...settings.quietHours, enabled: v } })}
                 />
               </div>
               {settings.quietHours.enabled ? (
@@ -319,9 +306,7 @@ function NotificationSettingsPage() {
                         />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[14px] font-medium tracking-tight">
-                          {meta.label}
-                        </div>
+                        <div className="text-[14px] font-medium tracking-tight">{meta.label}</div>
                         <div className="text-[12px] leading-snug text-muted-foreground">
                           {meta.description}
                         </div>
@@ -334,9 +319,7 @@ function NotificationSettingsPage() {
                     </div>
                     {meta.timed && setting.enabled ? (
                       <div className="mt-3 flex items-center gap-3 pl-12">
-                        <span className="text-[12.5px] text-muted-foreground">
-                          Remind at
-                        </span>
+                        <span className="text-[12.5px] text-muted-foreground">Remind at</span>
                         <TextField
                           type="time"
                           value={setting.time ?? meta.defaultTime ?? "09:00"}
@@ -364,9 +347,7 @@ function NotificationSettingsPage() {
                 />
               </span>
               <div className="min-w-0 flex-1">
-                <div className="text-[14px] font-medium tracking-tight">
-                  Weekly digest
-                </div>
+                <div className="text-[14px] font-medium tracking-tight">Weekly digest</div>
                 <div className="text-[12px] text-muted-foreground">
                   A recap of check-ins, tasks and level
                 </div>
@@ -393,13 +374,19 @@ function NotificationSettingsPage() {
                   }
                   className="h-11 flex-1 rounded-[14px] border border-border bg-white/[0.03] px-3 text-[14px] text-foreground outline-none"
                 >
-                  {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map(
-                    (day, i) => (
-                      <option key={day} value={i} className="bg-[#111]">
-                        {day}
-                      </option>
-                    ),
-                  )}
+                  {[
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                  ].map((day, i) => (
+                    <option key={day} value={i} className="bg-[#111]">
+                      {day}
+                    </option>
+                  ))}
                 </select>
                 <TextField
                   type="time"
@@ -434,31 +421,27 @@ function NotificationSettingsPage() {
             ) : null}
             {env ? (
               <div className="mt-3 space-y-1.5 border-t border-white/[0.05] pt-3">
-                {(
-                  env.native
-                    ? ([
-                        ["Android app (native bridge)", true],
-                        ["Native notifications", env.nativeNotificationsEnabled],
-                        ["Native haptics", env.nativeHaptics],
-                        ["Background scheduling", env.nativeScheduling],
-                        ["Exact alarms allowed", env.exactAlarms],
-                        ["Permission granted", permission === "granted"],
-                      ] as const)
-                    : ([
-                        ["Installed app", env.standalone],
-                        ["Secure context", env.secureContext],
-                        ["Notification API", env.notificationApi],
-                        ["Service worker API", env.serviceWorkerApi],
-                        ["Worker registered", env.swRegistered],
-                        ["Worker active", env.swActive],
-                        ["Worker controlling page", env.swControlling],
-                        ["Permission granted", permission === "granted"],
-                      ] as const)
+                {(env.native
+                  ? ([
+                      ["Android app (native bridge)", true],
+                      ["Native notifications", env.nativeNotificationsEnabled],
+                      ["Native haptics", env.nativeHaptics],
+                      ["Background scheduling", env.nativeScheduling],
+                      ["Exact alarms allowed", env.exactAlarms],
+                      ["Permission granted", permission === "granted"],
+                    ] as const)
+                  : ([
+                      ["Installed app", env.standalone],
+                      ["Secure context", env.secureContext],
+                      ["Notification API", env.notificationApi],
+                      ["Service worker API", env.serviceWorkerApi],
+                      ["Worker registered", env.swRegistered],
+                      ["Worker active", env.swActive],
+                      ["Worker controlling page", env.swControlling],
+                      ["Permission granted", permission === "granted"],
+                    ] as const)
                 ).map(([label, ok]) => (
-                  <div
-                    key={label}
-                    className="flex items-center justify-between text-[12.5px]"
-                  >
+                  <div key={label} className="flex items-center justify-between text-[12.5px]">
                     <span className="text-muted-foreground">{label}</span>
                     <span className={ok ? "text-emerald-400" : "text-amber-400"}>
                       {ok ? "yes" : "no"}
@@ -472,15 +455,11 @@ function NotificationSettingsPage() {
                     {env.androidSdk ? ` · Android API ${env.androidSdk}` : ""}
                   </p>
                 ) : null}
-                {env.error ? (
-                  <p className="pt-1 text-[12px] text-amber-400">{env.error}</p>
-                ) : null}
+                {env.error ? <p className="pt-1 text-[12px] text-amber-400">{env.error}</p> : null}
               </div>
             ) : null}
           </Card>
         </section>
-
-
 
         {/* Honest limits */}
         <Card className="p-4">
@@ -492,11 +471,10 @@ function NotificationSettingsPage() {
               <div className="mb-1 text-[13.5px] font-semibold text-foreground">
                 How reminders behave
               </div>
-              In the browser, reminders are evaluated while SkillSync is open — including a
-              catch-up pass every time you launch it, so nothing is lost. Notifications that
-              fire in the background while the app is closed need the Android build, which
-              schedules them at the OS level. Everything here is stored locally and works
-              fully offline.
+              In the browser, reminders are evaluated while SkillSync is open — including a catch-up
+              pass every time you launch it, so nothing is lost. Notifications that fire in the
+              background while the app is closed need the Android build, which schedules them at the
+              OS level. Everything here is stored locally and works fully offline.
             </div>
           </div>
         </Card>

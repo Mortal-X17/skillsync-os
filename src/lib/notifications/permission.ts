@@ -63,10 +63,7 @@ export async function requestPermission(): Promise<PermissionState> {
   }
 }
 
-export const PERMISSION_COPY: Record<
-  PermissionState,
-  { title: string; body: string }
-> = {
+export const PERMISSION_COPY: Record<PermissionState, { title: string; body: string }> = {
   unsupported: {
     title: "Not supported on this device",
     body: "This browser can't show system notifications. SkillSync still collects every reminder in your in-app notification center.",

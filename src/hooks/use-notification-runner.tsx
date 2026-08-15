@@ -12,7 +12,6 @@ import type { AppData } from "@/lib/schema";
 
 const TICK_MS = 60_000;
 
-
 /**
  * Client-only notification runner.
  *
@@ -57,7 +56,6 @@ export function useNotificationRunner() {
 
     let disposed = false;
 
-
     const run = async () => {
       if (disposed) return;
       const state = useAppStore.getState();
@@ -82,8 +80,7 @@ export function useNotificationRunner() {
 
       const quiet = isQuietHours(settings, now);
       const adapter = getAdapter();
-      const canDeliver =
-        settings.enabled && permission === "granted" && !quiet;
+      const canDeliver = settings.enabled && permission === "granted" && !quiet;
 
       for (const candidate of candidates) {
         const item = state.pushNotification(candidate);

@@ -51,10 +51,7 @@ let enabled = true;
 let intensity: HapticIntensity = "standard";
 
 /** Called once from the app shell whenever user preferences change. */
-export function configureHaptics(next: {
-  enabled?: boolean;
-  intensity?: HapticIntensity;
-}) {
+export function configureHaptics(next: { enabled?: boolean; intensity?: HapticIntensity }) {
   if (typeof next.enabled === "boolean") enabled = next.enabled;
   if (next.intensity) intensity = next.intensity;
 }
@@ -71,13 +68,14 @@ type NativeHaptics = {
 
 let nativeReady: boolean | null = null;
 let native: NativeHaptics | null = null;
-let nativeEnums: { ImpactStyle: Record<string, string>; NotificationType: Record<string, string> } | null =
-  null;
+let nativeEnums: {
+  ImpactStyle: Record<string, string>;
+  NotificationType: Record<string, string>;
+} | null = null;
 
 function isNative() {
   if (typeof window === "undefined") return false;
-  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } })
-    .Capacitor;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
   return Boolean(cap?.isNativePlatform?.());
 }
 
@@ -226,9 +224,9 @@ function fire(level: Level) {
           await native!.notification({ type: notif });
           if (level === "milestone") {
             setTimeout(() => {
-              void native!.impact({ style: nativeImpactStyle("medium") ?? "MEDIUM" }).catch(
-                () => {},
-              );
+              void native!
+                .impact({ style: nativeImpactStyle("medium") ?? "MEDIUM" })
+                .catch(() => {});
             }, 90);
           }
           return;

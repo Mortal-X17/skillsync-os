@@ -1,7 +1,4 @@
-import type {
-  NotificationItem,
-  ScheduledNotification,
-} from "./types";
+import type { NotificationItem, ScheduledNotification } from "./types";
 import { getPermission } from "./permission";
 import { getRegistration } from "./sw";
 import { hasNativeBridge, nativeBridge, type NativeRepeat } from "@/lib/native/bridge";
@@ -111,7 +108,6 @@ const webAdapter: NotificationAdapter = {
   },
   async cancel() {},
 };
-
 
 const noopAdapter: NotificationAdapter = {
   kind: "noop",

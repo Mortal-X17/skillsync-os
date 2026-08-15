@@ -145,3 +145,26 @@ re-generate if the brand mark changes.
 | "App not installed" | A different signing key than the installed build — uninstall first, or reuse the original keystore |
 | Gradle: SDK not found | Open the `android/` folder once in Android Studio and let it install the SDK |
 | Workflow warns "unsigned" | The four GitHub secrets aren't set (see step 3) |
+
+## Native Android integrations (back button, haptics, notifications)
+
+The APK ships a small first-party Capacitor plugin — no extra npm packages:
+
+| File | Role |
+| --- | --- |
+| `MainActivity.java` | Registers the plugin, re-arms reminders on launch, and handles the Android back gesture via `OnBackPressedDispatcher` (WebView history first, `finish()` only at the root). Notification taps are forwarded to the web app as a `skillsync:open` event. |
+| `SkillSyncNativePlugin.java` | JS bridge: `vibrate`, `vibratePattern`, `haptic`, `notify`, `schedule`, `cancel`, `cancelAll`, `listScheduled`, `checkNotificationPermission`, `requestNotificationPermission`, `capabilities`. |
+| `ReminderScheduler.java` | Notification channel + `AlarmManager` scheduling (exact when allowed), recurrence maths, `NotificationManagerCompat` display. |
+| `ReminderReceiver.java` | Fires reminders with the app closed and re-arms recurring ones. |
+| `BootReceiver.java` | Re-arms stored reminders after reboot / app update. |
+| `ReminderStore.java` | Offline `SharedPreferences` store for scheduled reminders. |
+
+Web side: `src/lib/native/bridge.ts` detects the plugin at runtime. `haptics.ts`,
+`notifications/adapter.ts`, `notifications/permission.ts` and
+`notifications/native-sync.ts` prefer it and fall back to browser APIs when the
+app runs outside the APK. Diagnostics (`/profile/notifications`) reports native
+capabilities instead of the browser Notification API when running in the APK.
+
+Permissions added: `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`,
+`USE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED` (plus existing `VIBRATE`).
+Release signing and the keystore setup are unchanged.

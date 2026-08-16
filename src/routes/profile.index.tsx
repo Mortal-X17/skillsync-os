@@ -34,7 +34,7 @@ import {
   BACKGROUND_OPTIONS,
   type BackgroundStyle,
 } from "@/components/layout/backgrounds";
-import { THEME_OPTIONS } from "@/hooks/use-theme";
+import { THEME_OPTIONS, resolveTheme } from "@/hooks/use-theme";
 import { haptics, hapticsSupported, type HapticIntensity } from "@/lib/haptics";
 
 
@@ -453,7 +453,7 @@ function ProfilePage() {
                     <span className="flex items-center gap-2">
                       <span className="text-[13px] text-muted-foreground">
                         {THEME_OPTIONS.find(
-                          (o) => o.id === (preferences.theme ?? "dark"),
+                          (o) => o.id === resolveTheme(preferences.theme),
                         )?.label}
                       </span>
                       <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
@@ -694,7 +694,7 @@ function ProfilePage() {
         </p>
         <div className="space-y-3">
           {THEME_OPTIONS.map((opt) => {
-            const active = (preferences.theme ?? "dark") === opt.id;
+            const active = resolveTheme(preferences.theme) === opt.id;
             return (
               <button
                 key={opt.id}

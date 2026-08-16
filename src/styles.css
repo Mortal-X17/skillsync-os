@@ -127,6 +127,8 @@ body {
   --aurora-stars-2: 0.3;
   --aurora-haze: 0.9;
   --overlay-tint: 255, 255, 255;
+  /* Launch-animation energy intensity */
+  --launch-glow: 1;
 
   color-scheme: dark;
 }
@@ -186,6 +188,7 @@ html.light body {
   --aurora-stars-2: 0;
   --aurora-haze: 0.3;
   --overlay-tint: 17, 24, 39;
+  --launch-glow: 0.35;
 
   color-scheme: light;
 }

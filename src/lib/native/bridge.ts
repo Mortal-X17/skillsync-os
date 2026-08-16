@@ -49,6 +49,7 @@ type NativePlugin = {
   cancelAll(): Promise<{ ok: boolean }>;
   listScheduled(): Promise<{ scheduled: unknown[] }>;
   takePendingRoute(): Promise<{ route: string | null }>;
+  setTheme?(o: { theme: string; background?: string }): Promise<{ ok: boolean }>;
 };
 
 type CapacitorGlobal = {
@@ -95,5 +96,25 @@ export async function nativeCapabilities(refresh = false): Promise<NativeCapabil
     return cached;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Mirrors the SkillSync theme onto the Android system bars (bar colours +
+ * icon contrast). No-op in the browser — the PWA relies on <meta theme-color>.
+ */
+export async function nativeSetTheme(
+  theme: "light" | "dark",
+  background?: string,
+): Promise<boolean> {
+  const bridge = nativeBridge() as unknown as {
+    setTheme?: (o: { theme: string; background?: string }) => Promise<unknown>;
+  } | null;
+  if (!bridge?.setTheme) return false;
+  try {
+    await bridge.setTheme({ theme, background });
+    return true;
+  } catch {
+    return false;
   }
 }

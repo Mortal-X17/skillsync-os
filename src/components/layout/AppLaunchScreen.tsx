@@ -94,14 +94,16 @@ export function AppLaunchScreen() {
     >
       {/* Phase 2 — energy field gathering at the center */}
       {!r ? (
-        <>
+        <div
+          className="absolute inset-0"
+          style={{ opacity: "var(--launch-glow, 1)" }}
+        >
           <div
             className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
               background:
                 "radial-gradient(circle, rgba(99,102,241,0.30) 0%, rgba(34,211,238,0.14) 38%, transparent 70%)",
               filter: "blur(36px)",
-              opacity: "var(--launch-glow, 1)",
               animation: `ss-energy 900ms var(--ease-out-soft, cubic-bezier(.22,1,.36,1)) ${T.darkness}ms both`,
               willChange: "opacity, transform",
             }}
@@ -114,13 +116,13 @@ export function AppLaunchScreen() {
               background:
                 "linear-gradient(to bottom, transparent, rgba(255,255,255,0.9), transparent)",
               height: 260,
-              opacity: "var(--launch-glow, 1)",
               animation: `ss-beam 720ms ease-out ${T.darkness}ms both`,
               willChange: "opacity, transform",
             }}
           />
-        </>
+        </div>
       ) : null}
+
 
       {/* Phase 3/4 — logo forms, then holds */}
       <div

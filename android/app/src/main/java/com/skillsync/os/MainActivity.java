@@ -27,6 +27,14 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(SkillSyncNativePlugin.class);
         super.onCreate(savedInstanceState);
+        // Paint the window with the user's last chosen SkillSync theme before
+        // the WebView has a chance to show an unstyled frame.
+        ThemeController.applyStored(this);
+        WebView bridgeView = getBridge() != null ? getBridge().getWebView() : null;
+        if (bridgeView != null) {
+            bridgeView.setBackgroundColor(
+                    "light".equals(ThemeController.stored(this)) ? 0xFFFBFAF8 : 0xFF070B19);
+        }
         ReminderScheduler.ensureChannel(this);
         ReminderScheduler.rescheduleAll(this);
 

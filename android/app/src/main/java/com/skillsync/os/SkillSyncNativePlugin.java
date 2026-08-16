@@ -279,6 +279,25 @@ public class SkillSyncNativePlugin extends Plugin {
         call.resolve(result);
     }
 
+    /* -------------------------------- theme -------------------------------- */
+
+    /**
+     * Applies the SkillSync theme to the Android system bars and caches it, so
+     * the next cold start paints the right colours immediately. Android's own
+     * light/dark setting is never consulted.
+     */
+    @PluginMethod
+    public void setTheme(PluginCall call) {
+        final String theme = "light".equals(call.getString("theme", "dark")) ? "light" : "dark";
+        Integer background = ThemeController.parseColor(call.getString("background"), theme);
+        ThemeController.store(getContext(), theme, background);
+        final android.app.Activity activity = getActivity();
+        if (activity != null) {
+            activity.runOnUiThread(() -> ThemeController.apply(activity, theme));
+        }
+        call.resolve(ok(true));
+    }
+
     private JSObject ok(boolean value) {
         JSObject result = new JSObject();
         result.put("ok", value);

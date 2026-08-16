@@ -137,10 +137,10 @@ body {
    ============================================================ */
 html.light,
 html.light body {
-  --background: #f8f9fc;
-  --foreground: #111827;
+  --background: #fbfaf8;
+  --foreground: #16181d;
   --surface: #ffffff;
-  --surface-2: #f4f5f9;
+  --surface-2: #f5f3f0;
   --surface-elevated: #ffffff;
   --card: #ffffff;
   --card-foreground: #111827;
@@ -154,9 +154,9 @@ html.light body {
   --secondary-foreground: #ffffff;
   --glow: color-mix(in oklab, var(--primary) 32%, transparent);
 
-  --muted: #f1f2f7;
-  --muted-foreground: #5a6373;
-  --accent: #eef0f7;
+  --muted: #f3f1ee;
+  --muted-foreground: #5d6270;
+  --accent: #efedea;
   --accent-foreground: #111827;
 
   --success: #16a34a;
@@ -170,7 +170,7 @@ html.light body {
   --input: rgba(17, 24, 39, 0.1);
   --ring: var(--primary);
 
-  --bg-base: #fbfbfe;
+  --bg-base: #fbfaf8;
   --aurora-1: 99, 102, 241; /* indigo */
   --aurora-2: 167, 139, 250; /* soft violet */
   --aurora-3: 148, 163, 184; /* silver */

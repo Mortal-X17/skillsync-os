@@ -94,7 +94,10 @@ export function AppLaunchScreen() {
     >
       {/* Phase 2 — energy field gathering at the center */}
       {!r ? (
-        <>
+        <div
+          className="absolute inset-0"
+          style={{ opacity: "var(--launch-glow, 1)" }}
+        >
           <div
             className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
@@ -117,8 +120,9 @@ export function AppLaunchScreen() {
               willChange: "opacity, transform",
             }}
           />
-        </>
+        </div>
       ) : null}
+
 
       {/* Phase 3/4 — logo forms, then holds */}
       <div

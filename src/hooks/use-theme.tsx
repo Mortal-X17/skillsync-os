@@ -1,8 +1,13 @@
 import { useEffect } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { nativeSetTheme } from "@/lib/native/bridge";
 
-export type ThemeMode = "light" | "dark" | "system";
-export type ResolvedTheme = "light" | "dark";
+/**
+ * SkillSync owns its appearance. The Android/OS colour scheme is intentionally
+ * NOT consulted — the only source of truth is the persisted Theme preference.
+ */
+export type ThemeMode = "light" | "dark";
+export type ResolvedTheme = ThemeMode;
 
 export const THEME_OPTIONS: {
   id: ThemeMode;
@@ -13,39 +18,27 @@ export const THEME_OPTIONS: {
   {
     id: "dark",
     label: "Dark",
-    description: "Deep charcoal with purple → blue accents.",
+    description: "Deep space with the animated aurora and glass surfaces.",
     swatch:
       "radial-gradient(70% 70% at 25% 20%, rgba(139,92,246,0.35), transparent 70%), radial-gradient(70% 70% at 80% 80%, rgba(37,99,235,0.3), transparent 70%), #09090b",
   },
   {
     id: "light",
     label: "Light",
-    description: "White and silver with indigo → violet accents.",
+    description: "Warm off-white, crisp surfaces, calm indigo atmosphere.",
     swatch:
-      "radial-gradient(70% 70% at 25% 20%, rgba(99,102,241,0.28), transparent 70%), radial-gradient(70% 70% at 80% 80%, rgba(167,139,250,0.28), transparent 70%), #f8f9fc",
-  },
-  {
-    id: "system",
-    label: "System",
-    description: "Follow your device appearance automatically.",
-    swatch:
-      "linear-gradient(120deg, #09090b 0%, #09090b 48%, #f8f9fc 52%, #f8f9fc 100%)",
+      "radial-gradient(70% 70% at 20% 0%, rgba(99,102,241,0.18), transparent 68%), radial-gradient(60% 60% at 90% 100%, rgba(167,139,250,0.16), transparent 70%), #fbfaf8",
   },
 ];
 
 const THEME_COLOR: Record<ResolvedTheme, string> = {
   dark: "#070b19",
-  light: "#f8f9fc",
+  light: "#fbfaf8",
 };
 
-function systemPrefersDark() {
-  if (typeof window === "undefined" || !window.matchMedia) return true;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
-export function resolveTheme(mode: ThemeMode): ResolvedTheme {
-  if (mode === "system") return systemPrefersDark() ? "dark" : "light";
-  return mode;
+/** Normalises legacy/unknown values (including the removed "system" mode). */
+export function resolveTheme(mode: string | undefined): ResolvedTheme {
+  return mode === "light" ? "light" : "dark";
 }
 
 let transitionTimer: number | undefined;
@@ -71,22 +64,34 @@ function applyTheme(resolved: ResolvedTheme, animate: boolean) {
 }
 
 /**
- * Applies the persisted theme preference to <html>, tracks the system
- * preference when the mode is "system", and animates theme changes.
+ * Applies the persisted theme preference to <html> and mirrors it onto the
+ * Android system bars. No system-preference listener: the OS never flips the
+ * app's theme.
  */
-export function useTheme() {
-  const mode = (useAppStore((s) => s.preferences.theme) ?? "dark") as ThemeMode;
+export function useTheme(): ResolvedTheme {
+  const stored = useAppStore((s) => s.preferences.theme);
+  const updatePreferences = useAppStore((s) => s.updatePreferences);
+  const resolved = resolveTheme(stored);
+
+  // One-time normalisation of the removed "system" mode into an explicit
+  // choice, so the OS can never influence the app again.
+  useEffect(() => {
+    if (stored !== "light" && stored !== "dark") {
+      updatePreferences({ theme: resolved });
+    }
+  }, [stored, resolved, updatePreferences]);
 
   useEffect(() => {
-    applyTheme(resolveTheme(mode), true);
-    if (mode !== "system" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => applyTheme(mq.matches ? "dark" : "light", true);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [mode]);
+    applyTheme(resolved, true);
+    void nativeSetTheme(resolved, THEME_COLOR[resolved]);
+  }, [resolved]);
 
-  return mode;
+  return resolved;
+}
+
+/** Read-only resolved theme for components that need to branch visually. */
+export function useResolvedTheme(): ResolvedTheme {
+  return resolveTheme(useAppStore((s) => s.preferences.theme));
 }
 
 export function ThemeManager() {

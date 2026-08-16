@@ -69,7 +69,17 @@ function applyTheme(resolved: ResolvedTheme, animate: boolean) {
  * app's theme.
  */
 export function useTheme(): ResolvedTheme {
-  const resolved = resolveTheme(useAppStore((s) => s.preferences.theme));
+  const stored = useAppStore((s) => s.preferences.theme);
+  const updatePreferences = useAppStore((s) => s.updatePreferences);
+  const resolved = resolveTheme(stored);
+
+  // One-time normalisation of the removed "system" mode into an explicit
+  // choice, so the OS can never influence the app again.
+  useEffect(() => {
+    if (stored !== "light" && stored !== "dark") {
+      updatePreferences({ theme: resolved });
+    }
+  }, [stored, resolved, updatePreferences]);
 
   useEffect(() => {
     applyTheme(resolved, true);

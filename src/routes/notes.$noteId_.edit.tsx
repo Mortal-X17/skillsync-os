@@ -8,7 +8,7 @@ import { TextField, TextArea } from "@/components/edit/Fields";
 import { ActionButton, IconButton } from "@/components/edit/Buttons";
 import { useAppStore, useHydrated } from "@/store/useAppStore";
 
-export const Route = createFileRoute("/notes/$noteId/edit")({
+export const Route = createFileRoute("/notes/$noteId_/edit")({
   head: () => ({
     meta: [
       { title: "Edit note — SkillSync" },

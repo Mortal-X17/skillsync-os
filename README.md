@@ -1,252 +1,97 @@
-# 🚀 SkillSync OS
+# ⚡ SkillSync OS
 
-> **My Personal Growth Operating System**
+> **Your personal operating system for learning, building, planning, and becoming better.**
 
-SkillSync OS is a premium personal growth platform designed to help students organize their learning journey, projects, habits, notes, and career preparation in one beautiful workspace.
+SkillSync OS brings **learning, projects, planning, habits, notes, reminders, and personal progress** into one unified productivity system.
 
-Initially, SkillSync is being built as a personal operating system to solve my own productivity and learning challenges throughout my B.Tech journey. Over time, it is intended to evolve into a customizable platform that can benefit engineering students everywhere.
+Built with a **premium futuristic UI**, animated Aurora backgrounds, offline-first architecture, and a dedicated Android experience.
 
----
+## ✨ Features
 
-## ✨ Vision
+- 📊 **Dashboard** — Your central productivity overview
+- 🎓 **Learn** — Structured learning roadmaps & progress
+- 🚀 **Projects** — Manage and track things you're building
+- 📅 **Planner** — Turn goals into actionable plans
+- 🔥 **Habits** — Build consistency and track routines
+- 📝 **Notes** — Local-first notes with autosave
+- 🔔 **Notifications** — Reminders, alerts & weekly digest
+- 📱 **Android App** — Native Android experience with haptics & system navigation
+- 🌌 **Aurora UI** — Animated futuristic visual environment
+- ☀️ **Light Theme** — Minimalist alternative to the Aurora dark theme
+- ⚡ **Offline-First** — Core functionality designed to work without internet
 
-SkillSync is not just another to-do app or habit tracker.
+## 🎨 Design
 
-It is designed to become a complete **Personal Growth Operating System**, combining learning, planning, project management, note-taking, and self-improvement into a single experience.
+SkillSync OS uses a futuristic yet minimal visual language built around:
 
-The goal is simple:
+**Deep dark surfaces · Aurora lighting · Purple/Blue/Cyan gradients · Glassmorphism · Smooth motion**
 
-> **Learn. Build. Track. Grow.**
+The app also includes a dedicated minimalist Light theme rather than simply reversing the Dark theme.
 
----
+## 📱 Android
 
-# 🎯 Core Features
+SkillSync OS can be packaged as a signed Android APK with:
 
-### 📚 Learning Engine
+- Native Android back navigation
+- Haptic feedback
+- Native local notifications
+- Offline functionality
+- Custom splash/opening experience
+- Automated GitHub Actions APK builds
+- Release signing
 
-- Dynamic roadmap system
-- Unlimited custom learning paths
-- Phases, Topics, Subtopics & Checklists
-- Progress tracking
-- XP system
-- Notes
-- Resources
-- Estimated learning time
+## 🎬 Brand Experience
 
----
+The SkillSync opening experience introduces the app through a cinematic logo sequence:
 
-### 🏠 Dashboard
+**Energy → Orbit → Logo Formation → Brand Reveal → Dashboard**
 
-- Daily mission
-- Learning progress
-- Current streak
-- XP & Levels
-- Weekly goals
-- Recent activity
-- Quick actions
+### Brand
 
----
+**SKILLSYNC OS**
 
-### 🚀 Projects
+**ALIGN • CONNECT • ELEVATE**
 
-- Project management
-- Progress tracking
-- GitHub links
-- Deadlines
-- Tech stack
-- Screenshots
-- Tasks
+The primary logo is a standalone S-shaped symbol representing synchronization, connection, alignment, and continuous growth.
 
----
+## 🧠 Philosophy
 
-### 📝 Notes
+SkillSync OS is built around a simple loop:
 
-- Rich notes
-- Tags
-- Search
-- Markdown support
-- Favorites
+**Learn → Plan → Build → Track → Reflect → Improve**
 
----
+Instead of using separate tools for every part of personal development, SkillSync aims to bring the entire system together in one place.
 
-### 📅 Planner
+## 🗺️ Roadmap
 
-- Daily planner
-- Weekly planner
-- Calendar
-- Deadlines
-- Reminders
+- [x] Core productivity system
+- [x] Dashboard
+- [x] Learn
+- [x] Projects
+- [x] Planner
+- [x] Habits
+- [x] Notes
+- [x] Local notifications
+- [x] Android APK
+- [x] Android back navigation
+- [x] Native haptics
+- [x] Aurora UI
+- [x] Light theme
+- [x] Custom app opening experience
+- [x] Automated APK builds
+- [ ] Cloud backup & sync
+- [ ] Multi-device synchronization
+- [ ] Further Android integrations
+- [ ] Continued performance optimization
 
----
+## 🚀 Status
 
-### 🌱 Operation Rebirth
+**Active development.**
 
-Personal development dashboard including:
-
-- Sleep
-- Workout
-- Diet
-- Reading
-- Coding
-- Walking
-- Meditation
-- Screen Time
-- Daily Journal
+SkillSync OS is continuously evolving across performance, Android integration, UI polish, productivity features, and data synchronization.
 
 ---
 
-### 📊 Analytics
+### ⚡ SkillSync OS
 
-- XP Progress
-- Learning Statistics
-- Habit Consistency
-- Monthly Reports
-- Growth Insights
-
----
-
-### 💾 Backup & Restore
-
-Offline-first architecture.
-
-Future support includes:
-
-- Local Backup
-- Import / Export
-- Google Drive Backup
-- Cross-device Sync
-
----
-
-# 🏗 Philosophy
-
-SkillSync follows a few simple principles:
-
-- 📱 Offline First
-- 🔒 Privacy First
-- 💾 User Owns Their Data
-- 🎯 Simplicity Over Complexity
-- ♻ Reusable Components
-- 📈 Continuous Personal Growth
-
----
-
-# 🛠 Current Status
-
-## Version
-
-**v0.1 — Foundation**
-
-Current progress:
-
-- ✅ Premium UI Foundation
-- ✅ Design System
-- ✅ Navigation
-- ✅ App Architecture
-
-Upcoming:
-
-- 🚧 Learning Engine
-- 🚧 Local Database
-- 🚧 XP System
-- 🚧 Backup & Restore
-- 🚧 Projects
-- 🚧 Planner
-
----
-
-# 🗺 Roadmap
-
-### Phase 1
-- Foundation
-- Navigation
-- UI System
-
-### Phase 2
-- Learning Engine
-
-### Phase 3
-- Local Database
-
-### Phase 4
-- Backup & Restore
-
-### Phase 5
-- XP & Levels
-
-### Phase 6
-- Dashboard
-
-### Phase 7
-- Projects
-
-### Phase 8
-- Notes
-
-### Phase 9
-- Planner
-
-### Phase 10
-- Personal Stable Release (v1.0)
-
----
-
-# 🎨 Design Language
-
-Inspired by:
-
-- Apple Human Interface
-- Linear
-- Arc Browser
-- Notion
-- GitHub
-- Material Design 3
-
-Theme:
-
-- Dark First
-- Glassmorphism
-- Clean Typography
-- Minimal Design
-- Smooth Animations
-
----
-
-# 🧠 Tech Stack
-
-- React
-- React Native / Expo
-- TypeScript
-- Local Storage (initially)
-- GitHub
-- Future Cloud Sync
-
----
-
-# 📌 Long-Term Goal
-
-SkillSync starts as a personal project throughout my B.Tech journey.
-
-Every feature is built because I personally need it.
-
-After extensive real-world usage, testing, and refinement, the vision is to evolve SkillSync into an open-source platform that engineering students can customize for their own learning and growth.
-
----
-
-# 🤝 Contributing
-
-At the moment, SkillSync is under active personal development.
-
-Once the project reaches a stable public release, contributions, suggestions, and community improvements will be welcomed.
-
----
-
-# 📄 License
-
-License will be decided before the first public release.
-
----
-
-## 💜 Motto
-
-> **"Learn. Build. Track. Grow."**
+**Align • Connect • Elevate**

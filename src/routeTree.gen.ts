@@ -34,7 +34,7 @@ import { Route as NotesNoteIdRouteImport } from './routes/notes.$noteId'
 import { Route as LearnRoadmapIdRouteImport } from './routes/learn.$roadmapId'
 import { Route as HabitsHabitIdRouteImport } from './routes/habits.$habitId'
 import { Route as AttendanceSemesterRouteImport } from './routes/attendance.$semester'
-import { Route as NotesNoteIdEditRouteImport } from './routes/notes.$noteId.edit'
+import { Route as NotesNoteIdEditRouteImport } from './routes/notes.$noteId_.edit'
 import { Route as LearnRoadmapIdTopicIdRouteImport } from './routes/learn.$roadmapId_.$topicId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -163,9 +163,9 @@ const AttendanceSemesterRoute = AttendanceSemesterRouteImport.update({
   getParentRoute: () => AttendanceRoute,
 } as any)
 const NotesNoteIdEditRoute = NotesNoteIdEditRouteImport.update({
-  id: '/edit',
-  path: '/edit',
-  getParentRoute: () => NotesNoteIdRoute,
+  id: '/$noteId_/edit',
+  path: '/$noteId/edit',
+  getParentRoute: () => NotesRoute,
 } as any)
 const LearnRoadmapIdTopicIdRoute = LearnRoadmapIdTopicIdRouteImport.update({
   id: '/$roadmapId_/$topicId',
@@ -189,7 +189,7 @@ export interface FileRoutesByFullPath {
   '/attendance/$semester': typeof AttendanceSemesterRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
-  '/notes/$noteId': typeof NotesNoteIdRouteWithChildren
+  '/notes/$noteId': typeof NotesNoteIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
   '/profile/notifications': typeof ProfileNotificationsRoute
@@ -212,7 +212,7 @@ export interface FileRoutesByTo {
   '/attendance/$semester': typeof AttendanceSemesterRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
-  '/notes/$noteId': typeof NotesNoteIdRouteWithChildren
+  '/notes/$noteId': typeof NotesNoteIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
   '/profile/notifications': typeof ProfileNotificationsRoute
@@ -242,7 +242,7 @@ export interface FileRoutesById {
   '/attendance/$semester': typeof AttendanceSemesterRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
-  '/notes/$noteId': typeof NotesNoteIdRouteWithChildren
+  '/notes/$noteId': typeof NotesNoteIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
   '/profile/notifications': typeof ProfileNotificationsRoute
@@ -253,7 +253,7 @@ export interface FileRoutesById {
   '/notes/': typeof NotesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/learn/$roadmapId_/$topicId': typeof LearnRoadmapIdTopicIdRoute
-  '/notes/$noteId/edit': typeof NotesNoteIdEditRoute
+  '/notes/$noteId_/edit': typeof NotesNoteIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -336,7 +336,7 @@ export interface FileRouteTypes {
     | '/notes/'
     | '/profile/'
     | '/learn/$roadmapId_/$topicId'
-    | '/notes/$noteId/edit'
+    | '/notes/$noteId_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -531,12 +531,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AttendanceSemesterRouteImport
       parentRoute: typeof AttendanceRoute
     }
-    '/notes/$noteId/edit': {
-      id: '/notes/$noteId/edit'
-      path: '/edit'
+    '/notes/$noteId_/edit': {
+      id: '/notes/$noteId_/edit'
+      path: '/$noteId/edit'
       fullPath: '/notes/$noteId/edit'
       preLoaderRoute: typeof NotesNoteIdEditRouteImport
-      parentRoute: typeof NotesNoteIdRoute
+      parentRoute: typeof NotesRoute
     }
     '/learn/$roadmapId_/$topicId': {
       id: '/learn/$roadmapId_/$topicId'
@@ -601,26 +601,16 @@ const LearnRouteChildren: LearnRouteChildren = {
 
 const LearnRouteWithChildren = LearnRoute._addFileChildren(LearnRouteChildren)
 
-interface NotesNoteIdRouteChildren {
+interface NotesRouteChildren {
+  NotesNoteIdRoute: typeof NotesNoteIdRoute
+  NotesIndexRoute: typeof NotesIndexRoute
   NotesNoteIdEditRoute: typeof NotesNoteIdEditRoute
 }
 
-const NotesNoteIdRouteChildren: NotesNoteIdRouteChildren = {
-  NotesNoteIdEditRoute: NotesNoteIdEditRoute,
-}
-
-const NotesNoteIdRouteWithChildren = NotesNoteIdRoute._addFileChildren(
-  NotesNoteIdRouteChildren,
-)
-
-interface NotesRouteChildren {
-  NotesNoteIdRoute: typeof NotesNoteIdRouteWithChildren
-  NotesIndexRoute: typeof NotesIndexRoute
-}
-
 const NotesRouteChildren: NotesRouteChildren = {
-  NotesNoteIdRoute: NotesNoteIdRouteWithChildren,
+  NotesNoteIdRoute: NotesNoteIdRoute,
   NotesIndexRoute: NotesIndexRoute,
+  NotesNoteIdEditRoute: NotesNoteIdEditRoute,
 }
 
 const NotesRouteWithChildren = NotesRoute._addFileChildren(NotesRouteChildren)

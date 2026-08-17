@@ -22,6 +22,7 @@ import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile.index'
+import { Route as NotesIndexRouteImport } from './routes/notes.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as HabitsIndexRouteImport } from './routes/habits.index'
 import { Route as ExpensesIndexRouteImport } from './routes/expenses.index'
@@ -29,9 +30,11 @@ import { Route as AttendanceIndexRouteImport } from './routes/attendance.index'
 import { Route as ProfileNotificationsRouteImport } from './routes/profile.notifications'
 import { Route as ProfileModulesRouteImport } from './routes/profile.modules'
 import { Route as ProfileBackupRouteImport } from './routes/profile.backup'
+import { Route as NotesNoteIdRouteImport } from './routes/notes.$noteId'
 import { Route as LearnRoadmapIdRouteImport } from './routes/learn.$roadmapId'
 import { Route as HabitsHabitIdRouteImport } from './routes/habits.$habitId'
 import { Route as AttendanceSemesterRouteImport } from './routes/attendance.$semester'
+import { Route as NotesNoteIdEditRouteImport } from './routes/notes.$noteId_.edit'
 import { Route as LearnRoadmapIdTopicIdRouteImport } from './routes/learn.$roadmapId_.$topicId'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -99,6 +102,11 @@ const ProfileIndexRoute = ProfileIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProfileRoute,
 } as any)
+const NotesIndexRoute = NotesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NotesRoute,
+} as any)
 const LearnIndexRoute = LearnIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -134,6 +142,11 @@ const ProfileBackupRoute = ProfileBackupRouteImport.update({
   path: '/backup',
   getParentRoute: () => ProfileRoute,
 } as any)
+const NotesNoteIdRoute = NotesNoteIdRouteImport.update({
+  id: '/$noteId',
+  path: '/$noteId',
+  getParentRoute: () => NotesRoute,
+} as any)
 const LearnRoadmapIdRoute = LearnRoadmapIdRouteImport.update({
   id: '/$roadmapId',
   path: '/$roadmapId',
@@ -149,6 +162,11 @@ const AttendanceSemesterRoute = AttendanceSemesterRouteImport.update({
   path: '/$semester',
   getParentRoute: () => AttendanceRoute,
 } as any)
+const NotesNoteIdEditRoute = NotesNoteIdEditRouteImport.update({
+  id: '/$noteId_/edit',
+  path: '/$noteId/edit',
+  getParentRoute: () => NotesRoute,
+} as any)
 const LearnRoadmapIdTopicIdRoute = LearnRoadmapIdTopicIdRouteImport.update({
   id: '/$roadmapId_/$topicId',
   path: '/$roadmapId/$topicId',
@@ -162,7 +180,7 @@ export interface FileRoutesByFullPath {
   '/expenses': typeof ExpensesRouteWithChildren
   '/habits': typeof HabitsRouteWithChildren
   '/learn': typeof LearnRouteWithChildren
-  '/notes': typeof NotesRoute
+  '/notes': typeof NotesRouteWithChildren
   '/notifications': typeof NotificationsRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRouteWithChildren
@@ -171,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/attendance/$semester': typeof AttendanceSemesterRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
+  '/notes/$noteId': typeof NotesNoteIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
   '/profile/notifications': typeof ProfileNotificationsRoute
@@ -178,13 +197,14 @@ export interface FileRoutesByFullPath {
   '/expenses/': typeof ExpensesIndexRoute
   '/habits/': typeof HabitsIndexRoute
   '/learn/': typeof LearnIndexRoute
+  '/notes/': typeof NotesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/learn/$roadmapId/$topicId': typeof LearnRoadmapIdTopicIdRoute
+  '/notes/$noteId/edit': typeof NotesNoteIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analytics': typeof AnalyticsRoute
-  '/notes': typeof NotesRoute
   '/notifications': typeof NotificationsRoute
   '/planner': typeof PlannerRoute
   '/projects': typeof ProjectsRoute
@@ -192,6 +212,7 @@ export interface FileRoutesByTo {
   '/attendance/$semester': typeof AttendanceSemesterRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
+  '/notes/$noteId': typeof NotesNoteIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
   '/profile/notifications': typeof ProfileNotificationsRoute
@@ -199,8 +220,10 @@ export interface FileRoutesByTo {
   '/expenses': typeof ExpensesIndexRoute
   '/habits': typeof HabitsIndexRoute
   '/learn': typeof LearnIndexRoute
+  '/notes': typeof NotesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/learn/$roadmapId/$topicId': typeof LearnRoadmapIdTopicIdRoute
+  '/notes/$noteId/edit': typeof NotesNoteIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -210,7 +233,7 @@ export interface FileRoutesById {
   '/expenses': typeof ExpensesRouteWithChildren
   '/habits': typeof HabitsRouteWithChildren
   '/learn': typeof LearnRouteWithChildren
-  '/notes': typeof NotesRoute
+  '/notes': typeof NotesRouteWithChildren
   '/notifications': typeof NotificationsRoute
   '/planner': typeof PlannerRoute
   '/profile': typeof ProfileRouteWithChildren
@@ -219,6 +242,7 @@ export interface FileRoutesById {
   '/attendance/$semester': typeof AttendanceSemesterRoute
   '/habits/$habitId': typeof HabitsHabitIdRoute
   '/learn/$roadmapId': typeof LearnRoadmapIdRoute
+  '/notes/$noteId': typeof NotesNoteIdRoute
   '/profile/backup': typeof ProfileBackupRoute
   '/profile/modules': typeof ProfileModulesRoute
   '/profile/notifications': typeof ProfileNotificationsRoute
@@ -226,8 +250,10 @@ export interface FileRoutesById {
   '/expenses/': typeof ExpensesIndexRoute
   '/habits/': typeof HabitsIndexRoute
   '/learn/': typeof LearnIndexRoute
+  '/notes/': typeof NotesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/learn/$roadmapId_/$topicId': typeof LearnRoadmapIdTopicIdRoute
+  '/notes/$noteId_/edit': typeof NotesNoteIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -247,6 +273,7 @@ export interface FileRouteTypes {
     | '/attendance/$semester'
     | '/habits/$habitId'
     | '/learn/$roadmapId'
+    | '/notes/$noteId'
     | '/profile/backup'
     | '/profile/modules'
     | '/profile/notifications'
@@ -254,13 +281,14 @@ export interface FileRouteTypes {
     | '/expenses/'
     | '/habits/'
     | '/learn/'
+    | '/notes/'
     | '/profile/'
     | '/learn/$roadmapId/$topicId'
+    | '/notes/$noteId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/analytics'
-    | '/notes'
     | '/notifications'
     | '/planner'
     | '/projects'
@@ -268,6 +296,7 @@ export interface FileRouteTypes {
     | '/attendance/$semester'
     | '/habits/$habitId'
     | '/learn/$roadmapId'
+    | '/notes/$noteId'
     | '/profile/backup'
     | '/profile/modules'
     | '/profile/notifications'
@@ -275,8 +304,10 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/habits'
     | '/learn'
+    | '/notes'
     | '/profile'
     | '/learn/$roadmapId/$topicId'
+    | '/notes/$noteId/edit'
   id:
     | '__root__'
     | '/'
@@ -294,6 +325,7 @@ export interface FileRouteTypes {
     | '/attendance/$semester'
     | '/habits/$habitId'
     | '/learn/$roadmapId'
+    | '/notes/$noteId'
     | '/profile/backup'
     | '/profile/modules'
     | '/profile/notifications'
@@ -301,8 +333,10 @@ export interface FileRouteTypes {
     | '/expenses/'
     | '/habits/'
     | '/learn/'
+    | '/notes/'
     | '/profile/'
     | '/learn/$roadmapId_/$topicId'
+    | '/notes/$noteId_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -312,7 +346,7 @@ export interface RootRouteChildren {
   ExpensesRoute: typeof ExpensesRouteWithChildren
   HabitsRoute: typeof HabitsRouteWithChildren
   LearnRoute: typeof LearnRouteWithChildren
-  NotesRoute: typeof NotesRoute
+  NotesRoute: typeof NotesRouteWithChildren
   NotificationsRoute: typeof NotificationsRoute
   PlannerRoute: typeof PlannerRoute
   ProfileRoute: typeof ProfileRouteWithChildren
@@ -413,6 +447,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/notes/': {
+      id: '/notes/'
+      path: '/'
+      fullPath: '/notes/'
+      preLoaderRoute: typeof NotesIndexRouteImport
+      parentRoute: typeof NotesRoute
+    }
     '/learn/': {
       id: '/learn/'
       path: '/'
@@ -462,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileBackupRouteImport
       parentRoute: typeof ProfileRoute
     }
+    '/notes/$noteId': {
+      id: '/notes/$noteId'
+      path: '/$noteId'
+      fullPath: '/notes/$noteId'
+      preLoaderRoute: typeof NotesNoteIdRouteImport
+      parentRoute: typeof NotesRoute
+    }
     '/learn/$roadmapId': {
       id: '/learn/$roadmapId'
       path: '/$roadmapId'
@@ -482,6 +530,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/attendance/$semester'
       preLoaderRoute: typeof AttendanceSemesterRouteImport
       parentRoute: typeof AttendanceRoute
+    }
+    '/notes/$noteId_/edit': {
+      id: '/notes/$noteId_/edit'
+      path: '/$noteId/edit'
+      fullPath: '/notes/$noteId/edit'
+      preLoaderRoute: typeof NotesNoteIdEditRouteImport
+      parentRoute: typeof NotesRoute
     }
     '/learn/$roadmapId_/$topicId': {
       id: '/learn/$roadmapId_/$topicId'
@@ -546,6 +601,20 @@ const LearnRouteChildren: LearnRouteChildren = {
 
 const LearnRouteWithChildren = LearnRoute._addFileChildren(LearnRouteChildren)
 
+interface NotesRouteChildren {
+  NotesNoteIdRoute: typeof NotesNoteIdRoute
+  NotesIndexRoute: typeof NotesIndexRoute
+  NotesNoteIdEditRoute: typeof NotesNoteIdEditRoute
+}
+
+const NotesRouteChildren: NotesRouteChildren = {
+  NotesNoteIdRoute: NotesNoteIdRoute,
+  NotesIndexRoute: NotesIndexRoute,
+  NotesNoteIdEditRoute: NotesNoteIdEditRoute,
+}
+
+const NotesRouteWithChildren = NotesRoute._addFileChildren(NotesRouteChildren)
+
 interface ProfileRouteChildren {
   ProfileBackupRoute: typeof ProfileBackupRoute
   ProfileModulesRoute: typeof ProfileModulesRoute
@@ -570,7 +639,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExpensesRoute: ExpensesRouteWithChildren,
   HabitsRoute: HabitsRouteWithChildren,
   LearnRoute: LearnRouteWithChildren,
-  NotesRoute: NotesRoute,
+  NotesRoute: NotesRouteWithChildren,
   NotificationsRoute: NotificationsRoute,
   PlannerRoute: PlannerRoute,
   ProfileRoute: ProfileRouteWithChildren,

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { SkillSyncLogo } from "@/components/brand/SkillSyncLogo";
+
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,

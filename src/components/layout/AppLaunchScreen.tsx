@@ -114,7 +114,7 @@ export function AppLaunchScreen() {
     >
       {/* Ambient bloom behind the mark — one blurred radial layer, no shadows. */}
       <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[min(120vw,560px)] w-[min(120vw,560px)] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[min(120vw,560px)] w-[min(120vw,560px)] rounded-full"
         style={{
           background:
             "radial-gradient(circle, rgba(124,92,245,0.28) 0%, rgba(34,211,238,0.12) 40%, transparent 70%)",

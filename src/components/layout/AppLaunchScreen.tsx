@@ -119,7 +119,9 @@ export function AppLaunchScreen() {
           background:
             "radial-gradient(circle, rgba(124,92,245,0.28) 0%, rgba(34,211,238,0.12) 40%, transparent 70%)",
           filter: "blur(40px)",
+          transform: "translate(-50%, -50%)",
           opacity: "var(--launch-glow, 1)",
+
           animation: r
             ? "ssx-in 260ms ease-out both"
             : `ssx-bloom 1600ms cubic-bezier(.22,1,.36,1) ${P.pulse}ms both`,

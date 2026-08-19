@@ -44,22 +44,13 @@ function applyTheme(resolved: ResolvedTheme, animate: boolean) {
 }
 
 /**
- * Applies the persisted theme preference to <html> and mirrors it onto the
- * Android system bars. No system-preference listener: the OS never flips the
- * app's theme.
+ * Applies the appearance derived from the Background preference to <html> and
+ * mirrors it onto the Android system bars. No system-preference listener: the
+ * OS never flips the app's appearance.
  */
 export function useTheme(): ResolvedTheme {
-  const stored = useAppStore((s) => s.preferences.theme);
-  const updatePreferences = useAppStore((s) => s.updatePreferences);
-  const resolved = resolveTheme(stored);
-
-  // One-time normalisation of the removed "system" mode into an explicit
-  // choice, so the OS can never influence the app again.
-  useEffect(() => {
-    if (stored !== "light" && stored !== "dark") {
-      updatePreferences({ theme: resolved });
-    }
-  }, [stored, resolved, updatePreferences]);
+  const background = useAppStore((s) => s.preferences.background);
+  const resolved = resolveTheme(background);
 
   useEffect(() => {
     applyTheme(resolved, true);
@@ -71,7 +62,7 @@ export function useTheme(): ResolvedTheme {
 
 /** Read-only resolved theme for components that need to branch visually. */
 export function useResolvedTheme(): ResolvedTheme {
-  return resolveTheme(useAppStore((s) => s.preferences.theme));
+  return resolveTheme(useAppStore((s) => s.preferences.background));
 }
 
 export function ThemeManager() {

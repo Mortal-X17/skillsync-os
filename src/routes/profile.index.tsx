@@ -3,7 +3,6 @@ import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   ChevronRight,
-  Palette,
   Info,
   Bell,
   Shield,
@@ -34,7 +33,6 @@ import {
   BACKGROUND_OPTIONS,
   type BackgroundStyle,
 } from "@/components/layout/backgrounds";
-import { THEME_OPTIONS, resolveTheme } from "@/hooks/use-theme";
 import { haptics, hapticsSupported, type HapticIntensity } from "@/lib/haptics";
 
 
@@ -95,7 +93,6 @@ function ProfilePage() {
   const [openProfile, setOpenProfile] = useState(false);
   const [openJson, setOpenJson] = useState(false);
   const [openAppearance, setOpenAppearance] = useState(false);
-  const [openTheme, setOpenTheme] = useState(false);
   const [openHaptics, setOpenHaptics] = useState(false);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   

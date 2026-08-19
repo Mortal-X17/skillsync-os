@@ -1,5 +1,5 @@
 import { useAppStore } from "@/store/useAppStore";
-import { useResolvedTheme } from "@/hooks/use-theme";
+
 import { AuroraBackground } from "./AuroraBackground";
 import { MinimalGradientBackground } from "./MinimalGradientBackground";
 import { AtmosphericBackground } from "./AtmosphericBackground";

@@ -108,6 +108,8 @@ export type BackupSummary = {
   plannerTasks: number;
   habits: number;
   habitLogs: number;
+  subjects: number;
+  transactions: number;
 };
 
 export function backupSummary(data: AppData): BackupSummary {
@@ -138,6 +140,8 @@ export function backupSummary(data: AppData): BackupSummary {
     plannerTasks: data.planner.length,
     habits: data.habits.length,
     habitLogs: data.habitLogs.length,
+    subjects: data.attendance?.subjects?.length ?? 0,
+    transactions: data.expenses?.transactions?.length ?? 0,
   };
 }
 
@@ -152,7 +156,9 @@ export function totalRecords(s: BackupSummary): number {
     s.projects +
     s.plannerTasks +
     s.habits +
-    s.habitLogs
+    s.habitLogs +
+    s.subjects +
+    s.transactions
   );
 }
 
@@ -165,6 +171,8 @@ export function moduleList(data: AppData): { key: string; label: string; count: 
     { key: "planner", label: "Planner tasks", count: s.plannerTasks },
     { key: "habits", label: "Habits", count: s.habits },
     { key: "habitLogs", label: "Habit logs", count: s.habitLogs },
+    { key: "attendance", label: "Attendance subjects", count: s.subjects },
+    { key: "expenses", label: "Expense entries", count: s.transactions },
     { key: "preferences", label: "Preferences & settings", count: 1 },
     { key: "profile", label: "Profile", count: 1 },
   ];
@@ -224,3 +232,81 @@ export function fmtTime(ms: number): string {
     minute: "2-digit",
   });
 }
+
+/**
+ * User-facing description of exactly what a backup file contains, derived from
+ * the real serialized data model so nothing is claimed that is not stored.
+ */
+export type IncludedCategory = {
+  key: string;
+  label: string;
+  detail: string;
+  count: number;
+};
+
+export function includedCategories(data: AppData): IncludedCategory[] {
+  const s = backupSummary(data);
+  return [
+    {
+      key: "roadmaps",
+      label: "Learning roadmaps",
+      detail: `${s.phases} phases · ${s.topics} topics · ${s.subtopics} subtopics · ${s.checklists} checklist items, with completion state and resources`,
+      count: s.roadmaps,
+    },
+    {
+      key: "notes",
+      label: "Notes",
+      detail: "Titles, full content and timestamps",
+      count: s.notes,
+    },
+    {
+      key: "projects",
+      label: "Projects",
+      detail: "Project details, status and their task lists",
+      count: s.projects,
+    },
+    {
+      key: "planner",
+      label: "Planner tasks",
+      detail: "Scheduled tasks with their day and done state",
+      count: s.plannerTasks,
+    },
+    {
+      key: "habits",
+      label: "Habits",
+      detail: `${s.habitLogs} logged completions, streak history and start dates`,
+      count: s.habits,
+    },
+    {
+      key: "attendance",
+      label: "Attendance subjects",
+      detail: "Semesters, faculty, minimum requirement and present/absent counts",
+      count: s.subjects,
+    },
+    {
+      key: "expenses",
+      label: "Expense entries",
+      detail: "Amounts, type, description, tags, dates and your custom order",
+      count: s.transactions,
+    },
+    {
+      key: "preferences",
+      label: "Preferences & settings",
+      detail: "Background/appearance, haptics, notification settings, optional modules, developer mode",
+      count: 1,
+    },
+    {
+      key: "profile",
+      label: "Profile & stats",
+      detail: "Your name, avatar, XP, level and streak",
+      count: 1,
+    },
+  ];
+}
+
+/** Things a backup deliberately does not contain. */
+export const NOT_INCLUDED: string[] = [
+  "Anything stored outside SkillSync on your device",
+  "Scheduled Android reminders (they are rebuilt from your settings after a restore)",
+  "Cloud accounts or sync — a backup is a single local file you control",
+];

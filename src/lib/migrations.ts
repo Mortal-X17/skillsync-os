@@ -83,17 +83,15 @@ export function migrate(input: unknown): AppData {
     },
   };
   // Appearance has exactly one source of truth: preferences.background.
-  if ((data.preferences as any).theme === "light" &&
-      !["aurora", "gradient", "atmospheric", "light"].includes(
-        (data.preferences as any).background,
-      )) {
-    (data.preferences as any).background = "light";
+  // A legacy light theme becomes the Minimalist Light background.
+  {
+    const prefs = data.preferences as any;
+    if (prefs.theme === "light") prefs.background = "light";
+    delete prefs.theme;
+    if (!["aurora", "gradient", "atmospheric", "light"].includes(prefs.background)) {
+      prefs.background = "aurora";
+    }
   }
-  if ((data.preferences as any).theme === "light" &&
-      (data.preferences as any).background === undefined) {
-    (data.preferences as any).background = "light";
-  }
-  delete (data.preferences as any).theme;
 
   data.attendance = data.attendance ?? { subjects: [] };
   data.expenses = data.expenses ?? { transactions: [] };

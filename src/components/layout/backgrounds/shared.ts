@@ -5,7 +5,7 @@ export const NOISE =
 export const BASE_LAYER_CLASS =
   "pointer-events-none fixed inset-0 -z-10 overflow-hidden";
 
-export type BackgroundStyle = "aurora" | "gradient" | "atmospheric";
+export type BackgroundStyle = "aurora" | "gradient" | "atmospheric" | "light";
 
 export const BACKGROUND_OPTIONS: {
   id: BackgroundStyle;
@@ -35,5 +35,13 @@ export const BACKGROUND_OPTIONS: {
     description: "Corner lighting and ambient shadow depth. No visible shapes.",
     swatch:
       "radial-gradient(50% 50% at 0% 0%, rgba(124,58,237,0.20), transparent 70%), radial-gradient(50% 50% at 100% 100%, rgba(29,78,216,0.18), transparent 70%), #09090b",
+  },
+  {
+    id: "light",
+    label: "Minimalist Light",
+    description:
+      "Warm off-white surfaces with a calm indigo atmosphere — the full light experience.",
+    swatch:
+      "radial-gradient(70% 70% at 20% 0%, rgba(99,102,241,0.18), transparent 68%), radial-gradient(60% 60% at 90% 100%, rgba(167,139,250,0.16), transparent 70%), #fbfaf8",
   },
 ];

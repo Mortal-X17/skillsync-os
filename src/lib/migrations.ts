@@ -44,6 +44,17 @@ const migrators: Record<number, (data: any) => any> = {
       background: (data.preferences ?? {}).background ?? "aurora",
     },
   }),
+  /**
+   * v4 -> v5: the separate Theme preference is gone. Background is now the
+   * single source of truth for appearance, so anyone who had chosen the light
+   * theme keeps a light app via the new "light" background.
+   */
+  4: (data) => {
+    const prefs = { ...(data.preferences ?? {}) };
+    if (prefs.theme === "light") prefs.background = "light";
+    delete prefs.theme;
+    return { ...data, preferences: prefs };
+  },
 };
 
 export function migrate(input: unknown): AppData {
@@ -64,7 +75,6 @@ export function migrate(input: unknown): AppData {
     notifications: true,
     developerMode: false,
     background: "aurora",
-    theme: "dark",
     ...(data.preferences ?? {}),
     modules: {
       attendance: false,
@@ -72,6 +82,19 @@ export function migrate(input: unknown): AppData {
       ...((data.preferences ?? {}).modules ?? {}),
     },
   };
+  // Appearance has exactly one source of truth: preferences.background.
+  if ((data.preferences as any).theme === "light" &&
+      !["aurora", "gradient", "atmospheric", "light"].includes(
+        (data.preferences as any).background,
+      )) {
+    (data.preferences as any).background = "light";
+  }
+  if ((data.preferences as any).theme === "light" &&
+      (data.preferences as any).background === undefined) {
+    (data.preferences as any).background = "light";
+  }
+  delete (data.preferences as any).theme;
+
   data.attendance = data.attendance ?? { subjects: [] };
   data.expenses = data.expenses ?? { transactions: [] };
   // Expense Manager V2: description / tags / position / updatedAt

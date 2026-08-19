@@ -16,19 +16,18 @@ export {
 };
 
 export function BackgroundByStyle({ style }: { style: BackgroundStyle }) {
+  if (style === "light") return <LightAtmosphereBackground />;
   if (style === "gradient") return <MinimalGradientBackground />;
   if (style === "atmospheric") return <AtmosphericBackground />;
   return <AuroraBackground />;
 }
 
 /**
- * Renders the background chosen in Profile → Preferences → Appearance.
- * The Light theme has its own restrained atmosphere instead of the dark
- * northern-lights curtain.
+ * Renders the background chosen in Profile → Preferences → Background — the
+ * single source of truth for the app's appearance. "Minimalist Light" swaps in
+ * the restrained light atmosphere instead of the dark aurora curtain.
  */
 export function AppBackground() {
   const style = useAppStore((s) => s.preferences.background) ?? "aurora";
-  const theme = useResolvedTheme();
-  if (theme === "light" && style === "aurora") return <LightAtmosphereBackground />;
   return <BackgroundByStyle style={style} />;
 }

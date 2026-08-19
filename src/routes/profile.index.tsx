@@ -443,26 +443,6 @@ function ProfilePage() {
 
               <button
                 type="button"
-                onClick={() => setOpenTheme(true)}
-                className="w-full text-left transition-transform active:scale-[0.99]"
-              >
-                <SettingRow
-                  icon={Palette}
-                  label="Theme"
-                  right={
-                    <span className="flex items-center gap-2">
-                      <span className="text-[13px] text-muted-foreground">
-                        {THEME_OPTIONS.find(
-                          (o) => o.id === resolveTheme(preferences.theme),
-                        )?.label}
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
-                    </span>
-                  }
-                />
-              </button>
-              <button
-                type="button"
                 onClick={() => setOpenHaptics(true)}
                 className="w-full text-left transition-transform active:scale-[0.99]"
               >
@@ -684,57 +664,6 @@ function ProfilePage() {
         </div>
       </BottomSheet>
 
-      <BottomSheet
-        open={openTheme}
-        onClose={() => setOpenTheme(false)}
-        title="Theme"
-      >
-        <p className="mb-4 text-[13px] leading-relaxed text-muted-foreground">
-          Switch instantly. Every module, card and chart follows the theme.
-        </p>
-        <div className="space-y-3">
-          {THEME_OPTIONS.map((opt) => {
-            const active = resolveTheme(preferences.theme) === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => {
-                  haptics.selection();
-                  updatePreferences({ theme: opt.id });
-                }}
-                className={
-                  "w-full overflow-hidden rounded-[18px] border text-left transition-all active:scale-[0.98] " +
-                  (active
-                    ? "border-[color-mix(in_oklab,var(--primary)_55%,transparent)] shadow-[var(--shadow-glow)]"
-                    : "border-border")
-                }
-              >
-                <div
-                  className="h-20 w-full"
-                  style={{ background: opt.swatch }}
-                  aria-hidden="true"
-                />
-                <div className="flex items-center justify-between gap-3 bg-white/[0.03] px-4 py-3">
-                  <div className="min-w-0">
-                    <div className="text-[14px] font-semibold tracking-tight">
-                      {opt.label}
-                    </div>
-                    <div className="text-[12px] leading-relaxed text-muted-foreground">
-                      {opt.description}
-                    </div>
-                  </div>
-                  {active ? (
-                    <span className="shrink-0 rounded-full bg-[var(--primary)] px-2.5 py-1 text-[11px] font-semibold text-primary-foreground">
-                      Active
-                    </span>
-                  ) : null}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </BottomSheet>
 
       <BottomSheet
         open={openAppearance}

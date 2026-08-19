@@ -127,10 +127,13 @@ export const PreferencesSchema = z.object({
   notifications: z.boolean().default(true),
   developerMode: z.boolean().default(false),
   modules: ModuleFlagsSchema.default({ attendance: false, expenses: false }),
+  /**
+   * The single source of truth for the app's appearance. "light" activates the
+   * Minimalist Light visual system; every other value is a dark variant.
+   */
   background: z
-    .enum(["aurora", "gradient", "atmospheric"])
+    .enum(["aurora", "gradient", "atmospheric", "light"])
     .default("aurora"),
-  theme: z.enum(["light", "dark", "system"]).default("dark"),
   /** Tactile feedback on supported devices. */
   haptics: z.boolean().default(true),
   hapticIntensity: z.enum(["light", "standard", "strong"]).default("standard"),
@@ -191,9 +194,9 @@ export const AppDataSchema = z.object({
     developerMode: false,
     modules: { attendance: false, expenses: false },
     background: "aurora",
-    theme: "dark",
     haptics: true,
     hapticIntensity: "standard",
+
 
   }),
   stats: StatsSchema.default({ xp: 0, level: 1, streak: 0, lastActive: "" }),

@@ -283,6 +283,12 @@ export function BackupSection({
     }
   };
 
+  const includedData = useMemo(
+    () => (includedOpen ? snapshotData() : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [includedOpen],
+  );
+
   const summary = pendingRestore ? backupSummary(pendingRestore.data) : null;
   const createSummary = previewData ? backupSummary(previewData) : null;
   const createSize = previewData

@@ -130,27 +130,27 @@ function matchesQuery(t: Transaction, q: string) {
 type RowProps = {
   tx: Transaction;
   dragging: boolean;
-  offset: number;
   onEdit: (tx: Transaction) => void;
   onLongPressStart: (id: string, e: React.PointerEvent<HTMLDivElement>) => void;
+  registerRow: (id: string, el: HTMLDivElement | null) => void;
 };
 
 const ExpenseRow = memo(function ExpenseRow({
   tx,
   dragging,
-  offset,
   onEdit,
   onLongPressStart,
+  registerRow,
 }: RowProps) {
   const credit = tx.type === "credit";
   return (
     <div
       data-expense-row={tx.id}
+      ref={(el) => registerRow(tx.id, el)}
       onPointerDown={(e) => onLongPressStart(tx.id, e)}
       style={{
-        transform: offset ? `translateY(${offset}px)` : undefined,
-        transition: dragging ? "none" : "transform 200ms var(--ease-out-soft)",
-        touchAction: dragging ? "none" : undefined,
+        // Declared up front so activating a drag never waits on a React render.
+        touchAction: "pan-y",
       }}
       className={cn(
         "relative flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-white/[0.02] px-3 py-3 select-none",

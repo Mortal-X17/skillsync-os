@@ -107,7 +107,8 @@ export function BackupSection({
     }
   };
 
-  const saveCreated = () => {
+  /** Last-resort browser download. */
+  const anchorDownload = () => {
     if (!created) return;
     const blob = new Blob([created.text], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -120,9 +121,92 @@ export function BackupSection({
     URL.revokeObjectURL(url);
   };
 
-  const shareCreated = async () => {
-    if (!created) return;
+  const saveCreated = async () => {
+    if (!created || busy) return;
+    setBusy("save");
     try {
+      const native = await nativeSaveFile({
+        filename: created.filename,
+        mimeType: "application/json",
+        text: created.text,
+      });
+      if (native.status === "saved") {
+        haptics.success();
+        toast.success(
+          native.location
+            ? `Saved to ${native.location}`
+            : `Saved ${created.filename}`,
+        );
+        return;
+      }
+      if (native.status === "error") {
+        haptics.error();
+        toast.error(`Could not save backup: ${native.message}`);
+        return;
+      }
+
+      // Chromium desktop: real file picker.
+      const picker = (
+        window as unknown as {
+          showSaveFilePicker?: (o: unknown) => Promise<{
+            createWritable: () => Promise<{
+              write: (d: string) => Promise<void>;
+              close: () => Promise<void>;
+            }>;
+          }>;
+        }
+      ).showSaveFilePicker;
+      if (picker) {
+        try {
+          const handle = await picker({
+            suggestedName: created.filename,
+            types: [
+              {
+                description: "SkillSync backup",
+                accept: { "application/json": [".json"] },
+              },
+            ],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(created.text);
+          await writable.close();
+          haptics.success();
+          toast.success(`Saved ${created.filename}`);
+          return;
+        } catch (e: any) {
+          if (e?.name === "AbortError") {
+            toast("Save cancelled");
+            return;
+          }
+          haptics.error();
+          toast.error(e?.message ?? "Could not save backup");
+          return;
+        }
+      }
+
+      anchorDownload();
+      toast.success(`Downloaded ${created.filename}`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const shareCreated = async () => {
+    if (!created || busy) return;
+    setBusy("share");
+    try {
+      const native = await nativeShareFile({
+        filename: created.filename,
+        mimeType: "application/json",
+        text: created.text,
+      });
+      if (native.status === "shared") return;
+      if (native.status === "error") {
+        haptics.error();
+        toast.error(`Could not share backup: ${native.message}`);
+        return;
+      }
+
       const file = new File([created.text], created.filename, {
         type: "application/json",
       });
@@ -131,17 +215,26 @@ export function BackupSection({
         share?: (d: { files?: File[]; title?: string; text?: string }) => Promise<void>;
       };
       if (nav.share && nav.canShare?.({ files: [file] })) {
-        await nav.share({
-          files: [file],
-          title: "SkillSync backup",
-          text: `SkillSync backup · ${fmtDate(created.meta.createdAt)}`,
-        });
-      } else {
-        saveCreated();
-        toast("Sharing not supported. Backup downloaded instead.");
+        try {
+          await nav.share({
+            files: [file],
+            title: "SkillSync backup",
+            text: `SkillSync backup · ${fmtDate(created.meta.createdAt)}`,
+          });
+        } catch (e: any) {
+          if (e?.name === "AbortError") toast("Share cancelled");
+          else {
+            haptics.error();
+            toast.error(e?.message ?? "Could not share backup");
+          }
+        }
+        return;
       }
-    } catch {
-      /* user cancelled */
+
+      anchorDownload();
+      toast("Sharing isn't available here — the backup was downloaded instead.");
+    } finally {
+      setBusy(null);
     }
   };
 

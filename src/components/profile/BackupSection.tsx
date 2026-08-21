@@ -654,10 +654,76 @@ export function BackupSection({
           </div>
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
             <div className="text-[13px] font-semibold tracking-tight">
+              Restoring
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              A restore fully replaces the workspace on this device with the
+              contents of the file — it is not merged.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
+              Limitations
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Backups are plain JSON files stored on this device. There is no
+              cloud sync — keep the file somewhere safe yourself.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
               App version
             </div>
             <p className="mt-1 text-[12.5px] text-muted-foreground">
               SkillSync v{APP_VERSION} · Backup format v{BACKUP_VERSION}
+            </p>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* What's included sheet */}
+      <BottomSheet
+        open={includedOpen}
+        onClose={() => setIncludedOpen(false)}
+        title="What's included"
+      >
+        <div className="space-y-4">
+          <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+            A backup contains everything SkillSync stores on this device. These
+            are the live counts from your current workspace — restoring this
+            backup brings all of it back exactly as it is now.
+          </p>
+          {includedData ? (
+            <div className="space-y-1.5">
+              {moduleList(includedData).map((m) => (
+                <div
+                  key={m.key}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-2.5"
+                >
+                  <span className="text-[12.5px] text-foreground">{m.label}</span>
+                  <span className="text-[12.5px] font-semibold tabular-nums text-muted-foreground">
+                    {m.count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
+              Roadmap detail
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Every roadmap is saved in full — its phases, topics, subtopics and
+              checklist items, including what you've already completed.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
+              Not included
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Nothing outside SkillSync's own local data — no device settings,
+              no files from other apps, and no accounts.
             </p>
           </div>
         </div>

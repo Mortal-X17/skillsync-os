@@ -444,18 +444,30 @@ export function BackupSection({
             <div className="flex gap-2">
               <button
                 onClick={shareCreated}
-                className="flex-1 rounded-xl border border-white/[0.08] py-2.5 text-[13.5px] font-medium text-foreground active:scale-[0.97]"
+                disabled={busy !== null}
+                className="flex-1 rounded-xl border border-white/[0.08] py-2.5 text-[13.5px] font-medium text-foreground active:scale-[0.97] disabled:opacity-60"
               >
                 <span className="inline-flex items-center justify-center gap-2">
-                  <Share2 className="h-3.5 w-3.5" /> Share
+                  {busy === "share" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Share2 className="h-3.5 w-3.5" />
+                  )}
+                  {busy === "share" ? "Sharing…" : "Share"}
                 </span>
               </button>
               <button
                 onClick={saveCreated}
-                className="flex-1 rounded-xl gradient-primary py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
+                disabled={busy !== null}
+                className="flex-1 rounded-xl gradient-primary py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97] disabled:opacity-70"
               >
                 <span className="inline-flex items-center justify-center gap-2">
-                  <Save className="h-3.5 w-3.5" /> Save backup
+                  {busy === "save" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Save className="h-3.5 w-3.5" />
+                  )}
+                  {busy === "save" ? "Saving…" : "Save backup"}
                 </span>
               </button>
             </div>

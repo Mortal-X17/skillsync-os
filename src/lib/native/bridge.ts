@@ -134,3 +134,37 @@ export async function nativeSetTheme(
     return false;
   }
 }
+
+type FilePayload = { filename: string; mimeType?: string; text: string };
+
+/** Writes a file into the device's Downloads folder through the native shell. */
+export async function nativeSaveFile(o: FilePayload): Promise<NativeFileResult> {
+  const bridge = nativeBridge();
+  if (!bridge?.saveFile) return { status: "unsupported" };
+  try {
+    const res = await bridge.saveFile({
+      filename: o.filename,
+      mimeType: o.mimeType ?? "application/json",
+      text: o.text,
+    });
+    return { status: "saved", location: res?.location };
+  } catch (error) {
+    return { status: "error", message: (error as Error)?.message ?? "Save failed" };
+  }
+}
+
+/** Hands a file to the Android system share sheet. */
+export async function nativeShareFile(o: FilePayload): Promise<NativeFileResult> {
+  const bridge = nativeBridge();
+  if (!bridge?.shareFile) return { status: "unsupported" };
+  try {
+    await bridge.shareFile({
+      filename: o.filename,
+      mimeType: o.mimeType ?? "application/json",
+      text: o.text,
+    });
+    return { status: "shared" };
+  } catch (error) {
+    return { status: "error", message: (error as Error)?.message ?? "Share failed" };
+  }
+}

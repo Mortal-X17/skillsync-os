@@ -40,6 +40,7 @@ import {
   type ValidBackup,
 } from "@/lib/backup";
 import { AppDataSchema, type AppData } from "@/lib/schema";
+import { nativeSaveFile, nativeShareFile } from "@/lib/native/bridge";
 
 type ResetIntent = "hard";
 
@@ -72,6 +73,8 @@ export function BackupSection({
 
   // Info state
   const [infoOpen, setInfoOpen] = useState(false);
+  const [includedOpen, setIncludedOpen] = useState(false);
+  const [busy, setBusy] = useState<"save" | "share" | null>(null);
 
   const snapshotData = (): AppData => {
     const raw = exportJSON();

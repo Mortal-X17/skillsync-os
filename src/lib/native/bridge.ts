@@ -50,7 +50,23 @@ type NativePlugin = {
   listScheduled(): Promise<{ scheduled: unknown[] }>;
   takePendingRoute(): Promise<{ route: string | null }>;
   setTheme?(o: { theme: string; background?: string }): Promise<{ ok: boolean }>;
+  saveFile?(o: {
+    filename: string;
+    mimeType: string;
+    text: string;
+  }): Promise<{ ok: boolean; location?: string; filename?: string }>;
+  shareFile?(o: {
+    filename: string;
+    mimeType: string;
+    text: string;
+  }): Promise<{ ok: boolean }>;
 };
+
+export type NativeFileResult =
+  | { status: "saved"; location?: string }
+  | { status: "shared" }
+  | { status: "unsupported" }
+  | { status: "error"; message: string };
 
 type CapacitorGlobal = {
   isNativePlatform?: () => boolean;

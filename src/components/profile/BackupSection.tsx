@@ -341,8 +341,8 @@ export function BackupSection({
         <ActionCard
           icon={Package}
           label="What's included"
-          hint={`v${BACKUP_VERSION} · App v${APP_VERSION}`}
-          onClick={() => setInfoOpen(true)}
+          hint="Data & features"
+          onClick={() => setIncludedOpen(true)}
         />
       </div>
 

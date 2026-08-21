@@ -236,16 +236,28 @@ function DragList({
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [order, setOrder] = useState<string[] | null>(null);
-  const [dy, setDy] = useState(0);
+
+  /** Live row elements, so a drag can write transforms without re-rendering. */
+  const rows = useRef(new Map<string, HTMLDivElement>());
+  const registerRow = useCallback((id: string, el: HTMLDivElement | null) => {
+    if (el) rows.current.set(id, el);
+    else rows.current.delete(id);
+  }, []);
+
   const state = useRef({
     timer: 0 as unknown as ReturnType<typeof setTimeout>,
     startY: 0,
+    pointerY: 0,
+    scrolled: 0,
+    scrollDir: 0,
     rowH: 0,
-    fromIndex: 0,
-    index: 0,
+    baseIds: [] as string[],
     ids: [] as string[],
+    index: 0,
+    dragId: null as string | null,
     active: false,
-    autoScroll: 0 as unknown as ReturnType<typeof setInterval>,
+    raf: 0,
+    captured: null as { el: HTMLDivElement; pointerId: number } | null,
   });
 
   const list = useMemo(() => {
@@ -254,98 +266,156 @@ function DragList({
     return order.map((id) => map.get(id)!).filter(Boolean);
   }, [items, order]);
 
-  const cleanup = useCallback(() => {
-    clearTimeout(state.current.timer);
-    clearInterval(state.current.autoScroll);
-    state.current.active = false;
+  /** Writes every row's transform for the current in-flight order. */
+  const paint = useCallback(() => {
+    const s = state.current;
+    if (!s.active || !s.dragId) return;
+    const delta = s.pointerY - s.startY + s.scrolled;
+
+    s.baseIds.forEach((id, domIndex) => {
+      const el = rows.current.get(id);
+      if (!el) return;
+      if (id === s.dragId) {
+        el.style.transition = "none";
+        el.style.transform = `translateY(${delta}px) scale(1.03)`;
+        return;
+      }
+      const next = s.ids.indexOf(id);
+      const shift = (next - domIndex) * s.rowH;
+      el.style.transform = shift ? `translateY(${shift}px)` : "";
+    });
   }, []);
 
-  const finish = useCallback(() => {
-    if (state.current.active) {
-      haptics.tap();
-      onReorder(state.current.ids);
+  const stopLoop = useCallback(() => {
+    if (state.current.raf) cancelAnimationFrame(state.current.raf);
+    state.current.raf = 0;
+  }, []);
+
+  const loop = useCallback(() => {
+    const s = state.current;
+    if (!s.active) return;
+    if (s.scrollDir) {
+      const step = s.scrollDir * 12;
+      window.scrollBy({ top: step });
+      s.scrolled += step;
     }
+    // Order resolution from the current pointer position.
+    const delta = s.pointerY - s.startY + s.scrolled;
+    const from = s.baseIds.indexOf(s.dragId!);
+    const target = Math.max(
+      0,
+      Math.min(s.ids.length - 1, from + Math.round(delta / s.rowH)),
+    );
+    if (target !== s.index) {
+      const next = s.baseIds.filter((x) => x !== s.dragId);
+      next.splice(target, 0, s.dragId!);
+      s.index = target;
+      s.ids = next;
+      haptics.selection();
+    }
+    paint();
+    s.raf = requestAnimationFrame(loop);
+  }, [paint]);
+
+  const cleanup = useCallback(() => {
+    const s = state.current;
+    clearTimeout(s.timer);
+    stopLoop();
+    s.active = false;
+    s.scrollDir = 0;
+    s.scrolled = 0;
+    if (s.captured) {
+      try {
+        s.captured.el.releasePointerCapture(s.captured.pointerId);
+      } catch {
+        /* already released */
+      }
+      s.captured = null;
+    }
+    // Clear every imperative transform; React owns layout again.
+    rows.current.forEach((el) => {
+      el.style.transform = "";
+      el.style.transition = "";
+      el.style.touchAction = "pan-y";
+    });
+    s.dragId = null;
+  }, [stopLoop]);
+
+  const finish = useCallback(() => {
+    const s = state.current;
+    const committed = s.active ? s.ids.slice() : null;
     cleanup();
     setActiveId(null);
-    setDy(0);
+    if (committed) {
+      haptics.tap();
+      setOrder(committed);
+      onReorder(committed);
+    }
   }, [cleanup, onReorder]);
 
   const onLongPressStart = useCallback(
     (id: string, e: React.PointerEvent<HTMLDivElement>) => {
       const el = e.currentTarget;
-      const startY = e.clientY;
+      const pointerId = e.pointerId;
       const ids = list.map((t) => t.id);
-      const fromIndex = ids.indexOf(id);
-      const rowH = el.getBoundingClientRect().height + 6;
-      state.current = {
-        ...state.current,
-        startY,
-        rowH,
-        fromIndex,
-        index: fromIndex,
-        ids,
-        active: false,
-      };
+      const s = state.current;
+      s.startY = e.clientY;
+      s.pointerY = e.clientY;
+      s.scrolled = 0;
+      s.scrollDir = 0;
+      s.rowH = el.getBoundingClientRect().height + 6;
+      s.baseIds = ids;
+      s.ids = ids.slice();
+      s.index = ids.indexOf(id);
+      s.dragId = id;
+      s.active = false;
 
       const move = (ev: PointerEvent) => {
-        if (!state.current.active) {
-          if (Math.abs(ev.clientY - startY) > 8) {
-            clearTimeout(state.current.timer);
-            document.removeEventListener("pointermove", move);
-            document.removeEventListener("pointerup", up);
+        if (!s.active) {
+          // Movement before the long press wins → treat as a scroll, bail out.
+          if (Math.abs(ev.clientY - s.startY) > 8) {
+            clearTimeout(s.timer);
+            detach();
           }
           return;
         }
         ev.preventDefault();
-        const delta = ev.clientY - state.current.startY;
-        setDy(delta);
-        const target = Math.max(
-          0,
-          Math.min(
-            state.current.ids.length - 1,
-            state.current.fromIndex + Math.round(delta / state.current.rowH),
-          ),
-        );
-        if (target !== state.current.index) {
-          const next = state.current.ids.filter((x) => x !== id);
-          next.splice(target, 0, id);
-          state.current.index = target;
-          state.current.ids = next;
-          setOrder(next);
-          state.current.fromIndex = target;
-          state.current.startY = ev.clientY;
-          setDy(0);
-          haptics.selection();
-        }
-
-        // Edge auto-scroll
+        s.pointerY = ev.clientY;
         const edge = 90;
         const vh = window.innerHeight;
-        clearInterval(state.current.autoScroll);
-        if (ev.clientY < edge || ev.clientY > vh - edge) {
-          const dir = ev.clientY < edge ? -1 : 1;
-          state.current.autoScroll = setInterval(() => {
-            window.scrollBy({ top: dir * 12 });
-          }, 16);
-        }
+        s.scrollDir = ev.clientY < edge ? -1 : ev.clientY > vh - edge ? 1 : 0;
       };
       const up = () => {
-        document.removeEventListener("pointermove", move);
-        document.removeEventListener("pointerup", up);
+        detach();
         finish();
       };
+      const detach = () => {
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerup", up);
+        el.removeEventListener("pointercancel", up);
+      };
 
-      document.addEventListener("pointermove", move, { passive: false });
-      document.addEventListener("pointerup", up);
+      el.addEventListener("pointermove", move, { passive: false });
+      el.addEventListener("pointerup", up);
+      el.addEventListener("pointercancel", up);
 
-      state.current.timer = setTimeout(() => {
-        state.current.active = true;
-        setActiveId(id);
-        setOrder(ids);
+      s.timer = setTimeout(() => {
+        s.active = true;
+        // Own the gesture immediately — no render gap, no WebView steal.
+        el.style.touchAction = "none";
+        try {
+          el.setPointerCapture(pointerId);
+          s.captured = { el, pointerId };
+        } catch {
+          /* capture unsupported */
+        }
         haptics.longPress();
+        setActiveId(id);
+        paint();
+        s.raf = requestAnimationFrame(loop);
       }, 380);
     },
-    [finish, list],
+    [finish, list, loop, paint],
   );
 
   useEffect(() => cleanup, [cleanup]);
@@ -357,9 +427,9 @@ function DragList({
           key={t.id}
           tx={t}
           dragging={activeId === t.id}
-          offset={activeId === t.id ? dy : 0}
           onEdit={onEdit}
           onLongPressStart={onLongPressStart}
+          registerRow={registerRow}
         />
       ))}
     </div>

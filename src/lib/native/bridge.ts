@@ -50,7 +50,23 @@ type NativePlugin = {
   listScheduled(): Promise<{ scheduled: unknown[] }>;
   takePendingRoute(): Promise<{ route: string | null }>;
   setTheme?(o: { theme: string; background?: string }): Promise<{ ok: boolean }>;
+  saveFile?(o: {
+    filename: string;
+    mimeType: string;
+    text: string;
+  }): Promise<{ ok: boolean; location?: string; filename?: string }>;
+  shareFile?(o: {
+    filename: string;
+    mimeType: string;
+    text: string;
+  }): Promise<{ ok: boolean }>;
 };
+
+export type NativeFileResult =
+  | { status: "saved"; location?: string }
+  | { status: "shared" }
+  | { status: "unsupported" }
+  | { status: "error"; message: string };
 
 type CapacitorGlobal = {
   isNativePlatform?: () => boolean;
@@ -116,5 +132,39 @@ export async function nativeSetTheme(
     return true;
   } catch {
     return false;
+  }
+}
+
+type FilePayload = { filename: string; mimeType?: string; text: string };
+
+/** Writes a file into the device's Downloads folder through the native shell. */
+export async function nativeSaveFile(o: FilePayload): Promise<NativeFileResult> {
+  const bridge = nativeBridge();
+  if (!bridge?.saveFile) return { status: "unsupported" };
+  try {
+    const res = await bridge.saveFile({
+      filename: o.filename,
+      mimeType: o.mimeType ?? "application/json",
+      text: o.text,
+    });
+    return { status: "saved", location: res?.location };
+  } catch (error) {
+    return { status: "error", message: (error as Error)?.message ?? "Save failed" };
+  }
+}
+
+/** Hands a file to the Android system share sheet. */
+export async function nativeShareFile(o: FilePayload): Promise<NativeFileResult> {
+  const bridge = nativeBridge();
+  if (!bridge?.shareFile) return { status: "unsupported" };
+  try {
+    await bridge.shareFile({
+      filename: o.filename,
+      mimeType: o.mimeType ?? "application/json",
+      text: o.text,
+    });
+    return { status: "shared" };
+  } catch (error) {
+    return { status: "error", message: (error as Error)?.message ?? "Share failed" };
   }
 }

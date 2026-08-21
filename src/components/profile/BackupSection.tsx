@@ -40,6 +40,7 @@ import {
   type ValidBackup,
 } from "@/lib/backup";
 import { AppDataSchema, type AppData } from "@/lib/schema";
+import { nativeSaveFile, nativeShareFile } from "@/lib/native/bridge";
 
 type ResetIntent = "hard";
 
@@ -72,6 +73,8 @@ export function BackupSection({
 
   // Info state
   const [infoOpen, setInfoOpen] = useState(false);
+  const [includedOpen, setIncludedOpen] = useState(false);
+  const [busy, setBusy] = useState<"save" | "share" | null>(null);
 
   const snapshotData = (): AppData => {
     const raw = exportJSON();
@@ -107,7 +110,8 @@ export function BackupSection({
     }
   };
 
-  const saveCreated = () => {
+  /** Last-resort browser download. */
+  const anchorDownload = () => {
     if (!created) return;
     const blob = new Blob([created.text], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -120,9 +124,92 @@ export function BackupSection({
     URL.revokeObjectURL(url);
   };
 
-  const shareCreated = async () => {
-    if (!created) return;
+  const saveCreated = async () => {
+    if (!created || busy) return;
+    setBusy("save");
     try {
+      const native = await nativeSaveFile({
+        filename: created.filename,
+        mimeType: "application/json",
+        text: created.text,
+      });
+      if (native.status === "saved") {
+        haptics.success();
+        toast.success(
+          native.location
+            ? `Saved to ${native.location}`
+            : `Saved ${created.filename}`,
+        );
+        return;
+      }
+      if (native.status === "error") {
+        haptics.error();
+        toast.error(`Could not save backup: ${native.message}`);
+        return;
+      }
+
+      // Chromium desktop: real file picker.
+      const picker = (
+        window as unknown as {
+          showSaveFilePicker?: (o: unknown) => Promise<{
+            createWritable: () => Promise<{
+              write: (d: string) => Promise<void>;
+              close: () => Promise<void>;
+            }>;
+          }>;
+        }
+      ).showSaveFilePicker;
+      if (picker) {
+        try {
+          const handle = await picker({
+            suggestedName: created.filename,
+            types: [
+              {
+                description: "SkillSync backup",
+                accept: { "application/json": [".json"] },
+              },
+            ],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(created.text);
+          await writable.close();
+          haptics.success();
+          toast.success(`Saved ${created.filename}`);
+          return;
+        } catch (e: any) {
+          if (e?.name === "AbortError") {
+            toast("Save cancelled");
+            return;
+          }
+          haptics.error();
+          toast.error(e?.message ?? "Could not save backup");
+          return;
+        }
+      }
+
+      anchorDownload();
+      toast.success(`Downloaded ${created.filename}`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const shareCreated = async () => {
+    if (!created || busy) return;
+    setBusy("share");
+    try {
+      const native = await nativeShareFile({
+        filename: created.filename,
+        mimeType: "application/json",
+        text: created.text,
+      });
+      if (native.status === "shared") return;
+      if (native.status === "error") {
+        haptics.error();
+        toast.error(`Could not share backup: ${native.message}`);
+        return;
+      }
+
       const file = new File([created.text], created.filename, {
         type: "application/json",
       });
@@ -131,17 +218,26 @@ export function BackupSection({
         share?: (d: { files?: File[]; title?: string; text?: string }) => Promise<void>;
       };
       if (nav.share && nav.canShare?.({ files: [file] })) {
-        await nav.share({
-          files: [file],
-          title: "SkillSync backup",
-          text: `SkillSync backup · ${fmtDate(created.meta.createdAt)}`,
-        });
-      } else {
-        saveCreated();
-        toast("Sharing not supported. Backup downloaded instead.");
+        try {
+          await nav.share({
+            files: [file],
+            title: "SkillSync backup",
+            text: `SkillSync backup · ${fmtDate(created.meta.createdAt)}`,
+          });
+        } catch (e: any) {
+          if (e?.name === "AbortError") toast("Share cancelled");
+          else {
+            haptics.error();
+            toast.error(e?.message ?? "Could not share backup");
+          }
+        }
+        return;
       }
-    } catch {
-      /* user cancelled */
+
+      anchorDownload();
+      toast("Sharing isn't available here — the backup was downloaded instead.");
+    } finally {
+      setBusy(null);
     }
   };
 
@@ -186,6 +282,12 @@ export function BackupSection({
       setRestoring(false);
     }
   };
+
+  const includedData = useMemo(
+    () => (includedOpen ? snapshotData() : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [includedOpen],
+  );
 
   const summary = pendingRestore ? backupSummary(pendingRestore.data) : null;
   const createSummary = previewData ? backupSummary(previewData) : null;
@@ -245,8 +347,8 @@ export function BackupSection({
         <ActionCard
           icon={Package}
           label="What's included"
-          hint={`v${BACKUP_VERSION} · App v${APP_VERSION}`}
-          onClick={() => setInfoOpen(true)}
+          hint="Data & features"
+          onClick={() => setIncludedOpen(true)}
         />
       </div>
 
@@ -348,18 +450,30 @@ export function BackupSection({
             <div className="flex gap-2">
               <button
                 onClick={shareCreated}
-                className="flex-1 rounded-xl border border-white/[0.08] py-2.5 text-[13.5px] font-medium text-foreground active:scale-[0.97]"
+                disabled={busy !== null}
+                className="flex-1 rounded-xl border border-white/[0.08] py-2.5 text-[13.5px] font-medium text-foreground active:scale-[0.97] disabled:opacity-60"
               >
                 <span className="inline-flex items-center justify-center gap-2">
-                  <Share2 className="h-3.5 w-3.5" /> Share
+                  {busy === "share" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Share2 className="h-3.5 w-3.5" />
+                  )}
+                  {busy === "share" ? "Sharing…" : "Share"}
                 </span>
               </button>
               <button
                 onClick={saveCreated}
-                className="flex-1 rounded-xl gradient-primary py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97]"
+                disabled={busy !== null}
+                className="flex-1 rounded-xl gradient-primary py-2.5 text-[13.5px] font-medium text-white active:scale-[0.97] disabled:opacity-70"
               >
                 <span className="inline-flex items-center justify-center gap-2">
-                  <Save className="h-3.5 w-3.5" /> Save backup
+                  {busy === "save" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Save className="h-3.5 w-3.5" />
+                  )}
+                  {busy === "save" ? "Saving…" : "Save backup"}
                 </span>
               </button>
             </div>
@@ -546,10 +660,76 @@ export function BackupSection({
           </div>
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
             <div className="text-[13px] font-semibold tracking-tight">
+              Restoring
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              A restore fully replaces the workspace on this device with the
+              contents of the file — it is not merged.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
+              Limitations
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Backups are plain JSON files stored on this device. There is no
+              cloud sync — keep the file somewhere safe yourself.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
               App version
             </div>
             <p className="mt-1 text-[12.5px] text-muted-foreground">
               SkillSync v{APP_VERSION} · Backup format v{BACKUP_VERSION}
+            </p>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* What's included sheet */}
+      <BottomSheet
+        open={includedOpen}
+        onClose={() => setIncludedOpen(false)}
+        title="What's included"
+      >
+        <div className="space-y-4">
+          <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+            A backup contains everything SkillSync stores on this device. These
+            are the live counts from your current workspace — restoring this
+            backup brings all of it back exactly as it is now.
+          </p>
+          {includedData ? (
+            <div className="space-y-1.5">
+              {moduleList(includedData).map((m) => (
+                <div
+                  key={m.key}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-2.5"
+                >
+                  <span className="text-[12.5px] text-foreground">{m.label}</span>
+                  <span className="text-[12.5px] font-semibold tabular-nums text-muted-foreground">
+                    {m.count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
+              Roadmap detail
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Every roadmap is saved in full — its phases, topics, subtopics and
+              checklist items, including what you've already completed.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5">
+            <div className="text-[13px] font-semibold tracking-tight">
+              Not included
+            </div>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Nothing outside SkillSync's own local data — no device settings,
+              no files from other apps, and no accounts.
             </p>
           </div>
         </div>

@@ -298,6 +298,100 @@ public class SkillSyncNativePlugin extends Plugin {
         call.resolve(ok(true));
     }
 
+    /* ----------------------------- files ----------------------------- */
+
+    /** Writes text into the public Downloads folder and returns the location. */
+    @PluginMethod
+    public void saveFile(PluginCall call) {
+        final String filename = safeName(call.getString("filename", "skillsync-backup.json"));
+        final String mimeType = call.getString("mimeType", "application/json");
+        final String text = call.getString("text", "");
+        try {
+            String location;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                android.content.ContentValues values = new android.content.ContentValues();
+                values.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, filename);
+                values.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, mimeType);
+                values.put(
+                    android.provider.MediaStore.MediaColumns.RELATIVE_PATH,
+                    android.os.Environment.DIRECTORY_DOWNLOADS
+                );
+                android.net.Uri uri = getContext()
+                    .getContentResolver()
+                    .insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                if (uri == null) {
+                    call.reject("Could not create the file");
+                    return;
+                }
+                java.io.OutputStream out = getContext().getContentResolver().openOutputStream(uri);
+                if (out == null) {
+                    call.reject("Could not open the file for writing");
+                    return;
+                }
+                out.write(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                out.flush();
+                out.close();
+                location = "Downloads/" + filename;
+            } else {
+                java.io.File dir = android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_DOWNLOADS
+                );
+                if (dir != null && !dir.exists()) dir.mkdirs();
+                java.io.File file = new java.io.File(dir, filename);
+                java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+                out.write(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                out.flush();
+                out.close();
+                location = file.getAbsolutePath();
+            }
+            JSObject result = ok(true);
+            result.put("location", location);
+            result.put("filename", filename);
+            call.resolve(result);
+        } catch (Exception error) {
+            call.reject(error.getMessage() == null ? "Save failed" : error.getMessage(), error);
+        }
+    }
+
+    /** Writes text into the app cache and opens the system share sheet. */
+    @PluginMethod
+    public void shareFile(PluginCall call) {
+        final String filename = safeName(call.getString("filename", "skillsync-backup.json"));
+        final String mimeType = call.getString("mimeType", "application/json");
+        final String text = call.getString("text", "");
+        try {
+            java.io.File dir = new java.io.File(getContext().getCacheDir(), "shared");
+            if (!dir.exists()) dir.mkdirs();
+            java.io.File file = new java.io.File(dir, filename);
+            java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+            out.write(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            out.flush();
+            out.close();
+
+            android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(
+                getContext(),
+                getContext().getPackageName() + ".fileprovider",
+                file
+            );
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_SEND);
+            intent.setType(mimeType);
+            intent.putExtra(android.content.Intent.EXTRA_STREAM, uri);
+            intent.putExtra(android.content.Intent.EXTRA_SUBJECT, filename);
+            intent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            android.content.Intent chooser = android.content.Intent.createChooser(intent, "Share backup");
+            chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(chooser);
+            call.resolve(ok(true));
+        } catch (Exception error) {
+            call.reject(error.getMessage() == null ? "Share failed" : error.getMessage(), error);
+        }
+    }
+
+    private String safeName(String name) {
+        String cleaned = name == null ? "" : name.replaceAll("[^A-Za-z0-9._-]", "_");
+        return cleaned.isEmpty() ? "skillsync-backup.json" : cleaned;
+    }
+
     private JSObject ok(boolean value) {
         JSObject result = new JSObject();
         result.put("ok", value);
